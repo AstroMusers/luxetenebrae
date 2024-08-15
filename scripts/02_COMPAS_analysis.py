@@ -141,7 +141,7 @@ for IMF in IMFs:
         A = semimajorAxisDC
         orbitalPeriodDC = (np.sqrt((4 * np.pi**2 * A**3)) / np.sqrt(G * M)) * 365.25
 
-        i = np.random.uniform(-90,90,len(seedsDC))
+        i = np.random.uniform(0,180,len(seedsDC))
 
 
 
@@ -164,7 +164,7 @@ for IMF in IMFs:
 
         maskDCsemaj = (semimajorAxisDC <= 3.0)
         maskDCorbper = (orbitalPeriodDC <= 30)
-        maskDCcosi = (np.cos(i) <= 2.228*(10**(-6)))
+        maskDCcosi = (np.abs(np.cos(i)) <= 2.22819667e-6)
         maskDCnegCE =  np.in1d(seedsDC, seedsCE, invert=True)
         maskDCposCE =  np.in1d(seedsDC, seedsCE)
 
