@@ -1,0 +1,71 @@
+ Run :150824_1755
+ Number of systems: 30600000
+ Number of systems forming DCO (via SP status): 1432413
+ Number of systems forming DCO (via DCO mass): 1432413
+ Number of primary mass BHs (SP): 2365317
+ Number of primary mass BHs (DC): 107362
+ Number of secondary mass BHs (SP): 587921
+ Number of secondary mass BHs (DC): 3210
+ Number of unbound binaries (SP): 4069230
+ Number of double compact objects (SP): 1432413
+ Number of mergers (SP): 9671711
+ Number of BH-NS binaries (DC): 107362
+ Number of NS-BH binaries (DC): 3210
+ Number of systems without any BHs (DC): 26771
+ Number of systems with semimajor axis < 3.0 AU (DC): 285596
+ Number of systems undergoing CE (DC): 100738
+ Number of systems not undergoing CE (DC): 1331675
+ Number of systems with semimajor axis < 3.0 AU AND undergoing CE (DC): 100257
+ Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (DC): 185339
+ Number of systems with orbital period < 30 days AND undergoing CE (DC): 95752
+ Number of systems with orbital period < 30 days AND NOT undergoing CE (DC): 98159
+ Number of systems with orbital inclination (cosi) <  2.228e-6 AND undergoing CE (DC): 1
+ Number of systems with orbital inclination (cosi) <  2.228e-6 AND NOT undergoing CE (DC): 1
+
+ Run :150824_2127
+ Number of systems: 30960000
+ Number of systems forming DCO (via SP status): 1449203
+ Number of systems forming DCO (via DCO mass): 1449203
+ Number of primary mass BHs (SP): 2393225
+ Number of primary mass BHs (DC): 108545
+ Number of secondary mass BHs (SP): 594754
+ Number of secondary mass BHs (DC): 3240
+ Number of unbound binaries (SP): 4117118
+ Number of double compact objects (SP): 1449203
+ Number of mergers (SP): 9785175
+ Number of BH-NS binaries (DC): 108545
+ Number of NS-BH binaries (DC): 3240
+ Number of systems without any BHs (DC): 27116
+ Number of systems with semimajor axis < 3.0 AU (DC): 288972
+ Number of systems undergoing CE (DC): 101853
+ Number of systems not undergoing CE (DC): 1347350
+ Number of systems with semimajor axis < 3.0 AU AND undergoing CE (DC): 101366
+ Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (DC): 187606
+ Number of systems with orbital period < 30 days AND undergoing CE (DC): 96803
+ Number of systems with orbital period < 30 days AND NOT undergoing CE (DC): 99332
+ Number of systems with orbital inclination (cosi) <  2.228e-6 AND undergoing CE (DC): 0
+ Number of systems with orbital inclination (cosi) <  2.228e-6 AND NOT undergoing CE (DC): 4
+
+ Run :150824_2129
+ Number of systems: 30960000
+ Number of systems forming DCO (via SP status): 1449203
+ Number of systems forming DCO (via DCO mass): 1449203
+ Number of primary mass BHs (SP): 2393225
+ Number of primary mass BHs (DC): 108545
+ Number of secondary mass BHs (SP): 594754
+ Number of secondary mass BHs (DC): 3240
+ Number of unbound binaries (SP): 4117118
+ Number of double compact objects (SP): 1449203
+ Number of mergers (SP): 9785175
+ Number of BH-NS binaries (DC): 108545
+ Number of NS-BH binaries (DC): 3240
+ Number of systems without any BHs (DC): 27116
+ Number of systems with semimajor axis < 3.0 AU (DC): 288972
+ Number of systems undergoing CE (DC): 101853
+ Number of systems not undergoing CE (DC): 1347350
+ Number of systems with semimajor axis < 3.0 AU AND undergoing CE (DC): 101366
+ Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (DC): 187606
+ Number of systems with orbital period < 30 days AND undergoing CE (DC): 96803
+ Number of systems with orbital period < 30 days AND NOT undergoing CE (DC): 99332
+ Number of systems with orbital inclination (cosi) <  2.228e-6 AND undergoing CE (DC): 0
+ Number of systems with orbital inclination (cosi) <  2.228e-6 AND NOT undergoing CE (DC): 0
