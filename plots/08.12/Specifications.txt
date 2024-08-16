@@ -1,0 +1,2 @@
+Systems choosen for semimajor axis < 3.0 AU
+Only the occurence rates, searchability is not considered.
