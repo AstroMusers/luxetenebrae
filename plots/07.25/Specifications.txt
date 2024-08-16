@@ -1,1 +1,2 @@
-
+Systems choosen for semimahor axis < 3.0 [AU]
+Only the occurance rates, searchability is not considered.
