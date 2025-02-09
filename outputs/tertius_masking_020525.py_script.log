@@ -1,0 +1,340 @@
+2025-02-08 21:39:30,957 - INFO - Start time :
+2025-02-08 21:39:30,957 - INFO - 080225_2139
+2025-02-08 21:39:30,957 - INFO - ['/data/a.saricaoglu/repo/COMPAS/compas-analysis', '/grad/a.saricaoglu/.conda/envs/compas/lib/python312.zip', '/grad/a.saricaoglu/.conda/envs/compas/lib/python3.12', '/grad/a.saricaoglu/.conda/envs/compas/lib/python3.12/lib-dynload', '/grad/a.saricaoglu/.conda/envs/compas/lib/python3.12/site-packages', '/data/a.saricaoglu/repo/COMPAS/postProcessing/PythonScripts']
+2025-02-08 21:39:30,957 - INFO - GROUP/FOLDER: Default/
+2025-02-08 21:39:30,971 - INFO - Filename: /data/a.saricaoglu/repo/COMPAS/Files/Default/02.07/secundus.fits
+2025-02-08 21:39:30,971 - INFO - No.    Name      Ver    Type      Cards   Dimensions   Format
+2025-02-08 21:39:30,971 - INFO -   0  PRIMARY       1 PrimaryHDU       4   ()
+2025-02-08 21:39:30,971 - INFO -   1                1 BinTableHDU     27   1000000R x 9C   [K, J, J, J, J, D, D, D, J]
+2025-02-08 21:39:30,971 - INFO -   2                1 BinTableHDU     50   2790409R x 20C   [K, J, J, J, J, D, D, D, D, D, D, J, B, D, D, D, D, D, D, B]
+2025-02-08 21:39:30,971 - INFO -   3                1 BinTableHDU     34   491297R x 12C   [K, J, J, J, J, J, D, D, D, D, D, D]
+2025-02-08 21:39:32,635 - ERROR - /data/a.saricaoglu/repo/COMPAS/compas-analysis/calculations.py:88: RuntimeWarning: invalid value encountered in sqrt
+2025-02-08 21:39:32,635 - ERROR -   orbitalPeriod = (np.sqrt((4 * np.pi**2 * A**3)) / np.sqrt(G * M)) * 365.25
+2025-02-08 21:39:32,648 - INFO - (2790409,)
+2025-02-08 21:39:32,778 - INFO - (2790409,)
+2025-02-08 21:39:32,821 - INFO - [False False False ... False False False]
+2025-02-08 21:39:32,821 - INFO - (2790409,)
+2025-02-08 21:39:33,873 - INFO - Run : 080225_2139
+2025-02-08 21:39:33,874 - INFO - Number of systems: 1000000
+2025-02-08 21:39:33,874 - INFO - Number of systems forming MT (via SP STATUS): 586565
+2025-02-08 21:39:33,898 - INFO - Number of systems forming MT (via MT mass): 2790409
+2025-02-08 21:39:33,899 - INFO - Number of primary mass BHs (SP):  76768
+2025-02-08 21:39:33,900 - INFO - Number of primary mass BHs (MT): 93519
+2025-02-08 21:39:33,901 - INFO - Number of secondary mass BHs (SP): 17549
+2025-02-08 21:39:33,902 - INFO - Number of secondary mass BHs (MT): 54
+2025-02-08 21:39:33,902 - INFO - Number of unbound binaries (SP): 271537
+2025-02-08 21:39:33,903 - INFO - Number of double compact objects (SP): 19
+2025-02-08 21:39:33,903 - INFO - Number of mergers (SP): 0
+2025-02-08 21:39:33,904 - INFO - Number of BH-NS binaries (pre MT): 0
+2025-02-08 21:39:33,906 - INFO - Number of NS-BH binaries (pre MT): 0
+2025-02-08 21:39:33,907 - INFO - Number of systems without any BHs (pre MT):  2696836
+2025-02-08 21:39:33,908 - INFO - Number of systems with semimajor axis < 3.0 AU (pre MT):  126740
+2025-02-08 21:39:33,909 - INFO - Number of systems undergoing CE (pre MT):  451174
+2025-02-08 21:39:33,910 - INFO - Number of systems not undergoing CE (pre MT):  2339235
+2025-02-08 21:39:33,912 - INFO - Number of systems with semimajor axis < 3.0 AU AND undergoing CE (pre MT):  0
+2025-02-08 21:39:33,914 - INFO - Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (pre MT):  126740
+2025-02-08 21:39:33,915 - INFO - Number of systems with orbital period < 70 days AND undergoing CE (pre MT):  0
+2025-02-08 21:39:33,917 - INFO - Number of systems with orbital period < 70 days AND NOT undergoing CE (pre MT):  1136
+2025-02-08 21:39:33,918 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND undergoing CE (pre MT):  1037
+2025-02-08 21:39:33,920 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND NOT undergoing CE (pre MT):  4109
+2025-02-08 21:39:33,921 - INFO - Number of BH-NS binaries (pst MT):  139
+2025-02-08 21:39:33,922 - INFO - Number of NS-BH binaries (pst MT):  10
+2025-02-08 21:39:33,924 - INFO - Number of systems without any BHs (pst MT):  2695042
+2025-02-08 21:39:33,925 - INFO - Number of systems with semimajor axis < 3.0 AU (pst MT):  283151
+2025-02-08 21:39:33,926 - INFO - Number of systems undergoing CE (pst MT):  451174
+2025-02-08 21:39:33,927 - INFO - Number of systems not undergoing CE (pst MT):  2339235
+2025-02-08 21:39:33,929 - INFO - Number of systems with semimajor axis < 3.0 AU AND undergoing CE (pst MT):  155627
+2025-02-08 21:39:33,930 - INFO - Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (pst MT):  127524
+2025-02-08 21:39:33,932 - INFO - Number of systems with orbital period < 70 days AND undergoing CE (pst MT):  58508
+2025-02-08 21:39:33,933 - INFO - Number of systems with orbital period < 70 days AND NOT undergoing CE (pst MT):  744
+2025-02-08 21:39:33,935 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND undergoing CE (pst MT):  71631
+2025-02-08 21:39:33,936 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND NOT undergoing CE (pst MT):  3085
+2025-02-08 21:39:33,938 - INFO - Total MT events:  57491152
+2025-02-08 21:39:33,965 - INFO - Number of primary HeWD (pre MT) :  19
+2025-02-08 21:39:33,992 - INFO - Number of primary COWD (pre MT) :  170072
+2025-02-08 21:39:34,018 - INFO - Number of primary ONeWD (pre MT) :  15743
+2025-02-08 21:39:34,044 - INFO - Number of primary HeWD (pst MT) :  38
+2025-02-08 21:39:34,071 - INFO - Number of primary COWD (pst MT) :  325688
+2025-02-08 21:39:34,096 - INFO - Number of primary ONeWD (pst MT) :  44387
+2025-02-08 21:39:34,122 - INFO - Number of secondary HeWD (pre MT) :  0
+2025-02-08 21:39:34,148 - INFO - Number of secondary COWD (pre MT) :  1951
+2025-02-08 21:39:34,174 - INFO - Number of secondary ONeWD (pre MT) :  10
+2025-02-08 21:39:34,199 - INFO - Number of secondary HeWD (pst MT) :  15309
+2025-02-08 21:39:34,226 - INFO - Number of secondary COWD (pst MT) :  51842
+2025-02-08 21:39:34,252 - INFO - Number of secondary ONeWD (pst MT) :  4980
+2025-02-08 21:39:34,253 - INFO - Number of BH-MS binaries (pre MT): 49167
+2025-02-08 21:39:34,254 - INFO - Number of MS-BH binaries (pre MT): 0
+2025-02-08 21:39:34,255 - INFO - Number of BH-MS binaries (pst MT):  50682
+2025-02-08 21:39:34,256 - INFO - Number of MS-BH binaries (pst MT):  0
+2025-02-08 21:39:34,258 - INFO - Number of BH-MS binaries (pst last MT):  1030
+2025-02-08 21:39:34,260 - INFO - Number of MS-BH binaries (pst last MT):  0
+2025-02-08 21:39:34,261 - INFO - Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pre MT):  0
+2025-02-08 21:39:34,263 - INFO - Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pre MT):  0
+2025-02-08 21:39:34,264 - INFO - Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pst MT):  13
+2025-02-08 21:39:34,266 - INFO - Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pst MT):  0
+2025-02-08 21:39:34,268 - INFO - Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pst last MT):  13
+2025-02-08 21:39:34,269 - INFO - Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pst last MT):  0
+2025-02-08 21:39:34,271 - INFO - Number of systems with orbital period < 70 days BH-MS binaries (pre MT):  0
+2025-02-08 21:39:34,272 - INFO - Number of systems with orbital period < 70 days MS-BH binaries (pre MT):  0
+2025-02-08 21:39:34,274 - INFO - Number of systems with orbital period < 70 days BH-MS binaries (pst MT):  4
+2025-02-08 21:39:34,276 - INFO - Number of systems with orbital period < 70 days MS-BH binaries (pst MT):  0
+2025-02-08 21:39:34,277 - INFO - Number of systems with orbital period < 70 days BH-MS binaries (pst last MT):  4
+2025-02-08 21:39:34,279 - INFO - Number of systems with orbital period < 70 days MS-BH binaries (pst last MT):  0
+2025-02-08 21:39:34,281 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pre MT):  67
+2025-02-08 21:39:34,282 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pre MT):  0
+2025-02-08 21:39:34,284 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pst MT):  68
+2025-02-08 21:39:34,285 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pst MT):  0
+2025-02-08 21:39:34,287 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pst last MT):  4
+2025-02-08 21:39:34,289 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pst last MT):  0
+2025-02-08 21:39:38,356 - INFO - GROUP/FOLDER: Limited/
+2025-02-08 21:39:38,379 - INFO - Filename: /data/a.saricaoglu/repo/COMPAS/Files/Limited/02.07/secundus.fits
+2025-02-08 21:39:38,379 - INFO - No.    Name      Ver    Type      Cards   Dimensions   Format
+2025-02-08 21:39:38,379 - INFO -   0  PRIMARY       1 PrimaryHDU       4   ()
+2025-02-08 21:39:38,379 - INFO -   1                1 BinTableHDU     27   1000000R x 9C   [K, J, J, J, J, D, D, D, J]
+2025-02-08 21:39:38,379 - INFO -   2                1 BinTableHDU     50   4895281R x 20C   [K, J, J, J, J, D, D, D, D, D, D, J, B, D, D, D, D, D, D, B]
+2025-02-08 21:39:38,379 - INFO -   3                1 BinTableHDU     34   860467R x 12C   [K, J, J, J, J, J, D, D, D, D, D, D]
+2025-02-08 21:39:41,252 - INFO - (4895281,)
+2025-02-08 21:39:41,456 - INFO - (4895281,)
+2025-02-08 21:39:41,527 - INFO - [False False False ... False False False]
+2025-02-08 21:39:41,527 - INFO - (4895281,)
+2025-02-08 21:39:43,290 - INFO - Run : 080225_2139
+2025-02-08 21:39:43,290 - INFO - Number of systems: 1000000
+2025-02-08 21:39:43,291 - INFO - Number of systems forming MT (via SP STATUS): 975448
+2025-02-08 21:39:43,333 - INFO - Number of systems forming MT (via MT mass): 4895281
+2025-02-08 21:39:43,333 - INFO - Number of primary mass BHs (SP):  38681
+2025-02-08 21:39:43,336 - INFO - Number of primary mass BHs (MT): 156444
+2025-02-08 21:39:43,336 - INFO - Number of secondary mass BHs (SP): 26496
+2025-02-08 21:39:43,338 - INFO - Number of secondary mass BHs (MT): 121
+2025-02-08 21:39:43,339 - INFO - Number of unbound binaries (SP): 248370
+2025-02-08 21:39:43,339 - INFO - Number of double compact objects (SP): 48
+2025-02-08 21:39:43,339 - INFO - Number of mergers (SP): 0
+2025-02-08 21:39:43,341 - INFO - Number of BH-NS binaries (pre MT): 0
+2025-02-08 21:39:43,344 - INFO - Number of NS-BH binaries (pre MT): 0
+2025-02-08 21:39:43,346 - INFO - Number of systems without any BHs (pre MT):  4738716
+2025-02-08 21:39:43,348 - INFO - Number of systems with semimajor axis < 3.0 AU (pre MT):  219298
+2025-02-08 21:39:43,350 - INFO - Number of systems undergoing CE (pre MT):  793043
+2025-02-08 21:39:43,352 - INFO - Number of systems not undergoing CE (pre MT):  4102238
+2025-02-08 21:39:43,355 - INFO - Number of systems with semimajor axis < 3.0 AU AND undergoing CE (pre MT):  0
+2025-02-08 21:39:43,357 - INFO - Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (pre MT):  219298
+2025-02-08 21:39:43,360 - INFO - Number of systems with orbital period < 70 days AND undergoing CE (pre MT):  0
+2025-02-08 21:39:43,363 - INFO - Number of systems with orbital period < 70 days AND NOT undergoing CE (pre MT):  2133
+2025-02-08 21:39:43,366 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND undergoing CE (pre MT):  1758
+2025-02-08 21:39:43,368 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND NOT undergoing CE (pre MT):  7288
+2025-02-08 21:39:43,370 - INFO - Number of BH-NS binaries (pst MT):  168
+2025-02-08 21:39:43,372 - INFO - Number of NS-BH binaries (pst MT):  13
+2025-02-08 21:39:43,374 - INFO - Number of systems without any BHs (pst MT):  4737450
+2025-02-08 21:39:43,376 - INFO - Number of systems with semimajor axis < 3.0 AU (pst MT):  497020
+2025-02-08 21:39:43,378 - INFO - Number of systems undergoing CE (pst MT):  793043
+2025-02-08 21:39:43,381 - INFO - Number of systems not undergoing CE (pst MT):  4102238
+2025-02-08 21:39:43,383 - INFO - Number of systems with semimajor axis < 3.0 AU AND undergoing CE (pst MT):  276304
+2025-02-08 21:39:43,386 - INFO - Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (pst MT):  220716
+2025-02-08 21:39:43,389 - INFO - Number of systems with orbital period < 70 days AND undergoing CE (pst MT):  103916
+2025-02-08 21:39:43,391 - INFO - Number of systems with orbital period < 70 days AND NOT undergoing CE (pst MT):  1324
+2025-02-08 21:39:43,394 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND undergoing CE (pst MT):  127279
+2025-02-08 21:39:43,397 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND NOT undergoing CE (pst MT):  5719
+2025-02-08 21:39:43,401 - INFO - Total MT events:  101872733
+2025-02-08 21:39:43,448 - INFO - Number of primary HeWD (pre MT) :  27
+2025-02-08 21:39:43,495 - INFO - Number of primary COWD (pre MT) :  303031
+2025-02-08 21:39:43,542 - INFO - Number of primary ONeWD (pre MT) :  23627
+2025-02-08 21:39:43,589 - INFO - Number of primary HeWD (pst MT) :  54
+2025-02-08 21:39:43,635 - INFO - Number of primary COWD (pst MT) :  547346
+2025-02-08 21:39:43,681 - INFO - Number of primary ONeWD (pst MT) :  49049
+2025-02-08 21:39:43,728 - INFO - Number of secondary HeWD (pre MT) :  0
+2025-02-08 21:39:43,774 - INFO - Number of secondary COWD (pre MT) :  3370
+2025-02-08 21:39:43,820 - INFO - Number of secondary ONeWD (pre MT) :  16
+2025-02-08 21:39:43,866 - INFO - Number of secondary HeWD (pst MT) :  27098
+2025-02-08 21:39:43,912 - INFO - Number of secondary COWD (pst MT) :  86479
+2025-02-08 21:39:43,957 - INFO - Number of secondary ONeWD (pst MT) :  7559
+2025-02-08 21:39:43,959 - INFO - Number of BH-MS binaries (pre MT): 81934
+2025-02-08 21:39:43,961 - INFO - Number of MS-BH binaries (pre MT): 0
+2025-02-08 21:39:43,963 - INFO - Number of BH-MS binaries (pst MT):  82962
+2025-02-08 21:39:43,966 - INFO - Number of MS-BH binaries (pst MT):  0
+2025-02-08 21:39:43,968 - INFO - Number of BH-MS binaries (pst last MT):  428
+2025-02-08 21:39:43,971 - INFO - Number of MS-BH binaries (pst last MT):  0
+2025-02-08 21:39:43,974 - INFO - Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pre MT):  0
+2025-02-08 21:39:43,977 - INFO - Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pre MT):  0
+2025-02-08 21:39:43,979 - INFO - Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pst MT):  19
+2025-02-08 21:39:43,982 - INFO - Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pst MT):  0
+2025-02-08 21:39:43,985 - INFO - Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pst last MT):  19
+2025-02-08 21:39:43,988 - INFO - Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pst last MT):  0
+2025-02-08 21:39:43,991 - INFO - Number of systems with orbital period < 70 days BH-MS binaries (pre MT):  0
+2025-02-08 21:39:43,993 - INFO - Number of systems with orbital period < 70 days MS-BH binaries (pre MT):  0
+2025-02-08 21:39:43,996 - INFO - Number of systems with orbital period < 70 days BH-MS binaries (pst MT):  2
+2025-02-08 21:39:43,999 - INFO - Number of systems with orbital period < 70 days MS-BH binaries (pst MT):  0
+2025-02-08 21:39:44,002 - INFO - Number of systems with orbital period < 70 days BH-MS binaries (pst last MT):  2
+2025-02-08 21:39:44,005 - INFO - Number of systems with orbital period < 70 days MS-BH binaries (pst last MT):  0
+2025-02-08 21:39:44,007 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pre MT):  132
+2025-02-08 21:39:44,010 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pre MT):  0
+2025-02-08 21:39:44,013 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pst MT):  133
+2025-02-08 21:39:44,015 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pst MT):  0
+2025-02-08 21:39:44,018 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pst last MT):  5
+2025-02-08 21:39:44,021 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pst last MT):  0
+2025-02-08 21:39:51,284 - INFO - GROUP/FOLDER: Default_WD_Enabled/
+2025-02-08 21:39:51,296 - INFO - Filename: /data/a.saricaoglu/repo/COMPAS/Files/Default_WD_Enabled/02.07/secundus.fits
+2025-02-08 21:39:51,296 - INFO - No.    Name      Ver    Type      Cards   Dimensions   Format
+2025-02-08 21:39:51,296 - INFO -   0  PRIMARY       1 PrimaryHDU       4   ()
+2025-02-08 21:39:51,296 - INFO -   1                1 BinTableHDU     27   1000000R x 9C   [K, J, J, J, J, D, D, D, J]
+2025-02-08 21:39:51,296 - INFO -   2                1 BinTableHDU     50   2786949R x 20C   [K, J, J, J, J, D, D, D, D, D, D, J, B, D, D, D, D, D, D, B]
+2025-02-08 21:39:51,296 - INFO -   3                1 BinTableHDU     34   491688R x 12C   [K, J, J, J, J, J, D, D, D, D, D, D]
+2025-02-08 21:39:52,973 - INFO - (2786949,)
+2025-02-08 21:39:53,107 - INFO - (2786949,)
+2025-02-08 21:39:53,150 - INFO - [False False False ... False False False]
+2025-02-08 21:39:53,150 - INFO - (2786949,)
+2025-02-08 21:39:54,192 - INFO - Run : 080225_2139
+2025-02-08 21:39:54,192 - INFO - Number of systems: 1000000
+2025-02-08 21:39:54,193 - INFO - Number of systems forming MT (via SP STATUS): 586975
+2025-02-08 21:39:54,217 - INFO - Number of systems forming MT (via MT mass): 2786949
+2025-02-08 21:39:54,218 - INFO - Number of primary mass BHs (SP):  76712
+2025-02-08 21:39:54,219 - INFO - Number of primary mass BHs (MT): 92288
+2025-02-08 21:39:54,219 - INFO - Number of secondary mass BHs (SP): 17571
+2025-02-08 21:39:54,220 - INFO - Number of secondary mass BHs (MT): 57
+2025-02-08 21:39:54,221 - INFO - Number of unbound binaries (SP): 64366
+2025-02-08 21:39:54,221 - INFO - Number of double compact objects (SP): 25
+2025-02-08 21:39:54,222 - INFO - Number of mergers (SP): 0
+2025-02-08 21:39:54,223 - INFO - Number of BH-NS binaries (pre MT): 0
+2025-02-08 21:39:54,224 - INFO - Number of NS-BH binaries (pre MT): 0
+2025-02-08 21:39:54,225 - INFO - Number of systems without any BHs (pre MT):  2694604
+2025-02-08 21:39:54,226 - INFO - Number of systems with semimajor axis < 3.0 AU (pre MT):  127142
+2025-02-08 21:39:54,228 - INFO - Number of systems undergoing CE (pre MT):  451497
+2025-02-08 21:39:54,229 - INFO - Number of systems not undergoing CE (pre MT):  2335452
+2025-02-08 21:39:54,230 - INFO - Number of systems with semimajor axis < 3.0 AU AND undergoing CE (pre MT):  0
+2025-02-08 21:39:54,232 - INFO - Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (pre MT):  127142
+2025-02-08 21:39:54,233 - INFO - Number of systems with orbital period < 70 days AND undergoing CE (pre MT):  0
+2025-02-08 21:39:54,235 - INFO - Number of systems with orbital period < 70 days AND NOT undergoing CE (pre MT):  1199
+2025-02-08 21:39:54,236 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND undergoing CE (pre MT):  991
+2025-02-08 21:39:54,238 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND NOT undergoing CE (pre MT):  4125
+2025-02-08 21:39:54,239 - INFO - Number of BH-NS binaries (pst MT):  137
+2025-02-08 21:39:54,240 - INFO - Number of NS-BH binaries (pst MT):  6
+2025-02-08 21:39:54,241 - INFO - Number of systems without any BHs (pst MT):  2692860
+2025-02-08 21:39:54,243 - INFO - Number of systems with semimajor axis < 3.0 AU (pst MT):  283384
+2025-02-08 21:39:54,244 - INFO - Number of systems undergoing CE (pst MT):  451497
+2025-02-08 21:39:54,245 - INFO - Number of systems not undergoing CE (pst MT):  2335452
+2025-02-08 21:39:54,247 - INFO - Number of systems with semimajor axis < 3.0 AU AND undergoing CE (pst MT):  155463
+2025-02-08 21:39:54,248 - INFO - Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (pst MT):  127921
+2025-02-08 21:39:54,250 - INFO - Number of systems with orbital period < 70 days AND undergoing CE (pst MT):  58487
+2025-02-08 21:39:54,251 - INFO - Number of systems with orbital period < 70 days AND NOT undergoing CE (pst MT):  797
+2025-02-08 21:39:54,253 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND undergoing CE (pst MT):  71905
+2025-02-08 21:39:54,254 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND NOT undergoing CE (pst MT):  3142
+2025-02-08 21:39:54,256 - INFO - Total MT events:  57315577
+2025-02-08 21:39:54,283 - INFO - Number of primary HeWD (pre MT) :  19
+2025-02-08 21:39:54,309 - INFO - Number of primary COWD (pre MT) :  170283
+2025-02-08 21:39:54,335 - INFO - Number of primary ONeWD (pre MT) :  15819
+2025-02-08 21:39:54,362 - INFO - Number of primary HeWD (pst MT) :  38
+2025-02-08 21:39:54,387 - INFO - Number of primary COWD (pst MT) :  325836
+2025-02-08 21:39:54,413 - INFO - Number of primary ONeWD (pst MT) :  44438
+2025-02-08 21:39:54,439 - INFO - Number of secondary HeWD (pre MT) :  0
+2025-02-08 21:39:54,465 - INFO - Number of secondary COWD (pre MT) :  1948
+2025-02-08 21:39:54,490 - INFO - Number of secondary ONeWD (pre MT) :  9
+2025-02-08 21:39:54,516 - INFO - Number of secondary HeWD (pst MT) :  15246
+2025-02-08 21:39:54,541 - INFO - Number of secondary COWD (pst MT) :  51726
+2025-02-08 21:39:54,566 - INFO - Number of secondary ONeWD (pst MT) :  4977
+2025-02-08 21:39:54,568 - INFO - Number of BH-MS binaries (pre MT): 47902
+2025-02-08 21:39:54,569 - INFO - Number of MS-BH binaries (pre MT): 0
+2025-02-08 21:39:54,570 - INFO - Number of BH-MS binaries (pst MT):  49360
+2025-02-08 21:39:54,571 - INFO - Number of MS-BH binaries (pst MT):  0
+2025-02-08 21:39:54,573 - INFO - Number of BH-MS binaries (pst last MT):  990
+2025-02-08 21:39:54,574 - INFO - Number of MS-BH binaries (pst last MT):  0
+2025-02-08 21:39:54,576 - INFO - Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pre MT):  0
+2025-02-08 21:39:54,577 - INFO - Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pre MT):  0
+2025-02-08 21:39:54,579 - INFO - Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pst MT):  15
+2025-02-08 21:39:54,581 - INFO - Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pst MT):  0
+2025-02-08 21:39:54,582 - INFO - Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pst last MT):  15
+2025-02-08 21:39:54,584 - INFO - Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pst last MT):  0
+2025-02-08 21:39:54,585 - INFO - Number of systems with orbital period < 70 days BH-MS binaries (pre MT):  0
+2025-02-08 21:39:54,587 - INFO - Number of systems with orbital period < 70 days MS-BH binaries (pre MT):  0
+2025-02-08 21:39:54,589 - INFO - Number of systems with orbital period < 70 days BH-MS binaries (pst MT):  4
+2025-02-08 21:39:54,590 - INFO - Number of systems with orbital period < 70 days MS-BH binaries (pst MT):  0
+2025-02-08 21:39:54,592 - INFO - Number of systems with orbital period < 70 days BH-MS binaries (pst last MT):  4
+2025-02-08 21:39:54,593 - INFO - Number of systems with orbital period < 70 days MS-BH binaries (pst last MT):  0
+2025-02-08 21:39:54,595 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pre MT):  73
+2025-02-08 21:39:54,597 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pre MT):  0
+2025-02-08 21:39:54,598 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pst MT):  74
+2025-02-08 21:39:54,600 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pst MT):  0
+2025-02-08 21:39:54,601 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pst last MT):  1
+2025-02-08 21:39:54,603 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pst last MT):  0
+2025-02-08 21:39:58,655 - INFO - GROUP/FOLDER: Limited_WD_Enabled/
+2025-02-08 21:39:58,677 - INFO - Filename: /data/a.saricaoglu/repo/COMPAS/Files/Limited_WD_Enabled/02.07/secundus.fits
+2025-02-08 21:39:58,677 - INFO - No.    Name      Ver    Type      Cards   Dimensions   Format
+2025-02-08 21:39:58,677 - INFO -   0  PRIMARY       1 PrimaryHDU       4   ()
+2025-02-08 21:39:58,677 - INFO -   1                1 BinTableHDU     27   1000000R x 9C   [K, J, J, J, J, D, D, D, J]
+2025-02-08 21:39:58,677 - INFO -   2                1 BinTableHDU     50   4896233R x 20C   [K, J, J, J, J, D, D, D, D, D, D, J, B, D, D, D, D, D, D, B]
+2025-02-08 21:39:58,677 - INFO -   3                1 BinTableHDU     34   860339R x 12C   [K, J, J, J, J, J, D, D, D, D, D, D]
+2025-02-08 21:40:01,538 - INFO - (4896233,)
+2025-02-08 21:40:01,740 - INFO - (4896233,)
+2025-02-08 21:40:01,809 - INFO - [False False False ... False False False]
+2025-02-08 21:40:01,809 - INFO - (4896233,)
+2025-02-08 21:40:03,577 - INFO - Run : 080225_2139
+2025-02-08 21:40:03,577 - INFO - Number of systems: 1000000
+2025-02-08 21:40:03,578 - INFO - Number of systems forming MT (via SP STATUS): 975521
+2025-02-08 21:40:03,622 - INFO - Number of systems forming MT (via MT mass): 4896233
+2025-02-08 21:40:03,622 - INFO - Number of primary mass BHs (SP):  38620
+2025-02-08 21:40:03,624 - INFO - Number of primary mass BHs (MT): 158665
+2025-02-08 21:40:03,625 - INFO - Number of secondary mass BHs (SP): 26494
+2025-02-08 21:40:03,627 - INFO - Number of secondary mass BHs (MT): 118
+2025-02-08 21:40:03,628 - INFO - Number of unbound binaries (SP): 60526
+2025-02-08 21:40:03,628 - INFO - Number of double compact objects (SP): 49
+2025-02-08 21:40:03,629 - INFO - Number of mergers (SP): 0
+2025-02-08 21:40:03,631 - INFO - Number of BH-NS binaries (pre MT): 0
+2025-02-08 21:40:03,633 - INFO - Number of NS-BH binaries (pre MT): 0
+2025-02-08 21:40:03,635 - INFO - Number of systems without any BHs (pre MT):  4737450
+2025-02-08 21:40:03,637 - INFO - Number of systems with semimajor axis < 3.0 AU (pre MT):  214579
+2025-02-08 21:40:03,640 - INFO - Number of systems undergoing CE (pre MT):  792900
+2025-02-08 21:40:03,642 - INFO - Number of systems not undergoing CE (pre MT):  4103333
+2025-02-08 21:40:03,645 - INFO - Number of systems with semimajor axis < 3.0 AU AND undergoing CE (pre MT):  0
+2025-02-08 21:40:03,647 - INFO - Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (pre MT):  214579
+2025-02-08 21:40:03,650 - INFO - Number of systems with orbital period < 70 days AND undergoing CE (pre MT):  0
+2025-02-08 21:40:03,653 - INFO - Number of systems with orbital period < 70 days AND NOT undergoing CE (pre MT):  2074
+2025-02-08 21:40:03,655 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND undergoing CE (pre MT):  1747
+2025-02-08 21:40:03,658 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND NOT undergoing CE (pre MT):  7310
+2025-02-08 21:40:03,660 - INFO - Number of BH-NS binaries (pst MT):  177
+2025-02-08 21:40:03,662 - INFO - Number of NS-BH binaries (pst MT):  12
+2025-02-08 21:40:03,664 - INFO - Number of systems without any BHs (pst MT):  4736177
+2025-02-08 21:40:03,666 - INFO - Number of systems with semimajor axis < 3.0 AU (pst MT):  491814
+2025-02-08 21:40:03,668 - INFO - Number of systems undergoing CE (pst MT):  792900
+2025-02-08 21:40:03,670 - INFO - Number of systems not undergoing CE (pst MT):  4103333
+2025-02-08 21:40:03,673 - INFO - Number of systems with semimajor axis < 3.0 AU AND undergoing CE (pst MT):  275826
+2025-02-08 21:40:03,676 - INFO - Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (pst MT):  215988
+2025-02-08 21:40:03,679 - INFO - Number of systems with orbital period < 70 days AND undergoing CE (pst MT):  103787
+2025-02-08 21:40:03,681 - INFO - Number of systems with orbital period < 70 days AND NOT undergoing CE (pst MT):  1300
+2025-02-08 21:40:03,684 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND undergoing CE (pst MT):  127437
+2025-02-08 21:40:03,687 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 AND NOT undergoing CE (pst MT):  5649
+2025-02-08 21:40:03,690 - INFO - Total MT events:  101744411
+2025-02-08 21:40:03,737 - INFO - Number of primary HeWD (pre MT) :  26
+2025-02-08 21:40:03,784 - INFO - Number of primary COWD (pre MT) :  303535
+2025-02-08 21:40:03,830 - INFO - Number of primary ONeWD (pre MT) :  23647
+2025-02-08 21:40:03,876 - INFO - Number of primary HeWD (pst MT) :  52
+2025-02-08 21:40:03,923 - INFO - Number of primary COWD (pst MT) :  547971
+2025-02-08 21:40:03,968 - INFO - Number of primary ONeWD (pst MT) :  49121
+2025-02-08 21:40:04,014 - INFO - Number of secondary HeWD (pre MT) :  0
+2025-02-08 21:40:04,060 - INFO - Number of secondary COWD (pre MT) :  3439
+2025-02-08 21:40:04,106 - INFO - Number of secondary ONeWD (pre MT) :  16
+2025-02-08 21:40:04,151 - INFO - Number of secondary HeWD (pst MT) :  27107
+2025-02-08 21:40:04,197 - INFO - Number of secondary COWD (pst MT) :  86573
+2025-02-08 21:40:04,243 - INFO - Number of secondary ONeWD (pst MT) :  7620
+2025-02-08 21:40:04,245 - INFO - Number of BH-MS binaries (pre MT): 83917
+2025-02-08 21:40:04,247 - INFO - Number of MS-BH binaries (pre MT): 0
+2025-02-08 21:40:04,249 - INFO - Number of BH-MS binaries (pst MT):  84954
+2025-02-08 21:40:04,251 - INFO - Number of MS-BH binaries (pst MT):  0
+2025-02-08 21:40:04,254 - INFO - Number of BH-MS binaries (pst last MT):  429
+2025-02-08 21:40:04,256 - INFO - Number of MS-BH binaries (pst last MT):  0
+2025-02-08 21:40:04,259 - INFO - Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pre MT):  0
+2025-02-08 21:40:04,262 - INFO - Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pre MT):  0
+2025-02-08 21:40:04,265 - INFO - Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pst MT):  21
+2025-02-08 21:40:04,268 - INFO - Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pst MT):  0
+2025-02-08 21:40:04,271 - INFO - Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pst last MT):  21
+2025-02-08 21:40:04,273 - INFO - Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pst last MT):  0
+2025-02-08 21:40:04,276 - INFO - Number of systems with orbital period < 70 days BH-MS binaries (pre MT):  0
+2025-02-08 21:40:04,279 - INFO - Number of systems with orbital period < 70 days MS-BH binaries (pre MT):  0
+2025-02-08 21:40:04,282 - INFO - Number of systems with orbital period < 70 days BH-MS binaries (pst MT):  3
+2025-02-08 21:40:04,284 - INFO - Number of systems with orbital period < 70 days MS-BH binaries (pst MT):  0
+2025-02-08 21:40:04,287 - INFO - Number of systems with orbital period < 70 days BH-MS binaries (pst last MT):  3
+2025-02-08 21:40:04,290 - INFO - Number of systems with orbital period < 70 days MS-BH binaries (pst last MT):  0
+2025-02-08 21:40:04,293 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pre MT):  140
+2025-02-08 21:40:04,296 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pre MT):  0
+2025-02-08 21:40:04,298 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pst MT):  131
+2025-02-08 21:40:04,301 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pst MT):  0
+2025-02-08 21:40:04,304 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pst last MT):  0
+2025-02-08 21:40:04,307 - INFO - Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pst last MT):  0
+2025-02-08 21:40:11,458 - INFO - 
+2025-02-08 21:40:11,458 - INFO -  Finish time :
+2025-02-08 21:40:11,458 - INFO - 080225_2140
