@@ -1,4 +1,4 @@
-#### PARENT SCRIPT: secundus_processng_082824.py
+#### PARENT SCRIPT: secundus_processing_020525
 #----> this version, instead of only MT data frame, reads CE too.
 import os, sys
 import numpy as np               # for handling arrays
@@ -10,9 +10,11 @@ import datetime as dt
 import h5py as h5                # for reading the COMPAS data
 import matplotlib.pyplot as plt  # for plotting
 import matplotlib
-import Luxetenebrae.scripts.calculations as calc      # functions from calculations.py
+import calculations as calc      # functions from calculations.py
 from astropy.io import fits
 from astropy.table import Table
+from astropy import constants as const
+from astropy import units as u
 
 matplotlib.use("Agg")
 
@@ -52,7 +54,7 @@ start_time = s.strftime("%d%m%y") + "_" + s.strftime('%H%M')
 print("Start time :", start_time)
 
 # Choose the mode to process
-mode = ["Default/","Limited/", "Default_WD_Enabled/","Limited_WD_Enabled/" ]
+mode = ["Default_WD_Enabled/" ] #,"Limited_WD_Enabled/", "Default_WD_Disabled/", "Limited_WD_Disabled/"]    
 
 # Import COMPAS specific scripts
 compasRootDir = os.environ['COMPAS_ROOT_DIR']
@@ -152,7 +154,7 @@ for mod in mode:
     # f = open(pathToData + '/Files/' + mod  + str(s.strftime("%m.%d")) +  "_general_outputs.txt", "a")
 
     # f.writelines(["\n","\n Run :", start_time])
-    print(f'Run :, {start_time}')
+    print(f'Data outputs :, {data_outputs}')
 
     i = 0
 
@@ -160,12 +162,13 @@ for mod in mode:
 
         c = dt.datetime.now()
         current_time = c.strftime("%d%m%y") + "_" + c.strftime('%H%M')
-        print("Batch (of 1 000 000 sys.)" + str(i) +  " start time :", current_time)
 
         SP = Data['BSE_System_Parameters']
 
         seedsSP = SP['SEED'][()]
         statusSP = SP['Evolution_Status'][()]
+
+        print(f"Batch (of {len(seedsSP)} sys.)" + str(i) +  " start time :", current_time)
 
         stellarTypeZamsSP1   =  SP['Stellar_Type@ZAMS(1)'][()]
         stellarTypeZamsSP2   =  SP['Stellar_Type@ZAMS(2)'][()]
@@ -175,7 +178,7 @@ for mod in mode:
         massZamsSP1 = SP['Mass@ZAMS(1)'][()] 
         massZamsSP2 = SP['Mass@ZAMS(2)'][()]
 
-        semimajorAxisZamsSP = SP['SemiMajorAxis@ZAMS'][()] 
+        semimajorAxisZamsSP = SP['SemiMajorAxis@ZAMS'][()] # in AU
 
         SPs.extend(seedsSP)
         EVOLUTIONSTATSP.extend(statusSP)
@@ -205,8 +208,11 @@ for mod in mode:
         masspstMT1 = MT['Mass(1)>MT'][()] 
         masspstMT2 = MT['Mass(2)>MT'][()]
 
-        semimajorAxispreMT = MT['SemiMajorAxis<MT'][()] 
+        semimajorAxispreMT = MT['SemiMajorAxis<MT'][()] # in R_sun
         semimajorAxispstMT = MT['SemiMajorAxis>MT'][()]
+
+        semimajorAxispreMT = (semimajorAxispreMT*const.R_sun).to(u.au).value
+        semimajorAxispstMT = (semimajorAxispstMT*const.R_sun).to(u.au).value
 
         timepreMT = MT['Time<MT'][()]
         timepstMT = MT['Time>MT'][()]
@@ -266,8 +272,11 @@ for mod in mode:
         masspstCE1 = CE['Mass(1)>CE'][()] 
         masspstCE2 = CE['Mass(2)>CE'][()]
 
-        semimajorAxispreCE = CE['SemiMajorAxis<CE'][()] 
+        semimajorAxispreCE = CE['SemiMajorAxis<CE'][()] # in R_sun
         semimajorAxispstCE = CE['SemiMajorAxis>CE'][()]
+
+        semimajorAxispreCE = (semimajorAxispreCE*const.R_sun).to(u.au).value
+        semimajorAxispstCE = (semimajorAxispstCE*const.R_sun).to(u.au).value
 
         timeCE = CE['Time'][()]
         
@@ -299,7 +308,7 @@ for mod in mode:
 
         c = dt.datetime.now()
         current_time = c.strftime("%d%m%y") + "_" + c.strftime('%H%M')
-        print("Batch (of 1 000 000 sys.)" + str(i) +  " end time :", current_time)
+        print("Batch " + str(i) +  " end time :", current_time)
         i = i+1
     Data.close()
 

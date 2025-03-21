@@ -1,4 +1,4 @@
-#### PARENT SCRIPT: secundus_processng_081624_MT.py
+#### PARENT SCRIPT: tertius_masking_020525
 #----> this version, instead of the systems just before the first and last mass transfer (MT) event, marks MT events in which StellarType1 or StellarType2
 #      and gets the system parameters before and after each event. CAUTION: since each transition event for the system is stored as another (with the same seed number)
 #      seed, arrays will be larger than actual system number.
@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt  # for plotting
 import matplotlib
 import calculations as calc      # functions from calculations.py
 from astropy.io import fits
+from astropy import units as u
+from astropy import constants as const
 from astropy.table import Table
 import logging
 import datetime as dt
@@ -51,7 +53,7 @@ start_time = s.strftime("%d%m%y") + "_" + s.strftime('%H%M')
 print("Start time :", start_time)
 
 # Choose the IMF to process
-mode = ["Default_WD_Enabled/","Limited_WD_Enabled/" ] #"Default/","Limited/", 
+mode = ["Default_WD_Enabled/"] #"Default/","Limited/", ,"Limited_WD_Enabled/" 
 
 # # Import COMPAS specific scripts
 compasRootDir = os.environ['COMPAS_ROOT_DIR']
@@ -65,7 +67,7 @@ for mod in mode:
     matplotlib.rcParams['font.size'] = 17
     matplotlib.rcParams['legend.loc'] = "upper right"
 
-    pathToData = path + '/Files/' + mod + "02.12/" #change the date accordingly the date of the files created via Sec
+    pathToData = path + '/Files/' + mod + "02.19/" #change the date accordingly the date of the files created via Stage_02
 
     if not os.path.exists(pathToData + str(s.strftime("%m.%d"))): 
         os.makedirs(pathToData +  str(s.strftime("%m.%d")))
@@ -190,7 +192,7 @@ for mod in mode:
 
     ORBITALPERIODSP = calc.orbital_period(SP['MASSZAMSSP1'], SP['MASSZAMSSP2'], SP['SEMIMAJORAXISZAMSSP'])
     ORBITALPERIODPREMT = calc.orbital_period(MT['MASSPREMT1'], MT['MASSPREMT2'], MT['SEMIMAJORAXISPREMT'])
-    ORBITALPERIODPSTMT = calc.orbital_period(MT['MASSPSTMT2'], MT['MASSPSTMT2'], MT['SEMIMAJORAXISPSTMT'])
+    ORBITALPERIODPSTMT = calc.orbital_period(MT['MASSPSTMT1'], MT['MASSPSTMT2'], MT['SEMIMAJORAXISPSTMT'])
     print(np.shape(ORBITALPERIODPREMT))
 
     COSIPREMT = calc.orbital_inclination(MT['RADIUSPREMT1'], MT['RADIUSPREMT2'], MT['SEMIMAJORAXISPREMT'])
@@ -239,6 +241,12 @@ for mod in mode:
 
     MASKPREMTORBPER = (ORBITALPERIODPREMT <= 70)
     MASKPSTMTORBPER = (ORBITALPERIODPSTMT <= 70)
+
+    MASKPREMTSEMAJ_masuda = (MT['SEMIMAJORAXISPREMT'] <= 0.4)
+    MASKPSTMTSEMAJ_masuda = (MT['SEMIMAJORAXISPSTMT'] <= 0.4)
+
+    MASKPREMTORBPER_masuda = (ORBITALPERIODPREMT <= 30)
+    MASKPSTMTORBPER_masuda = (ORBITALPERIODPSTMT <= 30)
     
     MASKPREMTnegCE =  np.in1d(MT['MTs']*MASKFIRSTMT, CE['CEs'], invert=True)
     MASKPREMTposCE =  np.in1d(MT['MTs']*MASKFIRSTMT, CE['CEs'])
@@ -287,8 +295,8 @@ for mod in mode:
     print(f"Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (pre MT):  {np.sum(MASKPREMTSEMAJ*MASKPREMTnegCE)}") 
     print(f"Number of systems with orbital period < 70 days AND undergoing CE (pre MT):  {np.sum(MASKPREMTORBPER*MASKPREMTposCE)}") 
     print(f"Number of systems with orbital period < 70 days AND NOT undergoing CE (pre MT):  {np.sum(MASKPREMTORBPER*MASKPREMTnegCE)}")     
-    print(f"Number of systems with orbital inclination (COSI) <  2.228e-6 AND undergoing CE (pre MT):  {np.sum(MASKPREMTSEARCHABILITY*MASKPREMTposCE)}") 
-    print(f"Number of systems with orbital inclination (COSI) <  2.228e-6 AND NOT undergoing CE (pre MT):  {np.sum(MASKPREMTSEARCHABILITY*MASKPREMTnegCE)}") 
+    print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.9)) AND undergoing CE (pre MT):  {np.sum(MASKPREMTSEARCHABILITY*MASKPREMTposCE)}") 
+    print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.9)) AND NOT undergoing CE (pre MT):  {np.sum(MASKPREMTSEARCHABILITY*MASKPREMTnegCE)}") 
     print(f"Number of BH-NS binaries (pst MT):  {np.sum(MASKPSTMTBHNS1)}") 
     print(f"Number of NS-BH binaries (pst MT):  {np.sum(MASKPSTMTBHNS2)}") 
 
@@ -300,8 +308,8 @@ for mod in mode:
     print(f"Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (pst MT):  {np.sum(MASKPSTMTSEMAJ*MASKPSTMTnegCE)}") 
     print(f"Number of systems with orbital period < 70 days AND undergoing CE (pst MT):  {np.sum(MASKPSTMTORBPER*MASKPSTMTposCE)}") 
     print(f"Number of systems with orbital period < 70 days AND NOT undergoing CE (pst MT):  {np.sum(MASKPSTMTORBPER*MASKPSTMTnegCE)}") 
-    print(f"Number of systems with orbital inclination (COSI) <  2.228e-6 AND undergoing CE (pst MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTposCE)}") 
-    print(f"Number of systems with orbital inclination (COSI) <  2.228e-6 AND NOT undergoing CE (pst MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTnegCE)}") 
+    print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.9)) AND undergoing CE (pst MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTposCE)}") 
+    print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.9)) AND NOT undergoing CE (pst MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTnegCE)}") 
     print(f"Total MT events:  {np.sum(MT['EVENTSMT'])}") 
     print(f"Number of primary HeWD (pre MT) :  {np.sum([MT['STELLARTYPEPREMT1'] == 10 ])}") 
     print(f"Number of primary COWD (pre MT) :  {np.sum([MT['STELLARTYPEPREMT1'] == 11 ])}") 
@@ -334,31 +342,42 @@ for mod in mode:
     print(f"Number of systems with orbital period < 70 days MS-BH binaries (pst MT):  {np.sum(MASKPSTMTORBPER*MASKPSTMTBHMS2)}")
     print(f"Number of systems with orbital period < 70 days BH-MS binaries (pst last MT):  {np.sum(MASKPSTMTORBPER*MASKPSTMTBHMS1*MASKLASTMT)}")
     print(f"Number of systems with orbital period < 70 days MS-BH binaries (pst last MT):  {np.sum(MASKPSTMTORBPER*MASKPSTMTBHMS2*MASKLASTMT)}")
-    print(f"Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pre MT):  {np.sum(MASKPREMTSEARCHABILITY*MASKPREMTBHMS1)}")
-    print(f"Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pre MT):  {np.sum(MASKPREMTSEARCHABILITY*MASKPREMTBHMS2)}")
-    print(f"Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pst MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTBHMS1)}")
-    print(f"Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pst MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTBHMS2)}")
-    print(f"Number of systems with orbital inclination (COSI) <  2.228e-6 BH-MS binaries (pst last MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTBHMS1*MASKLASTMT)}")
-    print(f"Number of systems with orbital inclination (COSI) <  2.228e-6 MS-BH binaries (pst last MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTBHMS2*MASKLASTMT)}")
+    print(f"Number of systems with orbital period < 30 days BH-MS binaries (pst MT):  {np.sum(MASKPSTMTORBPER_masuda*MASKPSTMTBHMS1)}")
+    print(f"Number of systems with orbital period < 30 days MS-BH binaries (pst MT):  {np.sum(MASKPSTMTORBPER_masuda*MASKPSTMTBHMS2)}")
+    print(f"Number of systems with orbital period < 30 days BH-MS binaries (pst last MT):  {np.sum(MASKPSTMTORBPER_masuda*MASKPSTMTBHMS1*MASKLASTMT)}")
+    print(f"Number of systems with orbital period < 30 days MS-BH binaries (pst last MT):  {np.sum(MASKPSTMTORBPER_masuda*MASKPSTMTBHMS2*MASKLASTMT)}")
+    print(f"Number of systems with semimajor axis < 0.4 AU BH-MS binaries (pst MT):  {np.sum(MASKPSTMTSEMAJ_masuda*MASKPSTMTBHMS1)}")
+    print(f"Number of systems with semimajor axis < 0.4 AU MS-BH binaries (pst MT):  {np.sum(MASKPSTMTSEMAJ_masuda*MASKPSTMTBHMS2)}")
+    print(f"Number of systems with semimajor axis < 0.4 AU BH-MS binaries (pst last MT):  {np.sum(MASKPSTMTSEMAJ_masuda*MASKPSTMTBHMS1*MASKLASTMT)}")
+    print(f"Number of systems with semimajor axis < 0.4 AU MS-BH binaries (pst last MT):  {np.sum(MASKPSTMTSEMAJ_masuda*MASKPSTMTBHMS2*MASKLASTMT)}")
+
+    print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.99)) BH-MS binaries (pre MT):  {np.sum(MASKPREMTSEARCHABILITY*MASKPREMTBHMS1)}")
+    print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.99)) MS-BH binaries (pre MT):  {np.sum(MASKPREMTSEARCHABILITY*MASKPREMTBHMS2)}")
+    print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.99)) BH-MS binaries (pst MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTBHMS1)}")
+    print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.99)) MS-BH binaries (pst MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTBHMS2)}")
+    print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.99)) BH-MS binaries (pst last MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTBHMS1*MASKLASTMT)}")
+    print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.99)) MS-BH binaries (pst last MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTBHMS2*MASKLASTMT)}")
 
     SP_mask_hdu = fits.BinTableHDU(Table(data=[MASKSPBH1,MASKSPBH2, MASKSPunb,MASKSPdco,MASKSPmrgr,MASKMTinSP, ORBITALPERIODSP], 
                                         names=["MASKSPBH1","MASKSPBH2", "MASKSPunb","MASKSPdco","MASKSPmrgr","MASKMTinSP", "ORBITALPERIODSP"]))
-    MT_Mask_hdu = fits.BinTableHDU(Table(data=[MASKPREMTBH1,MASKPREMTBH2,MASKPREMTBHNS1,MASKPREMTBHNS2,MASKPREMTBHMS1,MASKPREMTBHMS2,
+    MT_mask_hdu = fits.BinTableHDU(Table(data=[MASKPREMTBH1,MASKPREMTBH2,MASKPREMTBHNS1,MASKPREMTBHNS2,MASKPREMTBHMS1,MASKPREMTBHMS2,
                                                 MASKPREMTnonBH, MASKPREMTSEMAJ, MASKPREMTnegCE, MASKPREMTposCE,MASKFIRSTMT,
                                                 MASKPSTMTBH1,MASKPSTMTBH2,MASKPSTMTBHNS1,MASKPSTMTBHNS2,MASKPSTMTBHMS1,MASKPSTMTBHMS2,
                                                 MASKPSTMTnonBH, MASKPSTMTSEMAJ,
                                                 MASKPSTMTnegCE, MASKPSTMTposCE, MASKLASTMT, MASKTYPECHANGE1, MASKTYPECHANGE2,
                                                 ORBITALPERIODPREMT,ORBITALPERIODPSTMT, MASKPREMTORBPER, COSIPREMT,MASKPSTMTORBPER, COSIPSTMT,
-                                                MASKPREMTSEARCHABILITY, MASKPSTMTSEARCHABILITY, CEAFTERMT], 
+                                                MASKPREMTSEARCHABILITY, MASKPSTMTSEARCHABILITY, CEAFTERMT, MASKPREMTSEMAJ_masuda, MASKPSTMTSEMAJ_masuda,
+                                                MASKPREMTORBPER_masuda, MASKPSTMTORBPER_masuda], 
                                         names=["MASKPREMTBH1","MASKPREMTBH2","MASKPREMTBHNS1","MASKPREMTBHNS2","MASKPREMTBHMS1","MASKPREMTBHMS2",
                                                 "MASKPREMTnonBH", "MASKPREMTSEMAJ", "MASKPREMTnegCE", "MASKPREMTposCE","MASKFIRSTMT",
                                                 "MASKPSTMTBH1","MASKPSTMTBH2","MASKPSTMTBHNS1","MASKPSTMTBHNS2", "MASKPSTMTBHMS1","MASKPSTMTBHMS2", 
                                                 "MASKPSTMTnonBH", "MASKPSTMTSEMAJ",
                                                 "MASKPSTMTnegCE", "MASKPSTMTposCE", "MASKLASTMT", "MASKTYPECHANGE1", "MASKTYPECHANGE2",
                                                 "ORBITALPERIODPREMT", "ORBITALPERIODPSTMT","MASKPREMTORBPER", "COSIPREMT", "MASKPSTMTORBPER", "COSIPSTMT",
-                                                "MASKPREMTSEARCHABILITY", "MASKPSTMTSEARCHABILITY","CEAFTERMT"]))
+                                                "MASKPREMTSEARCHABILITY", "MASKPSTMTSEARCHABILITY","CEAFTERMT", "MASKPREMTSEMAJ_masuda", "MASKPSTMTSEMAJ_masuda",
+                                                "MASKPREMTORBPER_masuda", "MASKPSTMTORBPER_masuda"]))
     hdu.append(SP_mask_hdu)
-    hdu.append(MT_Mask_hdu)
+    hdu.append(MT_mask_hdu)
     hdu.close()
     
 

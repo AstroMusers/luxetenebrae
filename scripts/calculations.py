@@ -4,6 +4,8 @@ import os
 import logging
 import datetime as dt
 import sys
+from astropy import constants as const
+from astropy import units as u
 
 pathToData = '/data/a.saricaoglu/repo/COMPAS'
 
@@ -82,27 +84,40 @@ pathToData = '/data/a.saricaoglu/repo/COMPAS'
 
 
 def orbital_period(m1, m2, semimajax):
-    G =  39.4769264 # gravitational constant in AU^3 / (year^2 x Msun) 
-    M = (np.asarray(m1) + np.asarray(m2))
-    A = np.asarray(semimajax)
-    orbitalPeriod = (np.sqrt((4 * np.pi**2 * A**3)) / np.sqrt(G * M)) * 365.25
+    # G =  39.4769264 # gravitational constant in AU^3 / (year^2 x Msun) 
+    # M = (np.asarray(m1) + np.asarray(m2))
+    # A = np.asarray(semimajax)
+    # orbitalPeriod = (np.sqrt((4 * np.pi**2 * A**3)) / np.sqrt(G * M)) * 365.25
+    G = const.G # units of m^3 kg^-1 s^-2
+    m1 = m1 * const.M_sun # units of kg
+    m1 = m1.to(u.kg)
+    m2 = m2 * const.M_sun # units of kg
+    m2 = m2.to(u.kg)
+    A = semimajax * u.au # units of m
+    A = A.to(u.m)
+    orbitalPeriod = (np.sqrt((4 * np.pi**2 * A**3)) / np.sqrt(G * (m1 + m2))) # units of s
+    orbitalPeriod = orbitalPeriod.to(u.hour).value
+    print('max orbital period in hours:', np.max(orbitalPeriod))
+    orbitalPeriod = orbitalPeriod / 24 # units of days
+    print('max orbital period in days:', np.max(orbitalPeriod))
 
     return orbitalPeriod
 
 def orbital_inclination(r1,r2,semimajax):
 
-    # COMPAS output gives R in units of Rsun, hence converting AU here.
-    # Also we consider the larger r_i for the calculations since if there is a BH it will always have smaller r and we want the star radius.
-    R = np.maximum(np.asarray(r1),np.asarray(r2)) * 0.00465047
+    #both radius and semimajax are in solar radii, no need to convert
+    R = np.maximum(np.asarray(r1),np.asarray(r2))
     #print(R)
-    cosi = R/np.asarray(semimajax)
+    RoverA = R/np.asarray(semimajax)
 
-    return cosi
+    return RoverA
 
 def searchability(orbital_inclination):
 
-    inc = np.random.uniform(-1,1,len(orbital_inclination))
-    searchability_index = [np.absolute(inc) <= orbital_inclination][0]
+    inc = np.random.uniform(-np.pi,np.pi,len(orbital_inclination))
+    cosi = np.absolute(np.cos(inc))
+    print(cosi)
+    searchability_index = [cosi <= np.cos(np.deg2rad(89.9))][0]
 
     return searchability_index
 
@@ -187,3 +202,23 @@ def find_last_mt(MTs):
 
 #print(np.shape(s))
 #print(s)
+print(const.G)
+print(const.M_sun)
+print(u.M_sun)
+print(const.M_sun.to(u.kg))
+print(u.M_sun.to(u.kg))
+print((93*const.R_sun).to(u.au))
+G = const.G # units of m^3 kg^-1 s^-2
+m1 = (3*u.M_sun).to(u.kg) # units of kg
+m2 = (8*u.M_sun).to(u.kg)  # units of kg
+A = (7 * u.au).to(u.m) # units of m
+orbitalPeriod = (np.sqrt((4 * np.pi**2 * A**3)) / np.sqrt(G * (m1 + m2))) 
+print(orbitalPeriod)
+orbinc = orbital_inclination([1,2,3],[4,5,6],[70,80,90])
+print(orbinc)
+se = searchability(np.random.uniform(-1,1,1000000))
+print(np.sum(se))
+print('percentage of searchability:', np.sum(se)/len(se))
+print(np.arccos(2.228e-6))
+print(np.deg2rad(89.99))
+print(np.cos(np.deg2rad(89.99)))
