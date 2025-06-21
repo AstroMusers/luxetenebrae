@@ -16,11 +16,14 @@ from astropy.table import Table
 from astropy import constants as const
 from astropy import units as u
 from utils import is_ms_bh_pair
+# Import COMPAS specific scripts
+compasRootDir = os.environ['COMPAS_ROOT_DIR']
+sys.path.append(compasRootDir + 'postProcessing/PythonScripts')
 
 matplotlib.use("Agg")
 
 
-pathToData = '/data/a.saricaoglu/repo/COMPAS'
+pathToData = '/data/a.saricaoglu/repo/COMPAS/'
 
 # Get the script name
 script_name = os.path.basename(__file__)
@@ -56,7 +59,7 @@ start_time = s.strftime("%d%m%y") + "_" + s.strftime('%H%M')
 print("Start time :", start_time)
 
 # Choose the mode to process
-mode = ["Default_WD_Enabled/" ] #,"Limited_WD_Enabled/", "Default_WD_Disabled/", "Limited_WD_Disabled/"]    
+mode = ["Default_WD_Enabled_Detailed/" ] #,"Limited_WD_Enabled/", "Default_WD_Disabled/", "Limited_WD_Disabled/"]    
 
 # Import COMPAS specific scripts
 compasRootDir = os.environ['COMPAS_ROOT_DIR']
@@ -71,14 +74,18 @@ for mod in mode:
     # matplotlib.rcParams['lines.markersize'] = 1
     # matplotlib.rcParams['font.size'] = 14
     # matplotlib.rcParams['legend.loc'] = "upper right"
-    ps =  open(f'{pathToData}/Files/{mod}Detailed_Output/processed_systems.txt', 'a')
-    psr = ps.readlines()  
+
+    ps = open(f'{pathToData}Files/{mod}survivors.txt', 'r')    
+    survivors = ps.read().splitlines()
+
     
-    runs= [x[0] for x in os.walk(pathToData) if "Detailed_Output" in x[1]]
+    runs= [x[0] for x in os.walk(pathToData + 'Runs/' + mod) if "Detailed_Output" in x[1]]
     print('runs:', runs)
     data_outputs = []
+    data_outputs2 = []
     for run in runs:
         out = [f for f in os.listdir(run + '/Detailed_Output') if ".h5" in f]
+        out2 = [f for f in os.listdir(run) if ".h5" in f]
         for f in out:
             print("Reading file: ", run + '/Detailed_Output' + "/" + f)
             try:
@@ -86,14 +93,17 @@ for mod in mode:
                 data_outputs.append(data)
             except:
                 continue
-
+        for f in out2:
+            print("Reading file: ", run  + "/" + f)
+            data = h5.File( run + "/" + f, 'r')
+            data_outputs2.append(data)
     # Keeps corresponding numerical values. 
     # SPs
     c = dt.datetime.now()
     current_time = c.strftime("%d%m%y") + "_" + c.strftime('%H%M')
-    if not os.path.exists(pathToData + '/Files/' + mod + '/Detailed_Output/' + str(s.strftime("%m.%d"))): 
-        os.makedirs(pathToData + '/Files/' + mod + '/Detailed_Output/' +  str(s.strftime("%m.%d")))
-    directoryf = pathToData + '/Files/' + mod  + '/Detailed_Output/' +   str(s.strftime("%m.%d"))
+    if not os.path.exists(pathToData + '/Files/' + mod + '/' + str(s.strftime("%m.%d"))): 
+        os.makedirs(pathToData + '/Files/' + mod + '/' +  str(s.strftime("%m.%d")))
+    directoryf = pathToData + '/Files/' + mod  + '/' +   str(s.strftime("%m.%d"))
 
 
     
@@ -105,304 +115,104 @@ for mod in mode:
     # print(f'Data outputs :, {data_outputs}')
 
     i = 0
+    j = 0
+    seed_mergerflag_dict = {}
+    for Data in data_outputs2:
+        Data = h5.File(Data.filename, 'r')
+        SPs = Data['BSE_System_Parameters']   
+        seedsSP = SPs['SEED'][()]
+        mergersSP = SPs['Merger'][()]
+        # If survivors mask is needed, apply it here
+        seedsSP_mask = np.isin(seedsSP, survivors)  
+        seeds_matched = seedsSP[seedsSP_mask]
+        mergers_matched = mergersSP[seedsSP_mask]
+        # Build the dictionary
+        for seed, merger_flag in zip(seeds_matched, mergers_matched):
+            seed_mergerflag_dict[str(seed)] = merger_flag  # Use str(seed) for consistent matching
+
+        
 
 
+    for Data in data_outputs:
 
-    for Data in data_outputs[:1]:
+        stellar_type_1 = Data['Stellar_Type(1)'][:]
+        stellar_type_2 = Data['Stellar_Type(2)'][:]
 
+        semimajoraxis = (Data['SemiMajorAxis'][:]*const.R_sun).to(u.au).value
+        BH1 = [x for x in stellar_type_1 if x == 14]
+        BH2 = [x for x in stellar_type_2 if x == 14]
+        print("BH1:", len(BH1), "BH2:", len(BH2))
+
+        if (len(BH1) & len(BH2)) == 0:
+            print(f"No BHs in this batch, deleting {Data.filename}")
+            os.remove(f'{Data.filename}')
+            j += 1
+            continue
 
         Data = h5.File(Data.filename, 'r')
-        seed = Data['SEED'][:]
+        seed = Data['SEED'][()]
+        seed_str = str(seed[0])  # Convert to string for matching
+        merger_flag = seed_mergerflag_dict.get(seed_str, None)
+        if merger_flag is not None:
+            merger_flag_bool = bool(merger_flag)
+            print(f"Seed: {seed_str}, Merger flag: {merger_flag}, As boolean: {merger_flag_bool}")
 
-        if seed in psr:
-            print(f"Seed {seed} already processed, skipping...")
-            continue
-        ps.write(f"{seed}\n")
+        merger = np.full(len(seed), merger_flag_bool)
+
+
+        # print(psr)
+        # if str(seed[0]) in psr:
+        #     print(f"Seed {seed[0]} already processed, skipping...")
+        #     continue
+        ps = open(f'{pathToData}Files/{mod}survivors.txt', 'a')
+        ps.write(f"{seed[0]}\n")
         ps.flush()
         ps.close()
 
         print("Batch (of " + str(len(data_outputs)) + " sys.) " + str(i) +  " start time :", current_time)
 
-        print(Data.keys())
-        # print(Data['Stellar_Type(1)'][:])
-        # print(Data['Stellar_Type(2)'][:])
-        # print(len(Data['Stellar_Type(1)'][:]))
-        stellar_type_1 = Data['Stellar_Type(1)'][:]
-        stellar_type_2 = Data['Stellar_Type(2)'][:]
-        radius_1 = Data['Radius(1)'][:]
-        radius_2 = Data['Radius(2)'][:]
-        time = Data['Time'][:]
-        semimajoraxis = (Data['SemiMajorAxis'][:]*const.R_sun).to(u.au).value
-
-  
-        mask = np.array([is_ms_bh_pair(st1, st2) for st1, st2 in zip(stellar_type_1, stellar_type_2)])
-        print(f"Number of MS + BH states in this system: {np.sum(mask)}")
-        if np.sum(mask) != 0:
-
-            fit_filename = directoryf + f"/secundus_{seed}.fits"
-            hdu_pr = fits.PrimaryHDU()
-            hdu_pr.writeto(fit_filename, overwrite=True)
-            hdu = fits.open(fit_filename, mode='update')
-
-            time_filtered = Data['Time'][:][mask]  # Assuming 'Time' is the time evolution data
-            stype1_filtered = stellar_type_1[mask]
-            stype2_filtered = stellar_type_2[mask]
-            radius1_filtered = radius_1[mask]
-            radius2_filtered = radius_2[mask]
-            semimajoraxis_filtered = semimajoraxis[mask]
-            bhms_lifetime = time_filtered[-1] - time_filtered[0]
-            bhms_life = '{:.2f}'.format(bhms_lifetime) 
-            semaj_average = np.mean(semimajoraxis_filtered)
-            semaj_ave= '{:.2f}'.format(semaj_average) 
-
-            # Create a FITS table with the data
-            col1 = fits.Column(name='Seed', format='K', array=seed)
-            col2 = fits.Column(name='Time_BH_MS', format='D', unit='yr', array=time)
-            col3 = fits.Column(name='Avg_Semimajor_Axis', format='D', unit='AU', array=semaj_average)
-            col4 = fits.Column(name='Total_Lifetime', format='D', unit='yr', array=bhms_lifetime)
-            # Create a binary table HDU
-            hdu_1 = fits.BinTableHDU.from_columns([col1, col2, col3, col4])
-            # Write the FITS file
-            hdu.append(hdu_1)
-
-            col1 = fits.Column(name='Time', format='D', unit='Myr', array=time)
-            col2 = fits.Column(name='Stellar_Type_1', format='K', array=stellar_type_1)
-            col3 = fits.Column(name='Stellar_Type_2', format='K', array=stellar_type_2)
-            col4 = fits.Column(name='SemiMajorAxis', format='D', unit='AU', array=semimajoraxis)
-            col5 = fits.Column(name='Radius1', format='D', unit='Rsun', array=radius_1)
-            col6 = fits.Column(name='Radius2', format='D', unit='Rsun', array=radius_2)
-            col7 = fits.Column(name='Time_Filtered', format='K', array=time_filtered)
-            col8 = fits.Column(name='Stellar_Type_1_Filtered', format='K', array=stype1_filtered)
-            col9 = fits.Column(name='Stellar_Type_2_Filtered', format='K', array=stype2_filtered)
-            col10 = fits.Column(name='Radius1_Filtered', format='D', unit='Rsun', array=radius1_filtered)
-            col11 = fits.Column(name='Radius2_Filtered', format='D', unit='Rsun', array=radius2_filtered)
-            col12 = fits.Column(name='SemiMajorAxis_Filtered', format='D', unit='AU', array=semimajoraxis_filtered)
-
-            
-            # Create a binary table HDU
-            hdu_2 = fits.BinTableHDU.from_columns([col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12])
-            # Write the FITS file
-            hdu.append(hdu_2)
-            hdu.flush()
-            # Close the FITS file
-            hdu.close()
-
-
-            print(f"Data successfully written to {fit_filename}")
-
-        i = i + 1
-
-
-
-
-    #     SP = Data['BSE_System_Parameters']
-    #     # print(SP.keys())
-
-
-
-    #     seedsSP = SP['SEED'][()]
-    #     statusSP = SP['Evolution_Status'][()]
-
-    #     print(f"Batch (of {len(seedsSP)} sys.)" + str(i) +  " start time :", current_time)
-
-    #     stellarTypeZamsSP1   =  SP['Stellar_Type@ZAMS(1)'][()]
-    #     stellarTypeZamsSP2   =  SP['Stellar_Type@ZAMS(2)'][()]
-    #     stellarTypeSP1   =  SP['Stellar_Type(1)'][()]
-    #     stellarTypeSP2   =  SP['Stellar_Type(2)'][()]  
-
-    #     massZamsSP1 = SP['Mass@ZAMS(1)'][()] 
-    #     massZamsSP2 = SP['Mass@ZAMS(2)'][()]
-
-    #     semimajorAxisZamsSP = SP['SemiMajorAxis@ZAMS'][()] # in AU
-    #     eccentricityZamsSP = SP['Eccentricity@ZAMS'][()]
-
-    #     radiusSP1 = massZamsSP1**(0.8) # in R_sun
-    #     radiusSP2 = massZamsSP2**(0.8) # in R_sun
-    #     print(radiusSP1)
-
-
         
+        # print(Data['Stellar_Type(1)'][()])
+        # print(Data['Stellar_Type(2)'][()])
+        # print(len(Data['Stellar_Type(1)'][()]))
 
-    #     SPs.extend(seedsSP)
-    #     EVOLUTIONSTATSP.extend(statusSP)
+        fit_filename = directoryf + f"/secundus_{seed[0]}.fits"
+        hdu_pr = fits.PrimaryHDU()
+        hdu_pr.writeto(fit_filename, overwrite=True)
+        hdu = fits.open(fit_filename, mode='update')
+        stellar_type_1 = Data['Stellar_Type(1)'][()]
+        stellar_type_2 = Data['Stellar_Type(2)'][()]
+        radius_1 = Data['Radius(1)'][()]
+        radius_2 = Data['Radius(2)'][()]
+        time = Data['Time'][()]
+        semimajoraxis = (Data['SemiMajorAxis'][()]*const.R_sun).to(u.au).value
+        roche_lobe_1 = Data['RocheLobe(1)'][()]
+        roche_lobe_2 = Data['RocheLobe(2)'][()]
+        mass_1 = Data['Mass(1)'][()]
+        mass_2 = Data['Mass(2)'][()]
+        mass_zams_1 = Data['Mass@ZAMS(1)'][()]
+        mass_zams_2 = Data['Mass@ZAMS(2)'][()]
+        mt_history = Data['MT_History'][()]
+        eccentricity = Data['Eccentricity'][()]
 
-    #     STELLARTYPEZAMSSP1.extend(stellarTypeZamsSP1)
-    #     STELLARTYPEZAMSSP2.extend(stellarTypeZamsSP2)
-    #     STELLARTYPESP1.extend(stellarTypeSP1)
-    #     STELLARTYPESP2.extend(stellarTypeSP2)   
-
-    #     MASSZAMSSP1.extend(massZamsSP1)
-    #     MASSZAMSSP2.extend(massZamsSP2)
-
-    #     SEMIMAJORAXISZAMSSP.extend(semimajorAxisZamsSP)
-    #     ECCENTRICITYZAMSSP.extend(eccentricityZamsSP)
-
-    #     RADIUSSP1.extend(radiusSP1)
-    #     RADIUSSP2.extend(radiusSP2)
-
-
-
-    #     MT = Data['BSE_RLOF']
-
-    #     seedsMT = MT['SEED'][()]
-    #     eventsMT = MT['MT_Event_Counter'][()]
-
-    #     stellarTypepreMT1   =  MT['Stellar_Type(1)<MT'][()]
-    #     stellarTypepreMT2   =  MT['Stellar_Type(2)<MT'][()]  
-    #     stellarTypepstMT1   =  MT['Stellar_Type(1)>MT'][()]
-    #     stellarTypepstMT2   =  MT['Stellar_Type(2)>MT'][()] 
-
-    #     masspreMT1 = MT['Mass(1)<MT'][()] 
-    #     masspreMT2 = MT['Mass(2)<MT'][()] 
-    #     masspstMT1 = MT['Mass(1)>MT'][()] 
-    #     masspstMT2 = MT['Mass(2)>MT'][()]
-
-    #     semimajorAxispreMT = MT['SemiMajorAxis<MT'][()] # in R_sun
-    #     semimajorAxispstMT = MT['SemiMajorAxis>MT'][()]
-
-    #     eccentricitypreMT = MT['Eccentricity<MT'][()]
-    #     eccentricitypstMT = MT['Eccentricity>MT'][()]
-
-    #     semimajorAxispreMT = (semimajorAxispreMT*const.R_sun).to(u.au).value
-    #     semimajorAxispstMT = (semimajorAxispstMT*const.R_sun).to(u.au).value
+        table = fits.BinTableHDU(Table(data=[seed, time, stellar_type_1, stellar_type_2, semimajoraxis, radius_1, radius_2,
+                                            roche_lobe_1, roche_lobe_2, mass_1, mass_2, mass_zams_1, mass_zams_2, mt_history, eccentricity, merger],
+                                        names=['Seed', 'Time', 'Stellar_Type_1', 'Stellar_Type_2', 'SemiMajorAxis',
+                                                'Radius(1)', 'Radius(2)', 'RocheLobe(1)', 'RocheLobe(2)', 'Mass(1)', 'Mass(2)',
+                                                'Mass@ZAMS(1)', 'Mass@ZAMS(2)', 'MT_History', 'Eccentricity', 'Merger_Flag'], 
+                                        units=[' ', 'Myr', ' ', ' ', 'AU', 'Rsun', 'Rsun', 'Rsun', 'Rsun', 'Msun', 'Msun', 'Msun', 'Msun', ' ', ' ', 'Boolean']))
+        hdu.append(table)
+        hdu.flush()
+        # Close the FITS file
+        hdu.close()
 
 
-    #     timepreMT = MT['Time<MT'][()]
-    #     timepstMT = MT['Time>MT'][()]
-        
-    #     massTransferhistory = MT['CEE>MT'][()]
+        print(f"Data successfully written to {fit_filename}")
 
-    #     radiuspreMT1 = MT['Radius(1)<MT'][()]
-    #     radiuspstMT1 = MT['Radius(1)>MT'][()] 
-    #     radiuspreMT2 = MT['Radius(2)<MT'][()]
-    #     radiuspstMT2 = MT['Radius(2)>MT'][()]
+    i = i + 1
+print(f"Total number of systems with BHs: {i}")
+print(f"Total number of systems without BHs: {j}")
 
-        
-
-    #     CEafterMT = MT['CEE>MT'][()]
-
-    #     MTs.extend(seedsMT)
-    #     EVENTSMT.extend(eventsMT)
-      
-    #     STELLARTYPEPREMT1.extend(stellarTypepreMT1)
-    #     STELLARTYPEPREMT2.extend(stellarTypepreMT2) 
-    #     STELLARTYPEPSTMT1.extend(stellarTypepstMT1)
-    #     STELLARTYPEPSTMT2.extend(stellarTypepstMT2) 
-
-    #     MASSPREMT1.extend(masspreMT1)
-    #     MASSPREMT2.extend(masspreMT2)
-    #     MASSPSTMT1.extend(masspstMT1)
-    #     MASSPSTMT2.extend(masspstMT2)
-
-    #     SEMIMAJORAXISPREMT.extend(semimajorAxispreMT)
-    #     SEMIMAJORAXISPSTMT.extend(semimajorAxispstMT)
-
-    #     ECCENTRICITYPREMT.extend(eccentricitypreMT)
-    #     ECCENTRICITYPSTMT.extend(eccentricitypstMT)
-
-    #     TIMEPREMT.extend(timepreMT)
-    #     TIMEPSTMT.extend(timepstMT)
-
-    #     MASSTRANSFERHISTORY.extend(massTransferhistory)
-        
-
-   
-    #     CEAFTERMT.extend(CEafterMT)
-
-    #     RADIUSPREMT1.extend(radiuspreMT1)
-    #     RADIUSPREMT2.extend(radiuspreMT2)
-    #     RADIUSPSTMT1.extend(radiuspstMT1)
-    #     RADIUSPSTMT2.extend(radiuspstMT2)
-
-
-
-    #     CE = Data['BSE_Common_Envelopes']
-
-    #     seedsCE = CE['SEED'][()]
-    #     eventsCE = CE['CE_Event_Counter'][()]
-       
-    #     stellarTypepreCE1   =  CE['Stellar_Type(1)<CE'][()]
-    #     stellarTypepreCE2   =  CE['Stellar_Type(2)<CE'][()]  
-    #     stellarTypepstCE1   =  CE['Stellar_Type(1)'][()]
-    #     stellarTypepstCE2   =  CE['Stellar_Type(2)'][()] 
-    #     # PreCE refers to the mass just before the first CE event, while pstCE refers to the mass just after the last CE event.
-    #     masspreCE1 = CE['Mass(1)<CE'][()] 
-    #     masspreCE2 = CE['Mass(2)<CE'][()] 
-    #     masspstCE1 = CE['Mass(1)>CE'][()] 
-    #     masspstCE2 = CE['Mass(2)>CE'][()]
-
-    #     semimajorAxispreCE = CE['SemiMajorAxis<CE'][()] # in R_sun
-    #     semimajorAxispstCE = CE['SemiMajorAxis>CE'][()]
-
-    #     semimajorAxispreCE = (semimajorAxispreCE*const.R_sun).to(u.au).value
-    #     semimajorAxispstCE = (semimajorAxispstCE*const.R_sun).to(u.au).value
-
-    #     timeCE = CE['Time'][()]
-    #     circulartizationTime = CE['Tau_Circ'][()]
-        
-    #     radiuspreCE1 = CE['Radius(1)<CE'][()] # in R_sun
-    #     radiuspstCE1 = CE['Radius(1)>CE'][()] 
-    #     radiuspreCE2 = CE['Radius(2)<CE'][()]
-    #     radiuspstCE2 = CE['Radius(2)>CE'][()] 
-
-    #     CEs.extend(seedsCE)
-    #     EVENTSCE.extend(eventsCE)
-   
-    #     STELLARTYPEPRECE1.extend(stellarTypepreCE1)
-    #     STELLARTYPEPRECE2.extend(stellarTypepreCE2) 
-    #     STELLARTYPEPSTCE1.extend(stellarTypepstCE1)
-    #     STELLARTYPEPSTCE2.extend(stellarTypepstCE2) 
-
-    #     MASSPRECE1.extend(masspreCE1)
-    #     MASSPRECE2.extend(masspreCE2)
-    #     MASSPSTCE1.extend(masspstCE1)
-    #     MASSPSTCE2.extend(masspstCE2)
-
-    #     SEMIMAJORAXISPRECE.extend(semimajorAxispreCE)
-    #     SEMIMAJORAXISPSTCE.extend(semimajorAxispstCE)
-
-    #     CIRCULARIZATIONTIME.extend(circulartizationTime)
-
-
-    #     # PreMT refers to the mass just before the first MT event, while pstMT refers to the mass just after the last MT event.
-   
-
-    #     c = dt.datetime.now()
-    #     current_time = c.strftime("%d%m%y") + "_" + c.strftime('%H%M')
-    #     print("Batch " + str(i) +  " end time :", current_time)
-    #     i = i+1
-    # Data.close()
-
-    # arrays_to_save = [ ]
-    # filenames = []
-    # checklist = [MTs,STELLARTYPEPREMT1,STELLARTYPEPREMT2,STELLARTYPEPSTMT1,STELLARTYPEPSTMT2,
-    #                                     MASSPREMT1,MASSPREMT2,MASSPSTMT1,MASSPSTMT2,SEMIMAJORAXISPREMT, SEMIMAJORAXISPSTMT,
-    #                                     EVENTSMT,MASSTRANSFERHISTORY,RADIUSPREMT1, RADIUSPREMT2, RADIUSPSTMT1, RADIUSPSTMT2,
-    #                                     TIMEPREMT, TIMEPSTMT, CEAFTERMT]
-    # for e in checklist:
-    #     print(len(e))
-
-    # SP_hdu = fits.BinTableHDU(Table(data=[SPs, STELLARTYPEZAMSSP1,STELLARTYPEZAMSSP2,STELLARTYPESP1,STELLARTYPESP2,
-    #                                     MASSZAMSSP1,MASSZAMSSP2,SEMIMAJORAXISZAMSSP, EVOLUTIONSTATSP, ECCENTRICITYZAMSSP, RADIUSSP1, RADIUSSP2], 
-    #                                 names=["SPs","STELLARTYPEZAMSSP1", "STELLARTYPEZAMSSP2", "STELLARTYPESP1", "STELLARTYPESP2",
-    #                                     "MASSZAMSSP1", "MASSZAMSSP2",  "SEMIMAJORAXISZAMSSP", "EVOLUTIONSTATSP", "ECCENTRICITYZAMSSP", "RADIUSSP1", "RADIUSSP2"]))
-    
-    # MT_hdu = fits.BinTableHDU(Table(data=[MTs,STELLARTYPEPREMT1,STELLARTYPEPREMT2,STELLARTYPEPSTMT1,STELLARTYPEPSTMT2,
-    #                                     MASSPREMT1,MASSPREMT2,MASSPSTMT1,MASSPSTMT2,SEMIMAJORAXISPREMT, SEMIMAJORAXISPSTMT,
-    #                                     EVENTSMT,MASSTRANSFERHISTORY,RADIUSPREMT1, RADIUSPREMT2, RADIUSPSTMT1, RADIUSPSTMT2,
-    #                                     TIMEPREMT, TIMEPSTMT, CEAFTERMT, ECCENTRICITYPREMT, ECCENTRICITYPSTMT], 
-    #                                 names=["MTs","STELLARTYPEPREMT1", "STELLARTYPEPREMT2", "STELLARTYPEPSTMT1", "STELLARTYPEPSTMT2",
-    #                                     "MASSPREMT1", "MASSPREMT2", "MASSPSTMT1", "MASSPSTMT2", "SEMIMAJORAXISPREMT", "SEMIMAJORAXISPSTMT",
-    #                                     "EVENTSMT","MASSTRANSFERHISTORY", "RADIUSPREMT1", "RADIUSPREMT2", "RADIUSPSTMT1", "RADIUSPSTMT2",
-    #                                     "TIMEPREMT", "TIMEPSTMT","CEAFTERMT", "ECCENTRICITYPREMT", "ECCENTRICITYPSTMT"]))
-    # CE_hdu = fits.BinTableHDU(Table(data=[CEs, EVENTSCE, STELLARTYPEPRECE1, STELLARTYPEPRECE2, STELLARTYPEPSTCE1, STELLARTYPEPSTCE2, 
-    #                                     MASSPRECE1, MASSPRECE2, MASSPSTCE1, MASSPSTCE2, SEMIMAJORAXISPRECE, SEMIMAJORAXISPSTCE, CIRCULARIZATIONTIME],
-    #                                 names= ["CEs", "EVENTSCE","STELLARTYPEPRECE1", "STELLARTYPEPRECE2", "STELLARTYPEPSTCE1", "STELLARTYPEPSTCE2", 
-    #                                     "MASSPRECE1", "MASSPRECE2", "MASSPSTCE1", "MASSPSTCE2", "SEMIMAJORAXISPRECE", "SEMIMAJORAXISPSTCE", "CIRCULARIZATIONTIME"])) 
-    # hdu.append(SP_hdu)
-    # hdu.append(MT_hdu)
-    # hdu.append(CE_hdu)
-    # hdu.close()
 
 e = dt.datetime.now()
 # Displays Time

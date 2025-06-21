@@ -75,7 +75,7 @@ for mod in mode:
     print('runs:', runs)
     data_outputs1 = []
     data_outputs2 = []
-    for run in runs[33:]:  # Adjust the slice as needed
+    for run in runs[:34]:  # Adjust the slice as needed
         out1 = [f for f in os.listdir(run + '/Detailed_Output') if ".h5" in f]
         out2 = [f for f in os.listdir(run) if ".h5" in f]
         for f in out1:

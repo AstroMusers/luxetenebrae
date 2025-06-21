@@ -6,82 +6,10 @@ import datetime as dt
 import sys
 from astropy import constants as const
 from astropy import units as u
+from scipy.integrate import quad
+from scipy.interpolate import interp1d
 
 pathToData = '/data/a.saricaoglu/repo/COMPAS'
-
-# script_name = os.path.basename(__file__)
-# # Configure logging
-# log_filename = f"{pathToData}/Files/{dt.datetime.now().strftime('%m.%d')}/{dt.datetime.now().strftime('%H%M')}/{script_name}_script.log"
-# os.makedirs(os.path.dirname(log_filename), exist_ok=True)
-# logging.basicConfig(filename=log_filename, level=logging.INFO, 
-#                     format='%(asctime)s - %(levelname)s - %(message)s')
-
-# # Redirect stdout and stderr to the log file
-# class StreamToLogger:
-#     def __init__(self, logger, log_level):
-#         self.logger = logger
-#         self.log_level = log_level
-#         self.linebuf = ''
-
-#     def write(self, buf):
-#         for line in buf.rstrip().splitlines():
-#             self.logger.log(self.log_level, line.rstrip())
-
-#     def flush(self):
-#         pass
-
-# sys.stdout = StreamToLogger(logging.getLogger('STDOUT'), logging.INFO)
-# sys.stderr = StreamToLogger(logging.getLogger('STDERR'), logging.ERROR)
-# def get_current_parameters():
-
-#     SPs = []
-#     MTs = []
-#     CEs = []
-
-#     EVENTSMT = []
-#     EVOLUTIONSTATSP = []
-
-#     STELLARTYPEZAMSSP1   =  []
-#     STELLARTYPEZAMSSP2   =  []
-#     STELLARTYPESP1   =  []
-#     STELLARTYPESP2   =  []       
-#     STELLARTYPEPREMT1   =  []
-#     STELLARTYPEPREMT2   =  [] 
-#     STELLARTYPEPSTMT1   =  []
-#     STELLARTYPEPSTMT2   =  [] 
-
-#     MASSZAMSSP1 = []
-#     MASSZAMSSP2 = []
-#     MASSPREMT1 = []
-#     MASSPREMT2 = []
-#     MASSPSTMT1 = []
-#     MASSPSTMT2 = []
-
-#     SEMIMAJORAXISZAMSSP = []
-#     SEMIMAJORAXISPREMT = []
-#     SEMIMAJORAXISPSTMT = []
-
-#     ORBITALPERIODSP = []
-#     ORBITALPERIODPREMT = []
-#     ORBITALPERIODPSTMT= []
-
-#     RADIUSPREMT1 = []
-#     RADIUSPREMT2 = []
-#     RADIUSPSTMT1 = []
-#     RADIUSPSTMT2 = []
-
-#     TIMEPREMT = []
-#     TIMEPSTMT = []
-
-#     CEAFTERMT = []
-
-#     arrays = [SPs,MTs,CEs,STELLARTYPEZAMSSP1,STELLARTYPEZAMSSP2,STELLARTYPESP1,STELLARTYPESP2,STELLARTYPEPREMT1,STELLARTYPEPREMT2,STELLARTYPEPSTMT1,STELLARTYPEPSTMT2,
-#                     MASSZAMSSP1,MASSZAMSSP2,MASSPREMT1,MASSPREMT2,MASSPSTMT1,MASSPSTMT2,SEMIMAJORAXISZAMSSP,SEMIMAJORAXISPREMT, SEMIMAJORAXISPSTMT,
-#                     TIMEPREMT, TIMEPSTMT, CEAFTERMT, EVOLUTIONSTATSP, EVENTSMT,RADIUSPREMT1, RADIUSPREMT2, RADIUSPSTMT1, RADIUSPSTMT2]
-
-
-#     return arrays
-
 
 def orbital_period(m1, m2, semimajax):
     # G =  39.4769264 # gravitational constant in AU^3 / (year^2 x Msun) 
@@ -111,6 +39,9 @@ def orbital_inclination(r1,r2,semimajax):
     RoverA = R/np.asarray(semimajax)
 
     return RoverA
+
+def periapsis(semimajax, eccentricity):
+    return (semimajax * (1 - eccentricity))
 
 def searchability(orbital_inclination):
 
@@ -197,6 +128,65 @@ def find_last_mt(MTs):
             last = MTs[i]
 
     return masklastMT
+
+def density(counts, bins):
+    """
+    Calculate the density of points in a histogram.
+    
+    Parameters:
+    counts (array-like): The counts of points in each bin.
+    bins (array-like): The edges of the bins.
+    
+    Returns:
+    array: The density of points in each bin.
+    """
+    bin_widths = np.diff(bins)
+    return counts / bin_widths
+
+def kroupa_imf_continuous(m):
+    """
+    Kroupa IMF for continuous mass distribution.
+    
+    Parameters:
+    m (float): Mass in solar masses.
+    
+    Returns:
+    float: IMF value for the given mass.
+    """
+    if m <= 0.08:
+        return m**(-0.3)
+    elif m < 0.5:
+        return m**(-1.3)
+    else:
+        return m**(-2.3)
+
+def kroupa_imf(masses):
+    """
+    Calculate the Kroupa IMF for a given array of masses.
+    
+    Parameters:
+    masses (array-like): Array of masses in solar masses.
+    
+    Returns:
+    array: Kroupa IMF values for the given masses.
+    """
+    return np.array([kroupa_imf_continuous(m) for m in masses])
+
+def kroupa_imf_normalized(m_min, m_max):
+    """
+    Normalize the Kroupa IMF for a given array of masses.
+    
+    Parameters:
+    masses (array-like): Array of masses in solar masses.
+
+    Returns:
+    array: Normalized Kroupa IMF values for the given masses.
+    """
+
+    masses = np.linspace(m_min, m_max, 1000)
+    normalization, _ = quad(kroupa_imf_continuous, m_min, m_max)
+    imf = kroupa_imf(masses)
+    return imf / normalization
 
 # s = searchability(np.random.uniform(-1,1,10))
 
