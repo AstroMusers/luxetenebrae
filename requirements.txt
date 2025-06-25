@@ -1,0 +1,6 @@
+numpy
+matplotlib
+astropy
+pandas
+pytest
+git+https://github.com/TeamCOMPAS/COMPAS.git

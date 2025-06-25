@@ -1,0 +1,13 @@
+name: luxetenebrae-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy
+  - matplotlib
+  - astropy
+  - pandas
+  - pytest
+  - pip
+  - pip:
+      - git+https://github.com/TeamCOMPAS/COMPAS.git

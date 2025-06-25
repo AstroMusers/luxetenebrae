@@ -10,18 +10,18 @@ booleanChoices:
 
     ### LOGISTICS
 #    --debug-to-file: False                                                # Default: False
-     --detailed-output: False                                              # Default: False                                                                                                                                                                            # WARNING! this creates a data heavy file
+     --detailed-output: True                                             # Default: False                                                                                                                                                                            # WARNING! this creates a data heavy file
 #    --emit-gravitational-radiation: False                                 # Default: False
 #    --enable-warnings: False                                              # Default: False                                                                                                                                                                            # option to enable/disable warning messages
 #    --errors-to-file: False                                               # Default: False
 #    --evolve-main-sequence-mergers: False                                 # Default: False
 #    --evolve-unbound-systems: True                                        # Default: True
-#    --population-data-printing: False                                     # Default: False
+     --population-data-printing: True                                    # Default: False
 #    --print-bool-as-string: False                                         # Default: False
 #    --quiet: False                                                        # Default: False
 #    --rlof-printing: True                                                 # Default: True
 #    --store-input-files: True                                             # Default: True
-#    --switch-log: False                                                   # Default: False
+     --switch-log: True                                                  # Default: False
 
     ### STELLAR PROPERTIES
 #    --check-photon-tiring-limit: False                                    # Default: False
@@ -86,7 +86,7 @@ numericalChoices:
 #    --mass-change-fraction: 0.000000                                      # Default: 0.000000                                                                                                                                                                         # approximate desired fractional changes in stellar mass per timestep
      --maximum-evolution-time: 13700.00                                     # Default: 13700.00                                                                                                                                                                         # maximum physical time a system can be evolved [Myr]
      --maximum-number-timestep-iterations: 100000                           # Default: 99999
-     --number-of-systems: 4000000                                              # Default: 10                                                                                                                                                                               # number of systems per batch
+     --number-of-systems: 1000                                              # Default: 10                                                                                                                                                                               # number of systems per batch
 #    --radial-change-fraction: 0.000000                                    # Default: 0.000000                                                                                                                                                                         # approximate desired fractional changes in stellar radius per timestep
 #    --timestep-multiplier: 1.000000                                       # Default: 1.000000                                                                                                                                                                         # optional multiplier relative to default time step duration
 
@@ -121,10 +121,10 @@ numericalChoices:
 #    --minimum-secondary-mass: 0.100000                                    # Default: 0.100000                                                                                                                                                                         # Brown dwarf limit [Msol]
 #    --orbital-period: 0.100000                                            # Default: 0.100000                                                                                                                                                                         # orbital period for BSE
 #    --orbital-period-min: 1.100000                                        # Default: 1.100000                                                                                                                                                                         # [days]
-     --orbital-period-max: 70.00                                         # Default: 1000.00                                                                                                                                                                          # [days]
+#     --orbital-period-max: 70.00                                         # Default: 1000.00                                                                                                                                                                          # [days]
 #    --semi-major-axis: 0.100000                                           # Default: 0.100000                                                                                                                                                                         # semi-major axis for BSE
 #    --semi-major-axis-min: 0.010000                                       # Default: 0.010000                                                                                                                                                                         # [AU]
-     --semi-major-axis-max: 10.00                                        # Default: 1000.00                                                                                                                                                                          # [AU]
+#     --semi-major-axis-max: 10.00                                        # Default: 1000.00                                                                                                                                                                          # [AU]
 
     ### MASS TRANSFER
 #    --convective-envelope-temperature-threshold: 5370.00                  # Default: 5370.00                                                                                                                                                                          # Only if using envelope-state-prescription = 'FIXED_TEMPERATURE'
@@ -299,7 +299,7 @@ stringChoices:
 #    --logfile-supernovae: 'BSE_Supernovae'                                # Default: 'BSE_Supernovae'
 #    --logfile-switch-log: 'BSE_Switch_Log'                                # Default: 'BSE_Switch_Log'
 #    --logfile-system-parameters: 'BSE_System_Parameters'                  # Default: 'BSE_System_Parameters'
-     --output-path: '/data/a.saricaoglu/repo/COMPAS/data'                       # Default: '.'
+     --output-path: '/data/a.saricaoglu/repo/COMPAS/Runs/Default_WD_Enabled_Detailed/'                       # Default: '.'
 
 
 listChoices: 
