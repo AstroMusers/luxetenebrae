@@ -9,8 +9,6 @@ from astropy import units as u
 from scipy.integrate import quad
 from scipy.interpolate import interp1d
 
-pathToData = '/data/a.saricaoglu/repo/COMPAS'
-
 def orbital_period(m1, m2, semimajax):
     # G =  39.4769264 # gravitational constant in AU^3 / (year^2 x Msun) 
     # M = (np.asarray(m1) + np.asarray(m2))
@@ -58,76 +56,7 @@ def envelope_ejection(r1,r2,postcesemimajax):
 
     return ejection
 
-def type_change_MT(preMT1, pstMT1, preMT2, pstMT2, start_time):
-    maskchangeMT1 = np.zeros(len(preMT1), dtype='bool')
-    maskchangeMT2 = np.zeros(len(preMT2), dtype='bool')
-    s = datetime.now()
 
-    #print(f"Run : {start_time}")
-
-    for i in range(0, len(preMT1)):
-        if (preMT1[i] == pstMT1[i]):
-            maskchangeMT1[i] = False
-            ##print(f'StellarType(1)<MT : {preMT1[i]}, StellarType(1)>MT : {pstMT1[i]} --> No change in stellar type during mass transfer event, maskchangeMT1[ {i} = {maskchangeMT1[i]}')
-
-        else:
-            maskchangeMT1[i] = True
-            #print(f'StellarType(1)<MT : {preMT1[i]}, StellarType(1)>MT : {pstMT1[i]} --> Change in stellar type during mass transfer event, maskchangeMT1[ {i} = {maskchangeMT1[i]}')
-
-    #print(f"Run : {start_time}")
-
-    for i in range(0, len(preMT2)):
-        if (preMT2[i] == pstMT2[i]):
-            maskchangeMT2[i] = False
-            ##print(f'StellarType(2)<MT : {preMT2[i]}, StellarType(2)>MT : {pstMT2[i]} --> No change in stellar type during mass transfer event, maskchangeMT1[ {i} = {maskchangeMT2[i]}')
-
-        else:
-            maskchangeMT2[i] = True
-            #print(f'StellarType(2)<MT : {preMT2[i]}, StellarType(2)>MT : {pstMT2[i]} --> Change in stellar type during mass transfer event, maskchangeMT1[ {i} = {maskchangeMT2[i]}')
-
-
-    return maskchangeMT1, maskchangeMT2
-
-def type_change_CE(preCE1, pstCE1, preCE2, pstCE2, start_time):
-    maskchangeCE1 = np.zeros(len(preCE1), dtype='bool')
-    maskchangeCE2 = np.zeros(len(preCE2), dtype='bool')
-
-    for i in range(0, len(preCE1)):
-        if (preCE1[i] == pstCE1[i]):
-            maskchangeCE1[i] = False
-            ##print(f'StellarType(1)<CE : {preCE1[i]}, StellarType(1)>CE : {pstCE1[i]} --> No change in stellar type during mass transfer event, maskchangeCE1[ {i} = {maskchangeCE1[i]}')
-
-        else:
-            maskchangeCE1[i] = True
-            #print(f'StellarType(1)<CE : {preCE1[i]}, StellarType(1)>CE : {pstCE1[i]} --> Change in stellar type during mass transfer event, maskchangeCE1[ {i} = {maskchangeCE1[i]}')
-
-    #print(f"Run : {start_time}")
-
-    for i in range(0, len(preCE2)):
-        if (preCE2[i] == pstCE2[i]):
-            maskchangeCE2[i] = False
-            ##print(f'StellarType(2)<CE : {preCE2[i]}, StellarType(2)>CE : {pstCE2[i]}, --> No change in stellar type during mass transfer event, maskchangeCE1[ {i} = {maskchangeCE2[i]}')
-
-        else:
-            maskchangeCE2[i] = True
-            #print(f'StellarType(2)<CE : {preCE2[i]}, StellarType(2)>CE : {pstCE2[i]} --> Change in stellar type during mass transfer event, maskchangeCE1[ {i} = {maskchangeCE2[i]}')
-
-    return maskchangeCE1, maskchangeCE2
-
-
-def find_last_mt(MTs):
-
-    masklastMT = np.zeros(len(MTs), dtype='bool')
-    last = 0
-    for i in range(0, len(MTs)):
-        if (MTs[i] == last):
-            masklastMT[i-1] = False
-            masklastMT[i] = True
-        else:
-            masklastMT[i] = True
-            last = MTs[i]
-
-    return masklastMT
 
 def density(counts, bins):
     """

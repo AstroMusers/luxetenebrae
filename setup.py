@@ -1,14 +1,12 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
-    # Needed to silence warnings (and to be a worthwhile package)
     name='luxetenebrae',
     url='https://github.com/AstroMusers/luxetenebrae',
     author='Aysu Ece Saricaoglu',
     author_email='a.saricaoglu@wustl.edu',
-    # Needed to actually package something
-    packages=['luxetenebrae'],
-    # Needed for dependencies
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
     install_requires=[
         'numpy',
         'matplotlib',
@@ -16,14 +14,10 @@ setup(
         'astropy',
         'pandas',
         'datetime',
-        'h5py',
-        'git+https://github.com/TeamCOMPAS/COMPAS.git'
+        'h5py'
     ],
-    # *strongly* suggested for sharing
     version='0.1',
-    # The license can be anything you like
     license='MIT',
     description='An example of a python package from pre-existing code',
-    # We will also need a readme eventually (there will be a warning)
     # long_description=open('README.txt').read(),
 )
