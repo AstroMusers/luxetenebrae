@@ -10,15 +10,16 @@ import datetime as dt
 import h5py as h5                # for reading the COMPAS data
 import matplotlib.pyplot as plt  # for plotting
 import matplotlib
-from luxetenebrae import calculations as calc   # functions from calculations.py
 from astropy.io import fits
 from astropy.table import Table
 from astropy import constants as const
 from astropy import units as u
+from luxetenebrae import calculations as calc   # functions from calculations.py
 from luxetenebrae import utils as utils      # functions from utils.py
+
 now = dt.datetime.now()
 # Choose the modee to process
-mode = 'WD_Enabled'
+mode = 'WD_Enabled_Detailed'
 
 # Import COMPAS specific scripts
 compasRootDir = os.environ['COMPAS_ROOT_DIR']
@@ -57,12 +58,25 @@ start_time = s.strftime("%d%m%y") + "_" + s.strftime('%H%M')
 print("Start time :", start_time)
 
 out = [f for f in os.listdir(pathToFiles) if "stage_02_outputs" in f]
-data_outputs = []
+print('Output files found:', out)
+detailed_output = []
+SP_output = []
+MT_output = []
+CE_output = []
 for f in out:
-    # print("Reading file: ", pathToData + '/Files/' + mode  + "/" + f)
+    print("Reading file: ", pathToFiles + "/" + f)
 
     data = fits.open(pathToFiles + "/" + f)
-    data_outputs.append(data[1])
+    print("Number of tables in the file:", len(data))
+    detailed_output.append(data[1])
+    SP_output.append(data[2])
+
+    if len(data) > 3:
+        MT_output.append(data[3])
+
+    if len(data) > 4:
+        CE_output.append(data[4])
+
 
 
 # Keeps corresponding numerical values. 
@@ -79,8 +93,8 @@ bhms_final_systems = []
 bhbh_final_systems = []
 
 
-for Data in data_outputs:
-    
+for Data, Data_SP in zip(detailed_output, SP_output):
+
     Data = Data.data
     # print("Batch (of " + str(len(data_outputs)) + " sys.) " + str(i) +  " start time :", current_time)
     seed = Data['Seed'][0]
@@ -98,10 +112,11 @@ for Data in data_outputs:
     mass_zams_1 = Data['Mass@ZAMS(1)']
     mass_zams_2 = Data['Mass@ZAMS(2)']
     mt_history = Data['MT_History']
-    merger = Data['Merger_Flag'][0]
     eccentricity = Data['Eccentricity']
     periapsiss = calc.periapsis(semimajoraxis, eccentricity)
     # rocheR_periapsis = calculate_periapsis()
+
+    merger = Data_SP['MergerSP'][0]
 
     mask = np.array([utils.is_ms_bh_pair(st1, st2) for st1, st2 in zip(stellar_type_1, stellar_type_2)])
     # print(f"Number of MS + BH states in this system: {np.sum(mask)}")
@@ -152,7 +167,7 @@ for Data in data_outputs:
     ax[0].text(0.05, 0.95, fr'Lifetime of BH-MS: {bhms_life} Myr', transform=ax[0].transAxes,  verticalalignment='top')
     # ax[0].set_title('Stellar Type Evolution for MS + BH Systems')
     ax[0].legend()
-    ax[0].grid(True) 
+    ax[0].grid(False) 
     ax[0].set_ylabel('Stellar Type')
 
 
@@ -164,7 +179,7 @@ for Data in data_outputs:
     ax[1].plot(time, periapsiss, label='Periapsis', color='yellow', linestyle='dashed')
 
     ax[1].legend()
-    ax[1].grid(True) 
+    ax[1].grid(False) 
     ax[1].fill_between(time_filtered, 0, max(np.max(semimajoraxis_filtered), np.max(radius_1), np.max(radius_2)), color='orange', alpha=0.1)
     ax[1].text(0.05, 0.15, rf'$\langle$SA$\rangle$: {semaj_ave} AU', transform=ax[1].transAxes,  verticalalignment='top')
     ax[1].set_ylabel('Semi-major Axis [AU]')
@@ -177,19 +192,19 @@ for Data in data_outputs:
     ax[2].text(0.05, 0.85, f'Merger (from mthist): {merger_flag_mthist}', transform=ax[2].transAxes,  verticalalignment='top')
     ax[2].text(0.05, 0.75, f'Merger (manual): {merger_flag_manual}', transform=ax[2].transAxes,  verticalalignment='top')
     # ax[2].legend()
-    ax[2].grid(True) 
+    ax[2].grid(False) 
     ax[2].set_ylabel('MT History')
 
     ax[3].plot(time, eccentricity, label='Eccentricity', color='yellow')
     # ax[3].legend()
-    ax[3].grid(True) 
+    ax[3].grid(False) 
     ax[3].set_ylabel('Eccentricity')        
 
 
 
     plt.xlabel('Time [Myr]')
     plt.legend()
-    plt.grid(True) 
+    plt.grid(False) 
     plt.savefig(f'{pathToPlots}/stellar_type_evolution_{i}.png',bbox_inches='tight')
     plt.close()
 

@@ -25,8 +25,8 @@ print("COMPAS_ROOT_DIR:", compasRootDir)
 print(sys.path)
 
 pathToData = os.path.join(compasRootDir, "luxetenebrae/runs", mode)
-pathToLogs = os.path.join(compasRootDir, "luxetenebrae/logs", now.strftime('%m.%d'))
-pathToFiles = os.path.join(compasRootDir, "luxetenebrae/files", now.strftime('%m.%d'))
+pathToLogs = os.path.join(compasRootDir, "luxetenebrae/logs", mode)
+pathToFiles = os.path.join(compasRootDir, "luxetenebrae/files", mode)
 # Create output directory if it doesn't exist
 os.makedirs(pathToLogs, exist_ok=True)
 os.makedirs(pathToFiles, exist_ok=True)
@@ -34,7 +34,7 @@ os.makedirs(pathToFiles, exist_ok=True)
 # Get the script name
 script_name = os.path.basename(__file__)
 # Configure logging
-log_filename = f"{pathToLogs}/{script_name}_{now.strftime('%H%M')}.log"
+log_filename = f"{pathToLogs}/{script_name}_{now.strftime('%m.%d')}_{now.strftime('%H%M')}.log"
 os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 logging.basicConfig(filename=log_filename, level=logging.INFO, 
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -72,6 +72,7 @@ survivors = open(f'{compasRootDir}/luxetenebrae/files/survivors.txt', 'a')
 i = 0
 j = 0
 k = 0
+l = 0
 
 # Loop through the data outputs and check for black holes and MS + BH pairs. If not found, delete the detailed output file. 
 print(f"Total number of systems to process: {len(data_outputs_1)}")
@@ -110,12 +111,15 @@ for Data in data_outputs_1:
         continue
     
     # Save the seed of the system
+    print(f"System {seed[0]} survived the purge.")
     survivors.write(f"{seed[0]}\n")
+    l = l + 1
             
 survivors.close()
 print(f"Total number of systems: {k}")
 print(f"Total number of systems without BHs: {i}")
 print(f"Total number of systems without BH-MS pairs: {j}")           
+print(f"Total number of systems that survived the purge: {l}")
 
   
  
