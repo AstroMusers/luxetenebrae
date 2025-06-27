@@ -11,14 +11,10 @@ def is_bh_bh_pair(st1, st2):
     return (st1 == 14 and st2 == 14)
 
 def check_merger_MT_hist(mt_history):
-    for x in mt_history:
-        if x == 6:
-            return True
-        else:
-            return False
+    return (mt_history[-1] == 6)
 
-def check_merger_manual(r1, r2, sa):
-    if sa >= 0:
+def check_merger_manual(r1, r2, sa, e):
+    if e <= 1:
         return ((r1 + r2) >= sa)
     else:
         return False

@@ -96,6 +96,7 @@ bhbh_final_systems = []
 for Data, Data_SP in zip(detailed_output, SP_output):
 
     Data = Data.data
+    Data_SP = Data_SP.data
     # print("Batch (of " + str(len(data_outputs)) + " sys.) " + str(i) +  " start time :", current_time)
     seed = Data['Seed'][0]
     print('seed', seed)
@@ -116,15 +117,15 @@ for Data, Data_SP in zip(detailed_output, SP_output):
     periapsiss = calc.periapsis(semimajoraxis, eccentricity)
     # rocheR_periapsis = calculate_periapsis()
 
-    merger = Data_SP['MergerSP'][0]
+    merger = Data_SP['Merger']
 
     mask = np.array([utils.is_ms_bh_pair(st1, st2) for st1, st2 in zip(stellar_type_1, stellar_type_2)])
     # print(f"Number of MS + BH states in this system: {np.sum(mask)}")
 
     merger_flag_manual = False
-    for r1, r2, sa in zip(radius_1, radius_2, semimajoraxis):
+    for r1, r2, sa, e in zip(radius_1, radius_2, semimajoraxis, eccentricity):
         # print(check_merger_manual(r1, r2, sa))
-        if utils.check_merger_manual(r1, r2, sa):
+        if utils.check_merger_manual(r1, r2, sa, e):
             print('check merger manual True')
             merger_flag_manual = True
     if merger_flag_manual:       
@@ -134,8 +135,8 @@ for Data, Data_SP in zip(detailed_output, SP_output):
     # print(check_merger_MT_hist(mt_history))
     if utils.check_merger_MT_hist(mt_history):
         print('check merger mt hist True')
-
         merger_flag_mthist = True
+        print('r1 + r2 =', radius_1[-1] + radius_2[-1], 'semimajoraxis =', semimajoraxis[-1])
         merger_flags_mthist.append(seed)
 
 
@@ -181,7 +182,7 @@ for Data, Data_SP in zip(detailed_output, SP_output):
     ax[1].legend()
     ax[1].grid(False) 
     ax[1].fill_between(time_filtered, 0, max(np.max(semimajoraxis_filtered), np.max(radius_1), np.max(radius_2)), color='orange', alpha=0.1)
-    ax[1].text(0.05, 0.15, rf'$\langle$SA$\rangle$: {semaj_ave} AU', transform=ax[1].transAxes,  verticalalignment='top')
+    ax[1].text(0.05, 0.15, rf'$\langle$SA$\rangle_\tau$: {semaj_ave} AU', transform=ax[1].transAxes,  verticalalignment='top')
     ax[1].set_ylabel('Semi-major Axis [AU]')
 
     ax[2].scatter(time, mt_history, s=2)
