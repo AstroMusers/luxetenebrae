@@ -17,7 +17,7 @@ import datetime as dt
 # Detailed outputs is enabled by default in the config file, so you will get detailed outputs for each run. Change the option from 'True' to 'False' in the config file if you want to disable detailed outputs.
 # The output directory is set to the current working directory by default. You can change the output directory by setting the environment variable COMPAS_LOGS_OUTPUT_DIR_PATH or by changing the value in the config file under stringChoices -> '--output-path'.
 # Depending on your choices in the config file, you can keep track of important changes or categorise the runs by changing the mode variable below. In this way runs with different configurations can be stored in different directories.
-number_of_runs = 2
+number_of_runs = 5
 mode = "WD_Enabled_Detailed"  # Change this to the desired 'mode'. We use 'WD_Enabled_Detailed' because we want to enable detailed outputs and we want to include white dwarfs in the runs.
 for i in range(number_of_runs):
     # Check if we are using python 3
