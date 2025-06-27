@@ -10,45 +10,45 @@ import datetime as dt
 import h5py as h5                # for reading the COMPAS data
 import matplotlib.pyplot as plt  # for plotting
 import matplotlib
-from calculations import periapsis    # functions from calculations.py
+from luxetenebrae import calculations as calc   # functions from calculations.py
 from astropy.io import fits
 from astropy.table import Table
 from astropy import constants as const
 from astropy import units as u
-from utils import is_ms_bh_pair, check_merger_manual, check_merger_MT_hist, is_bh_bh_pair
-matplotlib.rcParams.update({'legend.labelspacing':0.15})
+from luxetenebrae import utils as utils      # functions from utils.py
+now = dt.datetime.now()
+# Choose the modee to process
+mode = 'WD_Enabled'
 
-matplotlib.use("Agg")
+# Import COMPAS specific scripts
+compasRootDir = os.environ['COMPAS_ROOT_DIR']
+sys.path.append(compasRootDir + '/postProcessing/PythonScripts')
+print("COMPAS_ROOT_DIR:", compasRootDir)
+print(sys.path)
 
-
-pathToData = '/data/a.saricaoglu/repo/COMPAS/'
+pathToData = os.path.join(compasRootDir, "luxetenebrae/runs", mode)
+pathToFiles = os.path.join(compasRootDir, "luxetenebrae/files", mode)
+pathToLogs = os.path.join(compasRootDir, "luxetenebrae/logs", mode)
+pathToPlots = os.path.join(compasRootDir, "luxetenebrae/plots", mode)
+# Create output directory if it doesn't exist
+os.makedirs(pathToFiles, exist_ok=True)
+os.makedirs(pathToLogs, exist_ok=True)
+os.makedirs(pathToPlots, exist_ok=True)
 
 # Get the script name
 script_name = os.path.basename(__file__)
 # Configure logging
-log_filename = f"{pathToData}/Files/{dt.datetime.now().strftime('%m.%d')}/{dt.datetime.now().strftime('%H%M')}/{script_name}_script.log"
+log_filename = f"{pathToLogs}/{script_name}_{now.strftime('%m.%d')}_{now.strftime('%H%M')}.log"
 os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 logging.basicConfig(filename=log_filename, level=logging.INFO, 
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Redirect stdout and stderr to the log file
-class StreamToLogger:
-    def __init__(self, logger, log_level):
-        self.logger = logger
-        self.log_level = log_level
-        self.linebuf = ''
-
-    def write(self, buf):
-        for line in buf.rstrip().splitlines():
-            self.logger.log(self.log_level, line.rstrip())
-
-    def flush(self):
-        pass
-
-# sys.stdout = StreamToLogger(logging.getLogger('STDOUT'), logging.INFO)
-# sys.stderr = StreamToLogger(logging.getLogger('STDERR'), logging.ERROR)
+sys.stdout = utils.StreamToLogger(logging.getLogger('STDOUT'), logging.INFO)
+sys.stderr = utils.StreamToLogger(logging.getLogger('STDERR'), logging.ERROR)
 # Log the start of the script with the script name
 logging.info(f'Script {script_name} started')
+
 # Displays Time
 s = dt.datetime.now()
 starttime = t.ctime(t.time())
@@ -56,187 +56,157 @@ start = t.process_time()
 start_time = s.strftime("%d%m%y") + "_" + s.strftime('%H%M')
 print("Start time :", start_time)
 
-# Choose the mode to process
-mode = ["Default_WD_Enabled_Detailed/" ] #,"Limited_WD_Enabled/", "Default_WD_Disabled/", "Limited_WD_Disabled/"]    
+out = [f for f in os.listdir(pathToFiles) if "stage_02_outputs" in f]
+data_outputs = []
+for f in out:
+    # print("Reading file: ", pathToData + '/Files/' + mode  + "/" + f)
 
-# Import COMPAS specific scripts
-compasRootDir = os.environ['COMPAS_ROOT_DIR']
-sys.path.append(compasRootDir + '/postProcessing/PythonScripts')
-print(sys.path)
-
-day = '06.14'
-
-# Choose an output hdf5 file to work with
-for mod in mode:
-    # matplotlib.rcParams['figure.figsize'] = (15,10)
-    # matplotlib.rcParams['lines.markersize'] = 1
-    # matplotlib.rcParams['font.size'] = 14
-    # matplotlib.rcParams['legend.loc'] = "upper right"
+    data = fits.open(pathToFiles + "/" + f)
+    data_outputs.append(data[1])
 
 
-    out = [f for f in os.listdir(pathToData + '/Files/' + mod + day) if ".fits" in f]
-    data_outputs = []
-    for f in out:
-        # print("Reading file: ", pathToData + '/Files/' + mod + day + "/" + f)
+# Keeps corresponding numerical values. 
+# SPs
+c = dt.datetime.now()
+current_time = c.strftime("%d%m%y") + "_" + c.strftime('%H%M')
 
-        data = fits.open(pathToData + '/Files/' + mod + day + "/" + f)
-        data_outputs.append(data[1])
+i = 0
 
-
-    # Keeps corresponding numerical values. 
-    # SPs
-    c = dt.datetime.now()
-    current_time = c.strftime("%d%m%y") + "_" + c.strftime('%H%M')
-    if not os.path.exists(pathToData+ "/Plots/" + mod + '/Detailed_Output/' +  str(c.strftime("%m.%d")+ "/" + current_time + "/") ): 
-        os.makedirs(pathToData + "/Plots/"  + mod + '/Detailed_Output/' +  str(c.strftime("%m.%d")+ "/" + current_time + "/") ) 
-    directoryp = pathToData + "/Plots/"  + mod + '/Detailed_Output/' +  str(c.strftime("%m.%d") + "/" + current_time + "/")  
+merger_flags_manual = []
+merger_flags_mthist = []
+merger_flags = []
+bhms_final_systems = []
+bhbh_final_systems = []
 
 
+for Data in data_outputs:
     
+    Data = Data.data
+    # print("Batch (of " + str(len(data_outputs)) + " sys.) " + str(i) +  " start time :", current_time)
+    seed = Data['Seed'][0]
+    print('seed', seed)
+    stellar_type_1 = Data['Stellar_Type_1']
+    stellar_type_2 = Data['Stellar_Type_2']
+    radius_1 = (Data['Radius(1)']*const.R_sun).to(u.au).value
+    radius_2 = (Data['Radius(2)']*const.R_sun).to(u.au).value
+    time = Data['Time']
+    semimajoraxis = Data['SemiMajorAxis']
+    roche_lobe_1 = (Data['RocheLobe(1)']*const.R_sun).to(u.au).value
+    roche_lobe_2 = (Data['RocheLobe(2)']*const.R_sun).to(u.au).value
+    mass_1 = Data['Mass(1)']
+    mass_2 = Data['Mass(2)']
+    mass_zams_1 = Data['Mass@ZAMS(1)']
+    mass_zams_2 = Data['Mass@ZAMS(2)']
+    mt_history = Data['MT_History']
+    merger = Data['Merger_Flag'][0]
+    eccentricity = Data['Eccentricity']
+    periapsiss = calc.periapsis(semimajoraxis, eccentricity)
+    # rocheR_periapsis = calculate_periapsis()
+
+    mask = np.array([utils.is_ms_bh_pair(st1, st2) for st1, st2 in zip(stellar_type_1, stellar_type_2)])
+    # print(f"Number of MS + BH states in this system: {np.sum(mask)}")
+
+    merger_flag_manual = False
+    for r1, r2, sa in zip(radius_1, radius_2, semimajoraxis):
+        # print(check_merger_manual(r1, r2, sa))
+        if utils.check_merger_manual(r1, r2, sa):
+            print('check merger manual True')
+            merger_flag_manual = True
+    if merger_flag_manual:       
+        merger_flags_manual.append(seed)
+
+    merger_flag_mthist = False
+    # print(check_merger_MT_hist(mt_history))
+    if utils.check_merger_MT_hist(mt_history):
+        print('check merger mt hist True')
+
+        merger_flag_mthist = True
+        merger_flags_mthist.append(seed)
 
 
-    # f = open(pathToData + '/Files/' + mod  + str(s.strftime("%m.%d")) +  "_general_outputs.txt", "a")
+    if utils.is_ms_bh_pair(stellar_type_1[-1], stellar_type_2[-1]):
+        bhms_final_systems.append(seed)
 
-    # f.writelines(["\n","\n Run :", start_time])
-    # print(f'Data outputs :, {data_outputs}')
+    if utils.is_bh_bh_pair(stellar_type_1[-1], stellar_type_2[-1]):
+        bhbh_final_systems.append(seed)
 
-    i = 0
-
-    merger_flags_manual = []
-    merger_flags_mthist = []
-    merger_flags = []
-    bhms_final_systems = []
-    bhbh_final_systems = []
-    
-
-    for Data in data_outputs:
-        
-        Data = Data.data
-        # print("Batch (of " + str(len(data_outputs)) + " sys.) " + str(i) +  " start time :", current_time)
-        seed = Data['Seed'][0]
-        print('seed', seed)
-        stellar_type_1 = Data['Stellar_Type_1']
-        stellar_type_2 = Data['Stellar_Type_2']
-        radius_1 = (Data['Radius(1)']*const.R_sun).to(u.au).value
-        radius_2 = (Data['Radius(2)']*const.R_sun).to(u.au).value
-        time = Data['Time']
-        semimajoraxis = Data['SemiMajorAxis']
-        roche_lobe_1 = (Data['RocheLobe(1)']*const.R_sun).to(u.au).value
-        roche_lobe_2 = (Data['RocheLobe(2)']*const.R_sun).to(u.au).value
-        mass_1 = Data['Mass(1)']
-        mass_2 = Data['Mass(2)']
-        mass_zams_1 = Data['Mass@ZAMS(1)']
-        mass_zams_2 = Data['Mass@ZAMS(2)']
-        mt_history = Data['MT_History']
-        merger = Data['Merger_Flag'][0]
-        eccentricity = Data['Eccentricity']
-        periapsiss = periapsis(semimajoraxis, eccentricity)
-        # rocheR_periapsis = calculate_periapsis()
-
-        mask = np.array([is_ms_bh_pair(st1, st2) for st1, st2 in zip(stellar_type_1, stellar_type_2)])
-        # print(f"Number of MS + BH states in this system: {np.sum(mask)}")
-
-        merger_flag_manual = False
-        for r1, r2, sa in zip(radius_1, radius_2, semimajoraxis):
-            # print(check_merger_manual(r1, r2, sa))
-            if check_merger_manual(r1, r2, sa):
-                print('check merger manual True')
-                merger_flag_manual = True
-        if merger_flag_manual:       
-            merger_flags_manual.append(seed)
-
-        merger_flag_mthist = False
-        # print(check_merger_MT_hist(mt_history))
-        if check_merger_MT_hist(mt_history):
-            print('check merger mt hist True')
-
-            merger_flag_mthist = True
-            merger_flags_mthist.append(seed)
-        
-        
-        if is_ms_bh_pair(stellar_type_1[-1], stellar_type_2[-1]):
-            bhms_final_systems.append(seed)
-
-        if is_bh_bh_pair(stellar_type_1[-1], stellar_type_2[-1]):
-            bhbh_final_systems.append(seed)
-
-        merger_flags.append(merger)
+    merger_flags.append(merger)
 
 
-        time_filtered = Data['Time'][:][mask]  # Assuming 'Time' is the time evolution data
-        stype1_filtered = stellar_type_1[mask]
-        stype2_filtered = stellar_type_2[mask]
-        radius1_filtered = radius_1[mask]
-        radius2_filtered = radius_2[mask]
-        semimajoraxis_filtered = semimajoraxis[mask]
-        bhms_lifetime = time_filtered[-1] - time_filtered[0]
-        bhms_life = '{:.2f}'.format(bhms_lifetime) 
-        semaj_average = np.mean(semimajoraxis_filtered)
-        semaj_ave= '{:.2f}'.format(semaj_average) 
+    time_filtered = Data['Time'][:][mask]  # Assuming 'Time' is the time evolution data
+    stype1_filtered = stellar_type_1[mask]
+    stype2_filtered = stellar_type_2[mask]
+    radius1_filtered = radius_1[mask]
+    radius2_filtered = radius_2[mask]
+    semimajoraxis_filtered = semimajoraxis[mask]
+    bhms_lifetime = time_filtered[-1] - time_filtered[0]
+    bhms_life = '{:.2f}'.format(bhms_lifetime) 
+    semaj_average = np.mean(semimajoraxis_filtered)
+    semaj_ave= '{:.2f}'.format(semaj_average) 
 
-        fig, ax = plt.subplots(4,1, sharex=True, figsize=(4, 10))
-        ax[0].scatter(time, stellar_type_1, s=2, label='Primary Star', color='blue')
-        ax[0].scatter(time, stellar_type_2, s=2, label='Secondary Star', color='red')
-        ax[0].set_yticks(np.arange(0,18,1), [r'MS (M<0.7 $M_\odot$)', r'MS (M>0.7 $M_\odot$)', 'HG', 'FGB', 'CHeB', 'EAGB', 'TPAGB', 'HeMS', 'HeHG', 'HeGB', 'HeWD', 'COWD', 'ONeWD','NS', 'BH', 'MR', 'CHE', 'None'])
-        ax[0].fill_between(time_filtered, 0, np.max(stype1_filtered) , color='orange', alpha=0.1)
-        ax[0].text(0.05, 0.95, fr'Lifetime of BH-MS: {bhms_life} Myr', transform=ax[0].transAxes,  verticalalignment='top')
-        # ax[0].set_title('Stellar Type Evolution for MS + BH Systems')
-        ax[0].legend()
-        ax[0].grid(True) 
-        ax[0].set_ylabel('Stellar Type')
+    fig, ax = plt.subplots(4,1, sharex=True, figsize=(4, 10))
+    ax[0].scatter(time, stellar_type_1, s=2, label='Primary Star', color='blue')
+    ax[0].scatter(time, stellar_type_2, s=2, label='Secondary Star', color='red')
+    ax[0].set_yticks(np.arange(0,18,1), [r'MS (M<0.7 $M_\odot$)', r'MS (M>0.7 $M_\odot$)', 'HG', 'FGB', 'CHeB', 'EAGB', 'TPAGB', 'HeMS', 'HeHG', 'HeGB', 'HeWD', 'COWD', 'ONeWD','NS', 'BH', 'MR', 'CHE', 'None'])
+    ax[0].fill_between(time_filtered, 0, np.max(stype1_filtered) , color='orange', alpha=0.1)
+    ax[0].text(0.05, 0.95, fr'Lifetime of BH-MS: {bhms_life} Myr', transform=ax[0].transAxes,  verticalalignment='top')
+    # ax[0].set_title('Stellar Type Evolution for MS + BH Systems')
+    ax[0].legend()
+    ax[0].grid(True) 
+    ax[0].set_ylabel('Stellar Type')
 
 
-        ax[1].plot(time, semimajoraxis, label='Semi-major Axis', color='yellow')
-        ax[1].plot(time, radius_1, label=r'$R_p$', color='blue')
-        ax[1].plot(time, radius_2, label=r'$R_s$', color='red')
-        ax[1].plot(time, roche_lobe_1, label=r'$Roche R_p$', color='blue', linestyle='dashed')
-        ax[1].plot(time, roche_lobe_2, label=r'$Roche R_s$', color='red', linestyle='dashed')   
-        ax[1].plot(time, periapsiss, label='Periapsis', color='yellow', linestyle='dashed')
-   
-        ax[1].legend()
-        ax[1].grid(True) 
-        ax[1].fill_between(time_filtered, 0, max(np.max(semimajoraxis_filtered), np.max(radius_1), np.max(radius_2)), color='orange', alpha=0.1)
-        ax[1].text(0.05, 0.15, rf'$\langle$SA$\rangle$: {semaj_ave} AU', transform=ax[1].transAxes,  verticalalignment='top')
-        ax[1].set_ylabel('Semi-major Axis [AU]')
+    ax[1].plot(time, semimajoraxis, label='Semi-major Axis', color='yellow')
+    ax[1].plot(time, radius_1, label=r'$R_p$', color='blue')
+    ax[1].plot(time, radius_2, label=r'$R_s$', color='red')
+    ax[1].plot(time, roche_lobe_1, label=r'$Roche R_p$', color='blue', linestyle='dashed')
+    ax[1].plot(time, roche_lobe_2, label=r'$Roche R_s$', color='red', linestyle='dashed')   
+    ax[1].plot(time, periapsiss, label='Periapsis', color='yellow', linestyle='dashed')
 
-        ax[2].scatter(time, mt_history, s=2)
-        ax[2].fill_between(time_filtered, 0, 7, color='orange', alpha=0.1)
-        ax[2].set_yticks(np.arange(0,7,1), ['No MT', 'MT 1->2', 'MT 2->1', 'MTCE 1->2', 'MTCE 2->1', 'MTCE DoubleCore', 'Merger'])
+    ax[1].legend()
+    ax[1].grid(True) 
+    ax[1].fill_between(time_filtered, 0, max(np.max(semimajoraxis_filtered), np.max(radius_1), np.max(radius_2)), color='orange', alpha=0.1)
+    ax[1].text(0.05, 0.15, rf'$\langle$SA$\rangle$: {semaj_ave} AU', transform=ax[1].transAxes,  verticalalignment='top')
+    ax[1].set_ylabel('Semi-major Axis [AU]')
 
-        ax[2].text(0.05, 0.95, f'Merger (from flag): {merger}', transform=ax[2].transAxes,  verticalalignment='top')
-        ax[2].text(0.05, 0.85, f'Merger (from mthist): {merger_flag_mthist}', transform=ax[2].transAxes,  verticalalignment='top')
-        ax[2].text(0.05, 0.75, f'Merger (manual): {merger_flag_manual}', transform=ax[2].transAxes,  verticalalignment='top')
-        # ax[2].legend()
-        ax[2].grid(True) 
-        ax[2].set_ylabel('MT History')
+    ax[2].scatter(time, mt_history, s=2)
+    ax[2].fill_between(time_filtered, 0, 7, color='orange', alpha=0.1)
+    ax[2].set_yticks(np.arange(0,7,1), ['No MT', 'MT 1->2', 'MT 2->1', 'MTCE 1->2', 'MTCE 2->1', 'MTCE DoubleCore', 'Merger'])
 
-        ax[3].plot(time, eccentricity, label='Eccentricity', color='yellow')
-        # ax[3].legend()
-        ax[3].grid(True) 
-        ax[3].set_ylabel('Eccentricity')        
+    ax[2].text(0.05, 0.95, f'Merger (from flag): {merger}', transform=ax[2].transAxes,  verticalalignment='top')
+    ax[2].text(0.05, 0.85, f'Merger (from mthist): {merger_flag_mthist}', transform=ax[2].transAxes,  verticalalignment='top')
+    ax[2].text(0.05, 0.75, f'Merger (manual): {merger_flag_manual}', transform=ax[2].transAxes,  verticalalignment='top')
+    # ax[2].legend()
+    ax[2].grid(True) 
+    ax[2].set_ylabel('MT History')
+
+    ax[3].plot(time, eccentricity, label='Eccentricity', color='yellow')
+    # ax[3].legend()
+    ax[3].grid(True) 
+    ax[3].set_ylabel('Eccentricity')        
 
 
 
-        plt.xlabel('Time [Myr]')
-        plt.legend()
-        plt.grid(True) 
-        plt.savefig(f'{directoryp}/stellar_type_evolution_{i}.png',bbox_inches='tight')
-        plt.close()
+    plt.xlabel('Time [Myr]')
+    plt.legend()
+    plt.grid(True) 
+    plt.savefig(f'{pathToPlots}/stellar_type_evolution_{i}.png',bbox_inches='tight')
+    plt.close()
 
-        i = i + 1
+    i = i + 1
 
-    print(f'Systems with merger (R1+R2>SA): {(merger_flags_manual)}')
-    print(f'Systems with merger (MT hist): {(merger_flags_mthist)}')
-    print(f'Systems with merger (flag): {(merger_flags)}')
-    print(f'Systems with BH-MS final state:{(bhms_final_systems)}')
+print(f'Systems with merger (R1+R2>SA): {(merger_flags_manual)}')
+print(f'Systems with merger (MT hist): {(merger_flags_mthist)}')
+print(f'Systems with merger (flag): {(merger_flags)}')
+print(f'Systems with BH-MS final state:{(bhms_final_systems)}')
 
 
 
-    print(f'Number of systems with merger (R1+R2>SA): {len(merger_flags_manual)}')
-    print(f'Number of systems with merger (MT hist): {len(merger_flags_mthist)}')
-    print(f'Number of systems with merger (flag): {np.sum(merger_flags)}')
-    print(f'Number of systems with BH-MS final state:{len(bhms_final_systems)}')
-    print(f'Number of systems with BH-BH final state:{len(bhbh_final_systems)}')
+print(f'Number of systems with merger (R1+R2>SA): {len(merger_flags_manual)}')
+print(f'Number of systems with merger (MT hist): {len(merger_flags_mthist)}')
+print(f'Number of systems with merger (flag): {np.sum(merger_flags)}')
+print(f'Number of systems with BH-MS final state:{len(bhms_final_systems)}')
+print(f'Number of systems with BH-BH final state:{len(bhbh_final_systems)}')
 e = dt.datetime.now()
 # Displays Time
 current_time = e.strftime("%d%m%y") + "_" + e.strftime('%H%M')

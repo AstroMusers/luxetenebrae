@@ -94,7 +94,7 @@ for Data in data_outputs_1:
     print("Number of primary black holes:", len(BH1), "Number of secondary black holes:", len(BH2))
 
     # Check if there are any BHs in the system
-    if (len(BH1) & len(BH2)) == 0:
+    if (len(BH1) + len(BH2)) == 0:
         print(f"No BHs in this system, deleting {Data.filename}")
         os.remove(f'{Data.filename}')
         i += 1
