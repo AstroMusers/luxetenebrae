@@ -15,7 +15,7 @@ from astropy.io import fits
 from astropy.table import Table
 from astropy import constants as const
 from astropy import units as u
-from utils import is_ms_bh_pair, check_merger_manual, check_merger_MT_hist, is_bh_bh_pair, which_bh
+from luxetenebrae.utils import is_ms_bh_pair, check_merger_manual, check_merger_MT_hist, is_bh_bh_pair, which_bh
 
 matplotlib.use("Agg")
 

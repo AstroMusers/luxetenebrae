@@ -19,7 +19,7 @@ from luxetenebrae import utils as utils
 
 now = dt.datetime.now()
 # Choose the mode to process
-mode = 'WD_Enabled_Detailed'
+mode = 'WD_Enabled'
 
 # Import COMPAS specific scripts
 compasRootDir = os.environ['COMPAS_ROOT_DIR']
@@ -28,8 +28,8 @@ print("COMPAS_ROOT_DIR:", compasRootDir)
 print(sys.path)
 
 pathToData = os.path.join(compasRootDir, "luxetenebrae/runs", mode)
-pathToFiles = os.path.join(compasRootDir, "luxetenebrae/files", now.strftime('%m.%d'))
-pathToLogs = os.path.join(compasRootDir, "luxetenebrae/logs", now.strftime('%m.%d'))
+pathToFiles = os.path.join(compasRootDir, "luxetenebrae/files", mode)
+pathToLogs = os.path.join(compasRootDir, "luxetenebrae/logs", mode)
 # Create output directory if it doesn't exist
 os.makedirs(pathToFiles, exist_ok=True)
 os.makedirs(pathToLogs, exist_ok=True)
@@ -37,7 +37,7 @@ os.makedirs(pathToLogs, exist_ok=True)
 # Get the script name
 script_name = os.path.basename(__file__)
 # Configure logging
-log_filename = f"{pathToLogs}/{script_name}_{now.strftime('%H%M')}.log"
+log_filename = f"{pathToLogs}/{script_name}_{now.strftime('%m.%d')}_{now.strftime('%H%M')}.log"
 os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 logging.basicConfig(filename=log_filename, level=logging.INFO, 
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -69,7 +69,7 @@ for run in runs:
 
 
 
-fit_filename = pathToFiles + "/secundus.fits"
+fit_filename = pathToFiles + "/stage_01_output.fits"
 hdu_pr = fits.PrimaryHDU()
 hdu_pr.writeto(fit_filename, overwrite=True)
 hdu = fits.open(fit_filename, mode='update')

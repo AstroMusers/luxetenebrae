@@ -59,9 +59,6 @@ start_time = s.strftime("%d%m%y") + "_" + s.strftime('%H%M')
 print("Start time :", start_time)
 # Choose an output hdf5 file to work with
 
-
-secundus = [x[0] for x in os.walk(pathToFiles) if "stage_01_output.fits" in x[2]]
-
 fit_filename = pathToFiles + "/stage_02_output.fits"
 hdu_pr = fits.PrimaryHDU()
 hdu_pr.writeto(fit_filename, overwrite=True)
@@ -114,7 +111,7 @@ MASKLASTMT = np.array([], dtype='bool')
 MASKPREMTSEARCHABILITY = np.array([], dtype='bool')
 MASKPSTMTSEARCHABILITY = np.array([], dtype='bool')
 
-fits_data = pathToFiles + 'stage_02_output.fits'
+fits_data = pathToFiles + '/stage_01_output.fits'
 with fits.open(fits_data) as hdul:
     hdul.info()
     SP = hdul[1].data
@@ -173,10 +170,10 @@ with fits.open(fits_data) as hdul:
 MASKFIRSTMT = (MT['EVENTSMT'] == 1)
 
 # Chooses last MT events.
-MASKLASTMT = calc.find_last_mt(MT['MTs'])
+MASKLASTMT = utils.find_last_mt(MT['MTs'])
 
 # Chooses MT events where stellar type changes.
-MASKTYPECHANGE1, MASKTYPECHANGE2 = calc.type_change_MT(MT['STELLARTYPEPREMT1'],MT['STELLARTYPEPSTMT1'],MT['STELLARTYPEPREMT2'], MT['STELLARTYPEPSTMT2'], start_time)
+MASKTYPECHANGE1, MASKTYPECHANGE2 = utils.type_change_MT(MT['STELLARTYPEPREMT1'],MT['STELLARTYPEPSTMT1'],MT['STELLARTYPEPREMT2'], MT['STELLARTYPEPSTMT2'], start_time)
 
 
 ORBITALPERIODSP = calc.orbital_period(SP['MASSZAMSSP1'], SP['MASSZAMSSP2'], SP['SEMIMAJORAXISZAMSSP'])
