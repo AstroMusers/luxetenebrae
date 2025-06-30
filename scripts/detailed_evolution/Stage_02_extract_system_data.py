@@ -156,10 +156,6 @@ for Data in data_outputs_1:
     eccentricityZamsSP = [SP_dict[seed]['Eccentricity@ZAMS'][()]]
     mergersSP = [SP_dict[seed]['Merger'][()]]
 
-    print(f'Lengths of SP arrays: {len(seedSP)}, {len(statusSP)}, {len(stellarTypeZamsSP1)}, {len(stellarTypeZamsSP2)}, '
-          f'{len(stellarTypeSP1)}, {len(stellarTypeSP2)}, {len(massZamsSP1)}, {len(massZamsSP2)}, '
-          f'{len(semimajorAxisZamsSP)}, {len(eccentricityZamsSP)}, {len(mergersSP)}')
-
     table_two = fits.BinTableHDU(Table(data=[seedSP, statusSP, stellarTypeZamsSP1, stellarTypeZamsSP2, stellarTypeSP1, stellarTypeSP2,
                                         massZamsSP1, massZamsSP2, semimajorAxisZamsSP, eccentricityZamsSP, mergersSP],
                                     names=['SEED', 'Evolution_Status', 'Stellar_Type@ZAMS(1)', 'Stellar_Type@ZAMS(2)',

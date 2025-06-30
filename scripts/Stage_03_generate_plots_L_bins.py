@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt  #for plotting
 import matplotlib
 import seaborn as sns
 from astropy.io import fits
-import calculations as calc
+from luxetenebrae import calculations as calc
 
 def mylog(x, y):
     # Compute the logarithm of x and y
@@ -48,7 +48,7 @@ for mod in mode:
     matplotlib.rcParams['font.size'] = 30
     matplotlib.rcParams['legend.loc'] = "upper right"
 
-    pathToData = path + '/Files/' + mod + "02.19/" #change the date accordingly the date of the files created via Sec
+    pathToData = path + '/Files/' + mod + "04.19/" #change the date accordingly the date of the files created via Sec
 
     # Keeps corresponding numerical values 
     SPs = []
@@ -127,18 +127,21 @@ for mod in mode:
     MTdf_pre_singleBH["BH1"] = MT["MASSPREMT1"]*MT_mask["MASKPREMTBH1"]
     MTdf_pre_singleBH["CP2"] = MT["MASSPREMT2"]*MT_mask["MASKPREMTBH1"]
     MTdf_pre_singleBH["SA1"] = MT["SEMIMAJORAXISPREMT"]*MT_mask["MASKPREMTBH1"]
+    MTdf_pre_singleBH["CPR1"] = MT["RADIUSPREMT2"]*MT_mask["MASKPREMTBH1"]
+
 
     #Systems which secondary is BH
     MTdf_pre_singleBH["BH2"] = MT["MASSPREMT2"]*MT_mask["MASKPREMTBH2"]
     MTdf_pre_singleBH["CP1"] = MT["MASSPREMT1"]*MT_mask["MASKPREMTBH2"]
     MTdf_pre_singleBH["SA2"] = MT["SEMIMAJORAXISPREMT"]*MT_mask["MASKPREMTBH2"]
+    MTdf_pre_singleBH["CPR2"] = MT["RADIUSPREMT1"]*MT_mask["MASKPREMTBH2"]
 
 ########## UPDATE 7.11.24
     #disregarding initially primary or secondary stars, BH objects are considered as primary and the star as secondary.
     MTdf_pre_tot["BlackHole"] = np.concatenate([MTdf_pre_singleBH["BH1"], MTdf_pre_singleBH["BH2"]])
-    MTdf_pre_tot["Companion"] = np.concatenate([MTdf_pre_singleBH["CP1"], MTdf_pre_singleBH["CP2"]])
+    MTdf_pre_tot["Companion"] = np.concatenate([MTdf_pre_singleBH["CP2"], MTdf_pre_singleBH["CP1"]])
     MTdf_pre_tot["Semax"] = np.concatenate([MTdf_pre_singleBH["SA1"] , MTdf_pre_singleBH["SA2"] ])
-
+    MTdf_pre_tot["CPR"] = np.concatenate([MTdf_pre_singleBH["CPR1"] , MTdf_pre_singleBH["CPR2"] ])
 
     MTdf_pst_singleBH = pd.DataFrame()
     MTdf_pst_tot = pd.DataFrame()
@@ -147,31 +150,37 @@ for mod in mode:
     MTdf_pst_singleBH["CP2"] = MT["MASSPSTMT2"]*MT_mask["MASKPSTMTBH1"]
     MTdf_pst_singleBH["SA1"] = MT["SEMIMAJORAXISPSTMT"]*MT_mask["MASKPSTMTBH1"]
     MTdf_pst_singleBH["OP1"] = MT_mask["ORBITALPERIODPSTMT"]*MT_mask["MASKPSTMTBH1"]
+    MTdf_pst_singleBH["CPR1"] = MT["RADIUSPSTMT2"]*MT_mask["MASKPSTMTBH1"]
 
     #Systems which secondary is BH
     MTdf_pst_singleBH["BH2"] = MT["MASSPSTMT2"]*MT_mask["MASKPSTMTBH2"]
     MTdf_pst_singleBH["CP1"] = MT["MASSPSTMT1"]*MT_mask["MASKPSTMTBH2"]
     MTdf_pst_singleBH["SA2"] = MT["SEMIMAJORAXISPSTMT"]*MT_mask["MASKPSTMTBH2"]
     MTdf_pst_singleBH["OP2"] = MT_mask["ORBITALPERIODPSTMT"]*MT_mask["MASKPSTMTBH2"]
+    MTdf_pst_singleBH["CPR2"] = MT["RADIUSPSTMT1"]*MT_mask["MASKPSTMTBH2"]
 ########## UPDATE 7.11.24
     #disregarding initially primary or secondary stars, BH objects are considered as primary and the star as secondary.
     MTdf_pst_tot["BlackHole"] = np.concatenate([MTdf_pst_singleBH["BH1"], MTdf_pst_singleBH["BH2"]])
-    MTdf_pst_tot["Companion"] = np.concatenate([MTdf_pst_singleBH["CP1"], MTdf_pst_singleBH["CP2"]])
+    MTdf_pst_tot["Companion"] = np.concatenate([MTdf_pst_singleBH["CP2"], MTdf_pst_singleBH["CP1"]])
     MTdf_pst_tot["Semax"] = np.concatenate([MTdf_pst_singleBH["SA1"] , MTdf_pst_singleBH["SA2"] ])
+    MTdf_pst_tot["OP"] = np.concatenate([MTdf_pst_singleBH["OP1"] , MTdf_pst_singleBH["OP2"] ])
+    MTdf_pst_tot["CPR"] = np.concatenate([MTdf_pst_singleBH["CPR1"] , MTdf_pst_singleBH["CPR2"] ])
+
+    print('Companion: ', np.min(MTdf_pst_tot["Companion"]), np.max(MTdf_pst_tot["Companion"]))
 
     change = (MT_mask['MASKTYPECHANGE1'] == 1) | (MT_mask['MASKTYPECHANGE2'] == 1)
     MTdf_pst_tot["BlackHole_changemsk"] = np.concatenate([MTdf_pst_singleBH["BH1"]*change, MTdf_pst_singleBH["BH2"]*change])
-    MTdf_pst_tot["Companion_changemsk"] = np.concatenate([MTdf_pst_singleBH["CP1"]*change, MTdf_pst_singleBH["CP2"]*change])
+    MTdf_pst_tot["Companion_changemsk"] = np.concatenate([MTdf_pst_singleBH["CP2"]*change, MTdf_pst_singleBH["CP1"]*change])
     MTdf_pst_tot["Semax_changemsk"] = np.concatenate([MTdf_pst_singleBH["SA1"]*change , MTdf_pst_singleBH["SA2"]*change ])  
 
     first = MT_mask['MASKFIRSTMT']
     MTdf_pre_tot["BlackHole_firstmsk"] = np.concatenate([MTdf_pre_singleBH["BH1"]*first, MTdf_pre_singleBH["BH2"]*first])
-    MTdf_pre_tot["Companion_firstmsk"] = np.concatenate([MTdf_pre_singleBH["CP1"]*first, MTdf_pre_singleBH["CP2"]*first])
+    MTdf_pre_tot["Companion_firstmsk"] = np.concatenate([MTdf_pre_singleBH["CP2"]*first, MTdf_pre_singleBH["CP1"]*first])
     MTdf_pre_tot["Semax_firstmsk"] = np.concatenate([MTdf_pre_singleBH["SA1"]*first , MTdf_pre_singleBH["SA2"]*first ]) 
 
     last = MT_mask['MASKLASTMT']
     MTdf_pst_tot["BlackHole_lastmsk"] = np.concatenate([MTdf_pst_singleBH["BH1"]*last, MTdf_pst_singleBH["BH2"]*last])
-    MTdf_pst_tot["Companion_lastmsk"] = np.concatenate([MTdf_pst_singleBH["CP1"]*last, MTdf_pst_singleBH["CP2"]*last])
+    MTdf_pst_tot["Companion_lastmsk"] = np.concatenate([MTdf_pst_singleBH["CP2"]*last, MTdf_pst_singleBH["CP1"]*last])
     MTdf_pst_tot["Semax_lastmsk"] = np.concatenate([MTdf_pst_singleBH["SA1"]*last , MTdf_pst_singleBH["SA2"]*last ])
 
     print("Checking for NaN values in MTdf_pst_tot['Semax_lastmsk']:", np.isnan(*mylog(MTdf_pst_tot["Semax_lastmsk"],MTdf_pst_tot["BlackHole_lastmsk"])).any())
@@ -179,26 +188,29 @@ for mod in mode:
 
     mainsequence_pre = (MT_mask['MASKPREMTBHMS1'] | MT_mask['MASKPREMTBHMS2']) & first
     MTdf_pre_tot["BlackHole_mainpremsk"] = np.concatenate([MTdf_pre_singleBH["BH1"]*mainsequence_pre, MTdf_pre_singleBH["BH2"]*mainsequence_pre])
-    MTdf_pre_tot["Companion_mainpremsk"] = np.concatenate([MTdf_pre_singleBH["CP1"]*mainsequence_pre, MTdf_pre_singleBH["CP2"]*mainsequence_pre])
+    MTdf_pre_tot["Companion_mainpremsk"] = np.concatenate([MTdf_pre_singleBH["CP2"]*mainsequence_pre, MTdf_pre_singleBH["CP1"]*mainsequence_pre])
     MTdf_pre_tot["Semax_mainpremsk"] = np.concatenate([MTdf_pre_singleBH["SA1"]*mainsequence_pre , MTdf_pre_singleBH["SA2"]*mainsequence_pre ])
 
     mainsequence_pst = (MT_mask['MASKPSTMTBHMS1'] | MT_mask['MASKPSTMTBHMS2']) & last
     MTdf_pst_tot["BlackHole_mainpstmsk"] = np.concatenate([MTdf_pst_singleBH["BH1"]*mainsequence_pst, MTdf_pst_singleBH["BH2"]*mainsequence_pst])
-    MTdf_pst_tot["Companion_mainpstmsk"] = np.concatenate([MTdf_pst_singleBH["CP1"]*mainsequence_pst, MTdf_pst_singleBH["CP2"]*mainsequence_pst])
+    MTdf_pst_tot["Companion_mainpstmsk"] = np.concatenate([MTdf_pst_singleBH["CP2"]*mainsequence_pst, MTdf_pst_singleBH["CP1"]*mainsequence_pst])
     MTdf_pst_tot["Semax_mainpstmsk"] = np.concatenate([MTdf_pst_singleBH["SA1"]*mainsequence_pst , MTdf_pst_singleBH["SA2"]*mainsequence_pst ])
     MTdf_pst_tot["OP_mainpstmsk"] = np.concatenate([MTdf_pst_singleBH["OP1"]*mainsequence_pst , MTdf_pst_singleBH["OP2"]*mainsequence_pst ])
-
+    MTdf_pst_tot["CompanionR_mainpstmsk"] = np.concatenate([MTdf_pst_singleBH["CPR1"]*mainsequence_pst , MTdf_pst_singleBH["CPR2"]*mainsequence_pst ])
+    MTdf_pst_tot["BlackHoleR_mainpstmsk"] = np.concatenate([MTdf_pst_singleBH["BH1"]*mainsequence_pst, MTdf_pst_singleBH["BH2"]*mainsequence_pst])
     mainsequence_pre_Tlim = mainsequence_pre & MT_mask['MASKPREMTORBPER']
     MTdf_pre_tot["BlackHole_mainpreTlimmsk"] = np.concatenate([MTdf_pre_singleBH["BH1"]*mainsequence_pre_Tlim, MTdf_pre_singleBH["BH2"]*mainsequence_pre_Tlim])
-    MTdf_pre_tot["Companion_mainpreTlimmsk"] = np.concatenate([MTdf_pre_singleBH["CP1"]*mainsequence_pre_Tlim, MTdf_pre_singleBH["CP2"]*mainsequence_pre_Tlim])
+    MTdf_pre_tot["Companion_mainpreTlimmsk"] = np.concatenate([MTdf_pre_singleBH["CP2"]*mainsequence_pre_Tlim, MTdf_pre_singleBH["CP1"]*mainsequence_pre_Tlim])
     MTdf_pre_tot["Semax_mainpreTlimmsk"] = np.concatenate([MTdf_pre_singleBH["SA1"]*mainsequence_pre_Tlim , MTdf_pre_singleBH["SA2"]*mainsequence_pre_Tlim ])
 
     mainsequence_pst_Tlim = mainsequence_pst & MT_mask['MASKPSTMTORBPER']
     MTdf_pst_tot["BlackHole_mainpstTlimmsk"] = np.concatenate([MTdf_pst_singleBH["BH1"]*mainsequence_pst_Tlim, MTdf_pst_singleBH["BH2"]*mainsequence_pst_Tlim])
-    MTdf_pst_tot["Companion_mainpstTlimmsk"] = np.concatenate([MTdf_pst_singleBH["CP1"]*mainsequence_pst_Tlim, MTdf_pst_singleBH["CP2"]*mainsequence_pst_Tlim])
+    MTdf_pst_tot["Companion_mainpstTlimmsk"] = np.concatenate([MTdf_pst_singleBH["CP2"]*mainsequence_pst_Tlim, MTdf_pst_singleBH["CP1"]*mainsequence_pst_Tlim])
     MTdf_pst_tot["Semax_mainpstTlimmsk"] = np.concatenate([MTdf_pst_singleBH["SA1"]*mainsequence_pst_Tlim , MTdf_pst_singleBH["SA2"]*mainsequence_pst_Tlim ])
     MTdf_pst_tot["OP_mainpstTlimmsk"] = np.concatenate([MTdf_pst_singleBH["OP1"]*mainsequence_pst_Tlim , MTdf_pst_singleBH["OP2"]*mainsequence_pst_Tlim ])
 
+    print('Companion: ', np.min(MTdf_pst_tot["Companion_mainpstTlimmsk"]), np.max(MTdf_pst_tot["Companion_mainpstTlimmsk"]))
+    
     searchability = calc.searchability(MTdf_pst_singleBH["SA1"])
     N = np.sum(searchability)
     searchability_index = N/len(searchability)
@@ -206,24 +218,27 @@ for mod in mode:
     print('Searchability index:', searchability_index)
     mainsequence_pst_alim_masuda = mainsequence_pst & MT_mask['MASKPSTMTSEMAJ_masuda'] 
     MTdf_pst_tot["BlackHole_mainpstalimmasudamsk"] = np.concatenate([MTdf_pst_singleBH["BH1"]*mainsequence_pst_alim_masuda, MTdf_pst_singleBH["BH2"]*mainsequence_pst_alim_masuda])
-    MTdf_pst_tot["Companion_mainpstalimmasudamsk"] = np.concatenate([MTdf_pst_singleBH["CP1"]*mainsequence_pst_alim_masuda, MTdf_pst_singleBH["CP2"]*mainsequence_pst_alim_masuda])
+    MTdf_pst_tot["Companion_mainpstalimmasudamsk"] = np.concatenate([MTdf_pst_singleBH["CP2"]*mainsequence_pst_alim_masuda, MTdf_pst_singleBH["CP1"]*mainsequence_pst_alim_masuda])
     MTdf_pst_tot["Semax_mainpstalimmasudamsk"] = np.concatenate([MTdf_pst_singleBH["SA1"]*mainsequence_pst_alim_masuda , MTdf_pst_singleBH["SA2"]*mainsequence_pst_alim_masuda ])
     MTdf_pst_tot["OP_mainpstalimmasudamsk"] = np.concatenate([MTdf_pst_singleBH["OP1"]*mainsequence_pst_alim_masuda , MTdf_pst_singleBH["OP2"]*mainsequence_pst_alim_masuda ])
 
     # print('Number of systems past last MT event with Orbital period less than 30 days:', np.sum(mainsequence_pst_alim_masuda))
-    print('Number of searchable systems past last MT event with semaj less than 0.4 au:', searchability_index*np.sum(mainsequence_pst_alim_masuda))
-    print('Number of systems past last with semaj less than 0.4 au:', np.sum(mainsequence_pst_alim_masuda))
+    print('Number of searchable systems past last MT event with semaj less than 0.4 au:', np.sum(mainsequence_pst_alim_masuda))
+    print('Number of systems past last with semaj less than 0.4 au:', np.sum(mainsequence_pst & MT_mask['MASKPSTMTSEMAJ_masuda']))
 
     mainsequence_pst_Tlim_masuda = mainsequence_pst & MT_mask['MASKPSTMTORBPER_masuda']
     MTdf_pst_tot["BlackHole_mainpstTlimmasudamsk"] = np.concatenate([MTdf_pst_singleBH["BH1"]*mainsequence_pst_Tlim_masuda, MTdf_pst_singleBH["BH2"]*mainsequence_pst_Tlim_masuda])
-    MTdf_pst_tot["Companion_mainpstTlimmasudamsk"] = np.concatenate([MTdf_pst_singleBH["CP1"]*mainsequence_pst_Tlim_masuda, MTdf_pst_singleBH["CP2"]*mainsequence_pst_Tlim_masuda])
+    MTdf_pst_tot["Companion_mainpstTlimmasudamsk"] = np.concatenate([MTdf_pst_singleBH["CP2"]*mainsequence_pst_Tlim_masuda, MTdf_pst_singleBH["CP1"]*mainsequence_pst_Tlim_masuda])
     MTdf_pst_tot["Semax_mainpstTlimmasudamsk"] = np.concatenate([MTdf_pst_singleBH["SA1"]*mainsequence_pst_Tlim_masuda , MTdf_pst_singleBH["SA2"]*mainsequence_pst_Tlim_masuda ])
     MTdf_pst_tot["OP_mainpstTlimmasudamsk"] = np.concatenate([MTdf_pst_singleBH["OP1"]*mainsequence_pst_Tlim_masuda , MTdf_pst_singleBH["OP2"]*mainsequence_pst_Tlim_masuda ])
+    MTdf_pst_tot["CPR_mainpstTlimmasudamsk"] = np.concatenate([MTdf_pst_singleBH["CPR1"]*mainsequence_pst_Tlim_masuda , MTdf_pst_singleBH["CPR2"]*mainsequence_pst_Tlim_masuda ])
 
     print('Number of searchable systems past last MT event with Orbital period less than 30 days:', searchability_index* np.sum(mainsequence_pst_Tlim_masuda))
     print('Number of systems past last MT event with Orbital period less than 30 days:', np.sum(mainsequence_pst_Tlim_masuda))
     print('Number of systems past last MT with Orbital period less than 30 days:', np.sum((MT_mask['MASKPSTMTORBPER_masuda']) * last))
     print('Number of systems past last MT with orbital period less than 70 days:', np.sum((MT_mask['MASKPSTMTORBPER']) * last))
+    print('Number of bhms past last MT with Orbital period less than 30 days:', np.sum((MT_mask['MASKPSTMTORBPER_masuda']) * mainsequence_pst))
+    print('Number of bhms past last MT with orbital period less than 70 days:', np.sum((MT_mask['MASKPSTMTORBPER']) * mainsequence_pst))
     print('max Orbital period in days masuda:', np.max(MTdf_pst_tot["OP_mainpstTlimmasudamsk"]))
     print('mean Orbital period in days masuda:', np.mean(MTdf_pst_tot["OP_mainpstTlimmasudamsk"]))
     print('max semimajor axis in au masuda:', np.max(MTdf_pst_tot["Semax_mainpstTlimmasudamsk"]))
@@ -247,8 +262,15 @@ for mod in mode:
 ########## UPDATE 7.11.24
     #disregarding initially primary or secondary stars, BH objects are considered as primary and the star as secondary.
     SPdf_tot["BlackHole"] = np.concatenate([SPdf_singleBH["BH1"], SPdf_singleBH["BH2"]])
-    SPdf_tot["Companion"] = np.concatenate([SPdf_singleBH["CP1"], SPdf_singleBH["CP2"]])
+    SPdf_tot["Companion"] = np.concatenate([SPdf_singleBH["CP2"], SPdf_singleBH["CP1"]])
     SPdf_tot["Semax"] = np.concatenate([SPdf_singleBH["SA1"] , SPdf_singleBH["SA2"] ])
+
+    SPdf_totMS["MainSequence"] = np.concatenate([SPdf_singleMS["MS1"], SPdf_singleMS["MS2"]])
+    SPdf_totMS["Companion"] = np.concatenate([SPdf_singleMS["CP2"], SPdf_singleMS["CP1"]])
+    SPdf_totMS["Semax"] = np.concatenate([SPdf_singleMS["SA1"] , SPdf_singleMS["SA2"] ])
+    SPdf_totMS["OP"] = np.concatenate([SPdf_singleMS["OP1"] , SPdf_singleMS["OP2"] ])
+    SPdf_totMS["MainSequenceR"] = np.concatenate([SPdf_singleMS["MSR1"] , SPdf_singleMS["MSR2"] ])
+    SPdf_totMS["CompanionR"] = np.concatenate([SPdf_singleMS["CPR2"] , SPdf_singleMS["CPR1"] ])
 ##########
     
      #Systems which primary is BH (MTs in SP)
@@ -264,7 +286,7 @@ for mod in mode:
 ########## UPDATE 7.11.24
     #disregarding initially primary or secondary stars, BH objects are considered as primary and the star as secondary (MTs in SP)
     SPdf_tot["BlackHole_MT"] = np.concatenate([SPdf_singleBH["BH1_MT"], SPdf_singleBH["BH2_MT"]])
-    SPdf_tot["Companion_MT"] = np.concatenate([SPdf_singleBH["CP1_MT"], SPdf_singleBH["CP2_MT"]])
+    SPdf_tot["Companion_MT"] = np.concatenate([SPdf_singleBH["CP2_MT"], SPdf_singleBH["CP1_MT"]])
     SPdf_tot["Semax_MT"] = np.concatenate([SPdf_singleBH["SA1_MT"] , SPdf_singleBH["SA2_MT"] ])
 ##########
 
@@ -663,7 +685,7 @@ for mod in mode:
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
     # 'frequency': values.T.flatten()})
-    values = values*searchability_index
+    #values = values*searchability_index
     df = pd.DataFrame(values, columns=xbins[1:], index=ybins[1:])
     print('df:', df)
     vals = df
@@ -694,7 +716,7 @@ for mod in mode:
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
     # 'frequency': values.T.flatten()})
-    values = values*searchability_index
+    #values = values*searchability_index
     df = pd.DataFrame(values, columns=xbins[1:], index=ybins[1:])
     print('df:', df)
     vals = df
@@ -725,7 +747,7 @@ for mod in mode:
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
     # 'frequency': values.T.flatten()})
-    values = values*searchability_index
+    #values = values*searchability_index
     df = pd.DataFrame(values, columns=xbins[1:], index=ybins[1:])
     print('df:', df)
     vals = df
@@ -754,7 +776,7 @@ for mod in mode:
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
     # 'frequency': values.T.flatten()})
-    values = values*searchability_index
+    #values = values*searchability_index
     df = pd.DataFrame(values, columns=xbins[1:], index=ybins[1:])
     print('df:', df)
     vals = df
@@ -814,20 +836,16 @@ for mod in mode:
     xbins = ['{:.2f}'.format(x) for x in xbins]    
     ybins = ['{:.1f}'.format(y) for y in ybins]
 
-    values = values*searchability_index
     print('values:', values)
     print('x bins:', xbins)
     print('y bins:', ybins)
-    df = pd.DataFrame({
-    "BlackHole": np.tile(ybins[1:], len(xbins)-1),
-    "Orbper": np.repeat(xbins[1:], len(ybins)-1),
-    'frequency': values.T.flatten()})
-    df = df.pivot(index="BlackHole", columns="Orbper", values="frequency")
-    values = df.values
-    values0 = vals_masuda.values
-    print('values:', values)
+    # df = pd.DataFrame({
+    # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
+    # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
+    # 'frequency': values.T.flatten()})
+    #values = values*searchability_index
 
-    df = pd.DataFrame(np.abs(values-values0), columns=xbins[1:], index=ybins[1:])
+    df = pd.DataFrame(np.abs(values-occurrence_rates), columns=xbins[1:], index=ybins[1:])
     print('df:', df)
     vals = df
     # print('values:', values)
@@ -848,7 +866,7 @@ for mod in mode:
     f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_masuda_diff_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
-    values, xbins, ybins = np.histogram2d(MTdf_pst_tot["OP_mainpstTlimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstTlimmasudamsk"],  bins=[(orbital_period_bins[1:]),(bh_mass_bins[1:])])     
+    values, xbins, ybins = np.histogram2d(MTdf_pst_tot["OP_mainpstTlimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstTlimmasudamsk"], bins=[(orbital_period_bins),(bh_mass_bins)])     
     values = percentage(systemSize, values)
     xbins = ['{:.2f}'.format(x) for x in xbins]    
     ybins = ['{:.1f}'.format(y) for y in ybins]
@@ -856,8 +874,8 @@ for mod in mode:
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
     # 'frequency': values.T.flatten()})
-    values = values*searchability_index
-    df = pd.DataFrame(values, columns=xbins, index=ybins)
+    #values = values*searchability_index
+    df = pd.DataFrame(values, columns=xbins[1:], index=ybins[1:])
     print('df:', df)
     vals = df
     # print('values:', values)
@@ -876,7 +894,7 @@ for mod in mode:
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_masuda_OP_searchability" + current_time + ".png",   bbox_inches='tight')
     plt.close()
-    values, xbins, ybins = np.histogram2d(MTdf_pst_tot["OP_mainpstTlimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstTlimmasudamsk"], bins=[(orbital_period_bins[1:]),(bh_mass_bins[1:])])     
+    values, xbins, ybins = np.histogram2d(MTdf_pst_tot["OP_mainpstTlimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstTlimmasudamsk"], bins=[(orbital_period_bins),(bh_mass_bins)])     
     values = percentage(systemSize, values)
     xbins = ['{:.2f}'.format(x) for x in xbins]    
     ybins = ['{:.1f}'.format(y) for y in ybins]
@@ -885,7 +903,7 @@ for mod in mode:
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
     # 'frequency': values.T.flatten()})
     values = values
-    df = pd.DataFrame(values, columns=xbins, index=ybins)
+    df = pd.DataFrame(values, columns=xbins[1:], index=ybins[1:])
     print('df:', df)
     vals = df
     # print('values:', values)
