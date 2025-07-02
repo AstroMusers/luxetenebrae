@@ -8,14 +8,6 @@ import argparse
 import warnings
 import logging
 import datetime as dt
-import argparse
-
-parser = argparse.ArgumentParser(description="Run COMPAS simulation with custom parameters.")
-parser.add_argument("--number_of_runs", type=int, default=100, help="Number of systems to simulate")
-parser.add_argument("--mode", type=str, default="WD_Enabled_Detailed", help="Mode for the runs (e.g., 'WD_Enabled_Detailed')")
-args = parser.parse_args()
-number_of_runs = args.number_of_runs
-mode = args.mode
 
 # The config file (my_compasConfigDefault.yaml) is used to set the options for COMPAS. You can change the options in the config file to customize the runs. 
 # In config file, number of systems each run is set to 1000. Therefore, total number of systems generated with this script will be 1000 * number_of_runs.
@@ -24,6 +16,9 @@ mode = args.mode
 # Detailed outputs is enabled by default in the config file, so you will get detailed outputs for each run. Change the option from 'True' to 'False' in the config file if you want to disable detailed outputs.
 # The output directory is set to the current working directory by default. You can change the output directory by setting the environment variable COMPAS_LOGS_OUTPUT_DIR_PATH or by changing the value in the config file under stringChoices -> '--output-path'.
 # Depending on your choices in the config file, you can keep track of important changes or categorise the runs by changing the mode variable below. In this way runs with different configurations can be stored in different directories.
+
+mode = 'WD_Enabled_Detailed'  # Change this to your desired mode, e.g., 'WD_Enabled_Detailed', 'BH_Enabled_Detailed', etc.
+number_of_runs = 20  # Change this to the number of runs you want to execute
 """
 Run COMPAS simulations based on the specified number of runs and mode.
 

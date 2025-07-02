@@ -136,23 +136,23 @@ def percentage(size, vals):
 
 #print(np.shape(s))
 #print(s)
-print(const.G)
-print(const.M_sun)
-print(u.M_sun)
-print(const.M_sun.to(u.kg))
-print(u.M_sun.to(u.kg))
-print((93*const.R_sun).to(u.au))
-G = const.G # units of m^3 kg^-1 s^-2
-m1 = (3*u.M_sun).to(u.kg) # units of kg
-m2 = (8*u.M_sun).to(u.kg)  # units of kg
-A = (7 * u.au).to(u.m) # units of m
-orbitalPeriod = (np.sqrt((4 * np.pi**2 * A**3)) / np.sqrt(G * (m1 + m2))) 
-print(orbitalPeriod)
-orbinc = orbital_inclination([1,2,3],[4,5,6],[70,80,90])
-print(orbinc)
-se = searchability(np.random.uniform(-1,1,1000000))
-print(np.sum(se))
-print('percentage of searchability:', np.sum(se)/len(se))
-print(np.arccos(2.228e-6))
-print(np.deg2rad(89.99))
-print(np.cos(np.deg2rad(89.99)))
+# print(const.G)
+# print(const.M_sun)
+# print(u.M_sun)
+# print(const.M_sun.to(u.kg))
+# print(u.M_sun.to(u.kg))
+# print((93*const.R_sun).to(u.au))
+# G = const.G # units of m^3 kg^-1 s^-2
+# m1 = (3*u.M_sun).to(u.kg) # units of kg
+# m2 = (8*u.M_sun).to(u.kg)  # units of kg
+# A = (7 * u.au).to(u.m) # units of m
+# orbitalPeriod = (np.sqrt((4 * np.pi**2 * A**3)) / np.sqrt(G * (m1 + m2))) 
+# print(orbitalPeriod)
+# orbinc = orbital_inclination([1,2,3],[4,5,6],[70,80,90])
+# print(orbinc)
+# se = searchability(np.random.uniform(-1,1,1000000))
+# print(np.sum(se))
+# print('percentage of searchability:', np.sum(se)/len(se))
+# print(np.arccos(2.228e-6))
+# print(np.deg2rad(89.99))
+# print(np.cos(np.deg2rad(89.99)))
