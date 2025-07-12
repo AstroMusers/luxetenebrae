@@ -11,8 +11,8 @@ import time as t                      # for finding computation time
 from datetime import datetime
 import matplotlib.pyplot as plt  # for plotting
 import matplotlib
-from luxetenebrae import calculations as calc      # functions from calculations.py
-from luxetenebrae import utils as utils
+from luxetenebrae.utils import calculations as calc      # functions from calculations.py
+from luxetenebrae.utils import utils as utils
 from astropy.io import fits
 from astropy import units as u
 from astropy import constants as const
@@ -25,7 +25,6 @@ def create_data_masks(mode):
 
     now = dt.datetime.now()
     # Choose the mode to process
-    mode = 'WD_Enabled'
 
     # Import COMPAS specific scripts
     compasRootDir = os.environ['COMPAS_ROOT_DIR']

@@ -18,7 +18,7 @@ import datetime as dt
 # Depending on your choices in the config file, you can keep track of important changes or categorise the runs by changing the mode variable below. In this way runs with different configurations can be stored in different directories.
 
 mode = 'WD_Enabled_Detailed'  # Change this to your desired mode, e.g., 'WD_Enabled_Detailed', 'BH_Enabled_Detailed', etc.
-number_of_runs = 20  # Change this to the number of runs you want to execute
+number_of_runs = 30  # Change this to the number of runs you want to execute
 """
 Run COMPAS simulations based on the specified number of runs and mode.
 

@@ -14,7 +14,7 @@ from astropy.io import fits
 from astropy.table import Table
 from astropy import constants as const
 from astropy import units as u
-from luxetenebrae import utils as utils
+from luxetenebrae.utils import utils as utils
 
 def extract_system_data(mode):
     """Extracts system data from COMPAS detailed output files and saves it to a FITS file."""
@@ -58,7 +58,7 @@ def extract_system_data(mode):
     runs= [x[0] for x in os.walk(pathToData) if "COMPAS" in x[0]]
     data_outputs = []
     for run in runs:
-        out = [f for f in os.listdir(run) if ".h5" in f]
+        out = [f for f in os.listdir(run) if ".h5" in f and "COMPAS" in f]
         try:
             data = h5.File(run + "/" + out[0])
             print("Reading file: ", run + "/" + out[0])
