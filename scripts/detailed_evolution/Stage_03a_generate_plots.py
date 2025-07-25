@@ -14,8 +14,8 @@ from astropy.io import fits
 from astropy.table import Table
 from astropy import constants as const
 from astropy import units as u
-from luxetenebrae import calculations as calc   # functions from calculations.py
-from luxetenebrae import utils as utils      # functions from utils.py
+from luxetenebrae.utils import calculations as calc   # functions from calculations.py
+from luxetenebrae.utils import utils as utils      # functions from utils.py
 
 now = dt.datetime.now()
 # Choose the modee to process
@@ -57,7 +57,7 @@ start = t.process_time()
 start_time = s.strftime("%d%m%y") + "_" + s.strftime('%H%M')
 print("Start time :", start_time)
 
-out = [f for f in os.listdir(pathToFiles) if "stage_02_outputs" in f]
+out = [f for f in os.listdir(pathToFiles) if "stage_02DE_outputs" in f]
 print('Output files found:', out)
 detailed_output = []
 SP_output = []
@@ -160,47 +160,51 @@ for Data, Data_SP in zip(detailed_output, SP_output):
     semaj_average = np.mean(semimajoraxis_filtered)
     semaj_ave= '{:.2f}'.format(semaj_average) 
 
+    plt.rcParams["font.family"] = "serif"
+    plt.rcParams["font.serif"] = ["Times New Roman"]
+    plt.rcParams["font.size"] = 11
+    # Set default colormap to plasma
+    plt.rcParams["image.cmap"] = "plasma"
     fig, ax = plt.subplots(4,1, sharex=True, figsize=(4, 10))
-    ax[0].scatter(time, stellar_type_1, s=2, label='Primary Star', color='blue')
-    ax[0].scatter(time, stellar_type_2, s=2, label='Secondary Star', color='red')
+    ax[0].scatter(time, stellar_type_1, s=2, label='Primary Star')
+    ax[0].scatter(time, stellar_type_2, s=2, label='Secondary Star')
     ax[0].set_yticks(np.arange(0,18,1), [r'MS (M<0.7 $M_\odot$)', r'MS (M>0.7 $M_\odot$)', 'HG', 'FGB', 'CHeB', 'EAGB', 'TPAGB', 'HeMS', 'HeHG', 'HeGB', 'HeWD', 'COWD', 'ONeWD','NS', 'BH', 'MR', 'CHE', 'None'])
-    ax[0].fill_between(time_filtered, 0, np.max(stype1_filtered) , color='orange', alpha=0.1)
+    ax[0].fill_between(time_filtered, 0, np.max(stype1_filtered), alpha=0.1)
     ax[0].text(0.05, 0.95, fr'Lifetime of BH-MS: {bhms_life} Myr', transform=ax[0].transAxes,  verticalalignment='top')
-    # ax[0].set_title('Stellar Type Evolution for MS + BH Systems')
-    ax[0].legend()
+    ax[0].legend(handlelength=0.5,       # Shorter line length
+                handletextpad=0.1,    # Less space between marker and text
+                borderpad=0.1,        # Less padding inside the legend box
+                loc='best'   )
     ax[0].grid(False) 
     ax[0].set_ylabel('Stellar Type')
 
-
-    ax[1].plot(time, semimajoraxis, label='Semi-major Axis', color='yellow')
-    ax[1].plot(time, radius_1, label=r'$R_p$', color='blue')
-    ax[1].plot(time, radius_2, label=r'$R_s$', color='red')
-    ax[1].plot(time, roche_lobe_1, label=r'$Roche R_p$', color='blue', linestyle='dashed')
-    ax[1].plot(time, roche_lobe_2, label=r'$Roche R_s$', color='red', linestyle='dashed')   
-    ax[1].plot(time, periapsiss, label='Periapsis', color='yellow', linestyle='dashed')
-
-    ax[1].legend()
+    ax[1].plot(time, semimajoraxis, label='Semi-major Axis')
+    ax[1].plot(time, radius_1, label=r'$R_p$')
+    ax[1].plot(time, radius_2, label=r'$R_s$')
+    ax[1].plot(time, roche_lobe_1, label=r'$Roche R_p$', linestyle='dashed')
+    ax[1].plot(time, roche_lobe_2, label=r'$Roche R_s$',  linestyle='dashed')   
+    ax[1].plot(time, periapsiss, label='Periapsis',  linestyle='dashed')
+    ax[1].legend(handlelength=0.5,       # Shorter line length
+                handletextpad=0.1,    # Less space between marker and text
+                borderpad=0.1,        # Less padding inside the legend box
+                loc='best'   )
     ax[1].grid(False) 
-    ax[1].fill_between(time_filtered, 0, max(np.max(semimajoraxis_filtered), np.max(radius_1), np.max(radius_2)), color='orange', alpha=0.1)
+    ax[1].fill_between(time_filtered, 0, max(np.max(semimajoraxis_filtered), np.max(radius_1), np.max(radius_2)), alpha=0.1)
     ax[1].text(0.05, 0.15, rf'$\langle$SA$\rangle_\tau$: {semaj_ave} AU', transform=ax[1].transAxes,  verticalalignment='top')
     ax[1].set_ylabel('Semi-major Axis [AU]')
 
     ax[2].scatter(time, mt_history, s=2)
-    ax[2].fill_between(time_filtered, 0, 7, color='orange', alpha=0.1)
+    ax[2].fill_between(time_filtered, 0, 7, alpha=0.1)
     ax[2].set_yticks(np.arange(0,7,1), ['No MT', 'MT 1->2', 'MT 2->1', 'MTCE 1->2', 'MTCE 2->1', 'MTCE DoubleCore', 'Merger'])
-
-    ax[2].text(0.05, 0.95, f'Merger (from flag): {merger}', transform=ax[2].transAxes,  verticalalignment='top')
-    ax[2].text(0.05, 0.85, f'Merger (from mthist): {merger_flag_mthist}', transform=ax[2].transAxes,  verticalalignment='top')
+    ax[2].text(0.05, 0.95, f'Merger (SP): {merger}', transform=ax[2].transAxes,  verticalalignment='top')
+    ax[2].text(0.05, 0.85, f'Merger (MT): {merger_flag_mthist}', transform=ax[2].transAxes,  verticalalignment='top')
     ax[2].text(0.05, 0.75, f'Merger (manual): {merger_flag_manual}', transform=ax[2].transAxes,  verticalalignment='top')
-    # ax[2].legend()
     ax[2].grid(False) 
     ax[2].set_ylabel('MT History')
 
-    ax[3].plot(time, eccentricity, label='Eccentricity', color='yellow')
-    # ax[3].legend()
+    ax[3].plot(time, eccentricity, label='Eccentricity')
     ax[3].grid(False) 
-    ax[3].set_ylabel('Eccentricity')        
-
+    ax[3].set_ylabel('Eccentricity')      
 
 
     plt.xlabel('Time [Myr]')

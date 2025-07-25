@@ -2,22 +2,34 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import FuncFormatter
 
-# Set global font to Times New Roman, 11pt
-plt.rcParams["font.family"] = "serif"
-plt.rcParams["font.serif"] = ["Times New Roman"]
-plt.rcParams["font.size"] = 11
-# Set default colormap to plasma
-plt.rcParams["image.cmap"] = "plasma"
+def set_plot_style():
+    """
+    Set the global plot style for matplotlib.
+    This function configures the default aesthetics for plots.
+    """
+    plt.rcParams['axes.grid'] = False  # Disable grid lines
+    plt.rcParams['grid.alpha'] = 0.5  # Set grid transparency
+    plt.rcParams['savefig.dpi'] = 300  # High resolution for saved figures
+        # Set global font to Times New Roman, 11pt
+    plt.rcParams["font.family"] = "serif"
+    plt.rcParams["font.serif"] = ["Times New Roman"]
+    plt.rcParams["font.size"] = 11
+    # Set default colormap to plasma
+    plt.rcParams["image.cmap"] = "plasma"
+
 
 # Formatter for 2 significant figures
-def two_sig_figs(x, pos=None):
-    try:
-        return f'{x:.2g}'
-    except Exception:
-        return str(x)
+def two_sig_figs(val, pos=None):
+    if val == 0:
+        return "0"
+    exponent = int(np.floor(np.log10(abs(val))))
+    coeff = round(val / 10**exponent, 1)
+    return r"${} \times 10^{{{}}}$".format(coeff, exponent)
 
 # Example: plot stellar type evolution (from Stage_03a_generate_plots.py)
-def plot_time_evolution(rows, cols, array_x, array_y, y_labels,legend_labels, path_to_save, x_labels=None, idx=None, info=None):
+def plot_time_evolution(array_x, array_y, y_labels,legend_labels, path_to_save, fill=None, x_labels=None, idx=None, info=None):
+    rows = len(array_y)
+    cols = len(array_x)
     fig, ax = plt.subplots(rows, cols, sharex=True, figsize=(3.5, cols*3.5))
     for i in range(rows*cols):
         for j in range(len(array_y[i])):
@@ -31,6 +43,8 @@ def plot_time_evolution(rows, cols, array_x, array_y, y_labels,legend_labels, pa
         ax[i].set_ylabel(y_labels[i])
         if x_labels is not None:
             ax[i].set_xlabel(x_labels[i])
+
+
 
     if x_labels is None:
         # If no x_labels provided, default to 'Time [Myr]'
