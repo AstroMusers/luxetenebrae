@@ -164,9 +164,18 @@ cython_debug/
 # Outputs
 *.out
 *.log
+
+
+# Output directories
+plots/
 *.png
 *.jpg
 *.jpeg
+
+files/
 *.txt
 *.fits
+*.h5
+
+runs/
 *.h5
