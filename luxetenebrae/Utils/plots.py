@@ -77,3 +77,9 @@ def plot_bhms_properties_histogram(rows, cols, array_x, array_y, y_labels,legend
     plt.close(fig)
 
 # Add more plotting functions as needed, following this pattern.
+def format_to_1sf(x, pos=None):
+    """Format a number to 1 significant figure for axis labels."""
+    if x == 0:
+        return "0"
+    else:
+        return f"{x:.1g}"

@@ -132,6 +132,9 @@ def mylog(x, y):
 def percentage(size, vals):
     return vals * (100/size)
 
+def ppm(size, vals):
+    return vals * (1e6/size)
+
 # s = searchability(np.random.uniform(-1,1,10))
 
 #print(np.shape(s))

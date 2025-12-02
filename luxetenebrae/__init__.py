@@ -2,5 +2,5 @@
 
 __version__ = "0.1"
 
-from .utils.calculations import *
-from .utils.utils import *
+from .Utils.calculations import *
+from .Utils.utils import *
