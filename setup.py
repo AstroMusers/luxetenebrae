@@ -27,7 +27,7 @@ setup(
         'astropy',
         'pandas',
         'datetime',
-        'h5py'
+        'h5py',
     ],
     version='0.1',
     license='MIT',

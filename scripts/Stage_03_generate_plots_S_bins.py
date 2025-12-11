@@ -16,7 +16,7 @@ import seaborn as sns
 from astropy.io import fits
 from luxetenebrae import calculations as calc
 from matplotlib.ticker import FuncFormatter, MultipleLocator, ScalarFormatter,LogFormatter, LogLocator
-from luxetenebrae import utils as utils      # functions from utils.py
+from luxetenebrae import Utils as Utils      # functions from utils.py
 import datetime as dt
 import logging            # for reading the COMPAS data
 import time as t
@@ -51,8 +51,8 @@ logging.basicConfig(filename=log_filename, level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Redirect stdout and stderr to the log file
-sys.stdout = utils.StreamToLogger(logging.getLogger('STDOUT'), logging.INFO)
-sys.stderr = utils.StreamToLogger(logging.getLogger('STDERR'), logging.ERROR)
+sys.stdout = Utils.StreamToLogger(logging.getLogger('STDOUT'), logging.INFO)
+sys.stderr = Utils.StreamToLogger(logging.getLogger('STDERR'), logging.ERROR)
 # Log the start of the script with the script name
 logging.info(f'Script {script_name} started')
 

@@ -11,8 +11,8 @@ import time as t                      # for finding computation time
 from datetime import datetime
 import matplotlib.pyplot as plt  # for plotting
 import matplotlib
-from luxetenebrae.utils import calculations as calc      # functions from calculations.py
-from luxetenebrae.utils import utils as utils
+from luxetenebrae.Utils import calculations as calc      # functions from calculations.py
+from luxetenebrae.Utils import utils as utils
 from astropy.io import fits
 from astropy import units as u
 from astropy import constants as const

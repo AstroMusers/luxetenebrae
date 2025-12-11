@@ -5,7 +5,7 @@
 ##~!!~## all COMPAS option entries commented so that the COMPAS default value for the
 ##~!!~## option is used by default. To use a value other than the COMPAS default value,
 ##~!!~## users must uncomment the entry and change the option value to the desired value.
-
+## RUNS BEFORE CONFIG DISCUSSION MEETING, 12/9/25
 booleanChoices:
 
     ### LOGISTICS

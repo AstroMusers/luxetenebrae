@@ -11,7 +11,7 @@ import h5py as h5                # for reading the COMPAS data
 import matplotlib.pyplot as plt  # for plotting
 import matplotlib
 from luxetenebrae import calculations as calc      # functions from calculations.py
-from luxetenebrae.utils import is_ms_bh_pair
+from luxetenebrae.luxetenebrae.utils.utils import is_ms_bh_pair
 
 matplotlib.use("Agg")
 

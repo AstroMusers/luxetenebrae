@@ -12,43 +12,61 @@ import matplotlib.pyplot as plt  #for plotting
 import matplotlib
 import seaborn as sns
 from astropy.io import fits
-from luxetenebrae import calculations as calc
+from luxetenebrae.Utils import calculations as calc
+from luxetenebrae.Utils import utils as utils      # functions from utils.py
+import logging
+import datetime as dt
+from matplotlib.font_manager import FontProperties
+import matplotlib as mpl  
+import matplotlib.lines as mlines
 
-def mylog(x, y):
-    # Compute the logarithm of x and y
-    log_x = np.log10(x[y > 0])
-    log_y = np.log10(y[x > 0])
-    
-    # Filter out NaN values
-    mask = ~np.isnan(log_x) & ~np.isnan(log_y)
-    log_x_filtered = log_x[mask]
-    log_y_filtered = log_y[mask]
-    
-    return log_x_filtered, log_y_filtered
-def percentage(size, vals):
-    return vals * (100/size)
-sns.set_theme(style="ticks")
+mpl.rc('font',family='DeJavu Serif')
+font = FontProperties(family='DeJavu Serif')
+plt.rcParams['savefig.dpi'] = 600  # Set the resolution for saved figures
+# Set the number of lines to plot and the colormap
+n_lines = 10
+cmap = mpl.colormaps['plasma']
+# Take colors at regular intervals spanning the colormap.
+colors = cmap(np.linspace(0, 1, n_lines))
 
-c = datetime.now()
-# Displays Time
-current_time = c.strftime('%H%M')
-print("current time :", current_time)
+def generate_plots_L_bins(mode):
+    mpl.rc('font',family='DeJavu Serif')
+    font = FontProperties(family='DeJavu Serif')
+    plt.rcParams['savefig.dpi'] = 600  # Set the resolution for saved figures
 
-mode = ["Default_WD_Enabled/"] #"Default/","Limited/", ,"Limited_WD_Enabled/"
+    now = dt.datetime.now()
+    # Choose the mode to process
+    current_time = now.strftime("%H:%M:%S")
+    # Import COMPAS specific scripts
+    compasRootDir = os.environ['COMPAS_ROOT_DIR']
+    sys.path.append(compasRootDir + '/postProcessing/PythonScripts')
+    print("COMPAS_ROOT_DIR:", compasRootDir)
+    print(sys.path)
 
-path = '/data/a.saricaoglu/repo/COMPAS'
-# # Import COMPAS specific scripts
-compasRootDir = os.environ['COMPAS_ROOT_DIR']
-sys.path.append(compasRootDir + '/postProcessing/PythonScripts')
-print(sys.path)
-# Choose an output hdf5 file to work with
-for mod in mode:
-    matplotlib.rcParams['figure.figsize'] = (21,14)
-    matplotlib.rcParams['lines.markersize'] = 1
-    matplotlib.rcParams['font.size'] = 30
-    matplotlib.rcParams['legend.loc'] = "upper right"
 
-    pathToData = path + '/Files/' + mod + "04.19/" #change the date accordingly the date of the files created via Sec
+    pathToFiles = os.path.join(compasRootDir, "luxetenebrae/files", mode)
+    pathToLogs = os.path.join(compasRootDir, "luxetenebrae/logs", mode)
+    pathToPlots = os.path.join(compasRootDir, "luxetenebrae/plots", mode)
+    # Create output directory if it doesn't exist
+    os.makedirs(pathToFiles, exist_ok=True)
+    os.makedirs(pathToLogs, exist_ok=True)
+    os.makedirs(pathToPlots, exist_ok=True)
+
+    # Get the script name
+    script_name = os.path.basename(__file__)
+    # Configure logging
+    log_filename = f"{pathToLogs}/{script_name}_{now.strftime('%m.%d')}_{now.strftime('%H%M')}.log"
+    os.makedirs(os.path.dirname(log_filename), exist_ok=True)
+    logging.basicConfig(filename=log_filename, level=logging.INFO, 
+                        format='%(asctime)s - %(levelname)s - %(message)s')
+
+    # Redirect stdout and stderr to the log file
+    sys.stdout = utils.StreamToLogger(logging.getLogger('STDOUT'), logging.INFO)
+    sys.stderr = utils.StreamToLogger(logging.getLogger('STDERR'), logging.ERROR)
+    # Log the start of the script with the script name
+    logging.info(f'Script {script_name} started')
+    # Choose an output hdf5 file to work with
+
 
     # Keeps corresponding numerical values 
     SPs = []
@@ -70,8 +88,53 @@ for mod in mode:
     SEMIMAJORAXISZAMSSP = []
     SEMIMAJORAXISMT = []
 
-    # Boolean values for masking
+    # Boolean values for masking# Keeps corresponding numerical values 
+    SPs = []
+    MTs = []
+    CEs = []
+
+    STELLARTYPEZAMSSP1   =  []
+    STELLARTYPEZAMSSP2   =  []
+    STELLARTYPESP1   =  []
+    STELLARTYPESP2   =  []       
+    STELLARTYPEMT1   =  []
+    STELLARTYPEMT2   =  [] 
+
+    MASSZAMSSP1 = []
+    MASSZAMSSP2 = []
+    MASSMT1 = []
+    MASSMT2 = []
+
+    SEMIMAJORAXISZAMSSP = []
     MASKSPBH1 = np.array([], dtype='bool')
+    # Keeps corresponding numerical values 
+    SPs = []
+    MTs = []
+    CEs = []
+
+    STELLARTYPEZAMSSP1   =  []
+    STELLARTYPEZAMSSP2   =  []
+    STELLARTYPESP1   =  []
+    STELLARTYPESP2   =  []       
+    STELLARTYPEMT1   =  []
+    STELLARTYPEMT2   =  [] 
+
+    MASSZAMSSP1 = []
+    MASSZAMSSP2 = []
+    MASSMT1 = []
+    MASSMT2 = []
+
+    SEMIMAJORAXISZAMSSP = []
+    SEMIMAJORAXISMT = []
+
+    # Boolean values for masking# Keeps corresponding numerical values 
+    SPs = []
+    MTs = []
+    CEs = []
+
+    STELLARTYPEZAMSSP1   =  []
+    STELLARTYPEZAMSSP2   =  []
+    STELLARTYPESP1   =  []
     MASKSPBH2 = np.array([], dtype='bool')
     MASKMTBH1 = np.array([], dtype='bool')
     MASKMTBH2 = np.array([], dtype='bool')
@@ -86,13 +149,13 @@ for mod in mode:
 
     MASKMTnonBH =  np.array([], dtype='bool')
     MASKMTSEMAJ = np.array([], dtype='bool')
-   
+
     # Dataframes to use with sns plotting package
     data_SP = {}
     SPdf = pd.DataFrame(data_SP)
     data_MT = {}
     MTdf = pd.DataFrame(data_MT)
-    
+
     # Reads files produced by ... and contructs the dataframes. SPs and MTs are separate since they have different sizes.
     arrays_to_save = [SPs,MTs,CEs,STELLARTYPEZAMSSP1,STELLARTYPEZAMSSP2,STELLARTYPESP1,STELLARTYPESP2,STELLARTYPEMT1,STELLARTYPEMT2,
                     MASSZAMSSP1,MASSZAMSSP2,MASSMT1,MASSMT2,SEMIMAJORAXISZAMSSP,SEMIMAJORAXISMT,MASKSPBH1,MASKSPBH2,MASKMTBH1,MASKMTBH2,
@@ -101,14 +164,14 @@ for mod in mode:
                 "MASSZAMSSP1","MASSZAMSSP2","MASSMT1","MASSMT2","SEMIMAJORAXISZAMSSP","SEMIMAJORAXISMT","MASKSPBH1","MASKSPBH2","MASKMTBH1","MASKMTBH2",
                 "MASKSPunb","MASKSPMTo","MASKSPmrgr","MASKMTinSP","MASKMTBHNS1","MASKMTBHNS2", "MASKMTnonBH", "MASKMTSEMAJ"]
 
-    fits_data = pathToData + 'secundus.fits'
+    fits_data = pathToFiles+ "/stage_01_output.fits"
     with fits.open(fits_data) as hdul:
         hdul.info()
         SP = hdul[1].data
         MT = hdul[2].data
         CE = hdul[3].data
-    
-    fits_data = pathToData + 'tertius.fits'
+
+    fits_data = pathToFiles + "/stage_02_output.fits"
     with fits.open(fits_data) as hdul:
         hdul.info()
         SP_mask = hdul[1].data
@@ -120,7 +183,24 @@ for mod in mode:
 
 
     systemSize = len(SP['SPs'])
-    print(f"System size: {systemSize}")
+    print(f"System size: {systemSize}")# Keeps corresponding numerical values 
+    SPs = []
+    MTs = []
+    CEs = []
+
+    STELLARTYPEZAMSSP1   =  []
+    STELLARTYPEZAMSSP2   =  []
+    STELLARTYPESP1   =  []
+    STELLARTYPESP2   =  []       
+    STELLARTYPEMT1   =  []
+    STELLARTYPEMT2   =  [] 
+
+    MASSZAMSSP1 = []
+    MASSZAMSSP2 = []
+    MASSMT1 = []
+    MASSMT2 = []
+
+    SEMIMAJORAXISZAMSSP = []
     MTdf_pre_singleBH = pd.DataFrame()
     MTdf_pre_tot = pd.DataFrame()
     #Systems which primary is BH
@@ -136,7 +216,7 @@ for mod in mode:
     MTdf_pre_singleBH["SA2"] = MT["SEMIMAJORAXISPREMT"]*MT_mask["MASKPREMTBH2"]
     MTdf_pre_singleBH["CPR2"] = MT["RADIUSPREMT1"]*MT_mask["MASKPREMTBH2"]
 
-########## UPDATE 7.11.24
+    ########## UPDATE 7.11.24
     #disregarding initially primary or secondary stars, BH objects are considered as primary and the star as secondary.
     MTdf_pre_tot["BlackHole"] = np.concatenate([MTdf_pre_singleBH["BH1"], MTdf_pre_singleBH["BH2"]])
     MTdf_pre_tot["Companion"] = np.concatenate([MTdf_pre_singleBH["CP2"], MTdf_pre_singleBH["CP1"]])
@@ -158,7 +238,7 @@ for mod in mode:
     MTdf_pst_singleBH["SA2"] = MT["SEMIMAJORAXISPSTMT"]*MT_mask["MASKPSTMTBH2"]
     MTdf_pst_singleBH["OP2"] = MT_mask["ORBITALPERIODPSTMT"]*MT_mask["MASKPSTMTBH2"]
     MTdf_pst_singleBH["CPR2"] = MT["RADIUSPSTMT1"]*MT_mask["MASKPSTMTBH2"]
-########## UPDATE 7.11.24
+    ########## UPDATE 7.11.24
     #disregarding initially primary or secondary stars, BH objects are considered as primary and the star as secondary.
     MTdf_pst_tot["BlackHole"] = np.concatenate([MTdf_pst_singleBH["BH1"], MTdf_pst_singleBH["BH2"]])
     MTdf_pst_tot["Companion"] = np.concatenate([MTdf_pst_singleBH["CP2"], MTdf_pst_singleBH["CP1"]])
@@ -183,7 +263,7 @@ for mod in mode:
     MTdf_pst_tot["Companion_lastmsk"] = np.concatenate([MTdf_pst_singleBH["CP2"]*last, MTdf_pst_singleBH["CP1"]*last])
     MTdf_pst_tot["Semax_lastmsk"] = np.concatenate([MTdf_pst_singleBH["SA1"]*last , MTdf_pst_singleBH["SA2"]*last ])
 
-    print("Checking for NaN values in MTdf_pst_tot['Semax_lastmsk']:", np.isnan(*mylog(MTdf_pst_tot["Semax_lastmsk"],MTdf_pst_tot["BlackHole_lastmsk"])).any())
+    print("Checking for NaN values in MTdf_pst_tot['Semax_lastmsk']:", np.isnan(*calc.mylog(MTdf_pst_tot["Semax_lastmsk"],MTdf_pst_tot["BlackHole_lastmsk"])).any())
 
 
     mainsequence_pre = (MT_mask['MASKPREMTBHMS1'] | MT_mask['MASKPREMTBHMS2']) & first
@@ -210,7 +290,7 @@ for mod in mode:
     MTdf_pst_tot["OP_mainpstTlimmsk"] = np.concatenate([MTdf_pst_singleBH["OP1"]*mainsequence_pst_Tlim , MTdf_pst_singleBH["OP2"]*mainsequence_pst_Tlim ])
 
     print('Companion: ', np.min(MTdf_pst_tot["Companion_mainpstTlimmsk"]), np.max(MTdf_pst_tot["Companion_mainpstTlimmsk"]))
-    
+
     searchability = calc.searchability(MTdf_pst_singleBH["SA1"])
     N = np.sum(searchability)
     searchability_index = N/len(searchability)
@@ -245,11 +325,11 @@ for mod in mode:
     print('max orbital period in days:', np.max(MTdf_pst_tot["OP_mainpstTlimmsk"]))
     print('mean orbital period in days:', np.mean(MTdf_pst_tot["OP_mainpstTlimmsk"]))
     print('max semimajor axis in au:', np.max(MTdf_pst_tot["Semax_mainpstTlimmsk"]))
-##########
+    ##########
 
     SPdf_singleBH = pd.DataFrame()
     SPdf_tot = pd.DataFrame()
-     #Systems which primary is BH
+        #Systems which primary is BH
     SPdf_singleBH["BH1"] = SP["MASSZAMSSP1"]*SP_mask["MASKSPBH1"]
     SPdf_singleBH["CP2"] = SP["MASSZAMSSP2"]*SP_mask["MASKSPBH1"]
     SPdf_singleBH["SA1"] = SP["SEMIMAJORAXISZAMSSP"]*SP_mask["MASKSPBH1"]
@@ -259,21 +339,21 @@ for mod in mode:
     SPdf_singleBH["CP1"] = SP["MASSZAMSSP1"]*SP_mask["MASKSPBH2"]
     SPdf_singleBH["SA2"] = SP["SEMIMAJORAXISZAMSSP"]*SP_mask["MASKSPBH2"]
 
-########## UPDATE 7.11.24
+    ########## UPDATE 7.11.24
     #disregarding initially primary or secondary stars, BH objects are considered as primary and the star as secondary.
     SPdf_tot["BlackHole"] = np.concatenate([SPdf_singleBH["BH1"], SPdf_singleBH["BH2"]])
     SPdf_tot["Companion"] = np.concatenate([SPdf_singleBH["CP2"], SPdf_singleBH["CP1"]])
     SPdf_tot["Semax"] = np.concatenate([SPdf_singleBH["SA1"] , SPdf_singleBH["SA2"] ])
 
-    SPdf_totMS["MainSequence"] = np.concatenate([SPdf_singleMS["MS1"], SPdf_singleMS["MS2"]])
-    SPdf_totMS["Companion"] = np.concatenate([SPdf_singleMS["CP2"], SPdf_singleMS["CP1"]])
-    SPdf_totMS["Semax"] = np.concatenate([SPdf_singleMS["SA1"] , SPdf_singleMS["SA2"] ])
-    SPdf_totMS["OP"] = np.concatenate([SPdf_singleMS["OP1"] , SPdf_singleMS["OP2"] ])
-    SPdf_totMS["MainSequenceR"] = np.concatenate([SPdf_singleMS["MSR1"] , SPdf_singleMS["MSR2"] ])
-    SPdf_totMS["CompanionR"] = np.concatenate([SPdf_singleMS["CPR2"] , SPdf_singleMS["CPR1"] ])
-##########
-    
-     #Systems which primary is BH (MTs in SP)
+    # SPdf_totMS["MainSequence"] = np.concatenate([SPdf_singleMS["MS1"], SPdf_singleMS["MS2"]])
+    # SPdf_totMS["Companion"] = np.concatenate([SPdf_singleMS["CP2"], SPdf_singleMS["CP1"]])
+    # SPdf_totMS["Semax"] = np.concatenate([SPdf_singleMS["SA1"] , SPdf_singleMS["SA2"] ])
+    # SPdf_totMS["OP"] = np.concatenate([SPdf_singleMS["OP1"] , SPdf_singleMS["OP2"] ])
+    # SPdf_totMS["MainSequenceR"] = np.concatenate([SPdf_singleMS["MSR1"] , SPdf_singleMS["MSR2"] ])
+    # SPdf_totMS["CompanionR"] = np.concatenate([SPdf_singleMS["CPR2"] , SPdf_singleMS["CPR1"] ])
+    ##########
+
+        #Systems which primary is BH (MTs in SP)
     SPdf_singleBH["BH1_MT"] = SP["MASSZAMSSP1"]*SP_mask["MASKSPBH1"]*SP_mask["MASKMTinSP"]
     SPdf_singleBH["CP2_MT"] = SP["MASSZAMSSP2"]*SP_mask["MASKSPBH1"]*SP_mask["MASKMTinSP"]
     SPdf_singleBH["SA1_MT"] = SP["SEMIMAJORAXISZAMSSP"]*SP_mask["MASKSPBH1"]*SP_mask["MASKMTinSP"]
@@ -283,169 +363,169 @@ for mod in mode:
     SPdf_singleBH["CP1_MT"] = SP["MASSZAMSSP1"]*SP_mask["MASKSPBH2"]*SP_mask["MASKMTinSP"]
     SPdf_singleBH["SA2_MT"] = SP["SEMIMAJORAXISZAMSSP"]*SP_mask["MASKSPBH2"]*SP_mask["MASKMTinSP"]
 
-########## UPDATE 7.11.24
+    ########## UPDATE 7.11.24
     #disregarding initially primary or secondary stars, BH objects are considered as primary and the star as secondary (MTs in SP)
     SPdf_tot["BlackHole_MT"] = np.concatenate([SPdf_singleBH["BH1_MT"], SPdf_singleBH["BH2_MT"]])
     SPdf_tot["Companion_MT"] = np.concatenate([SPdf_singleBH["CP2_MT"], SPdf_singleBH["CP1_MT"]])
     SPdf_tot["Semax_MT"] = np.concatenate([SPdf_singleBH["SA1_MT"] , SPdf_singleBH["SA2_MT"] ])
-##########
+    ##########
 
     # print(max(MTdf_pre_tot["Semax"]))
     # print(max(MTdf_pre_tot["BlackHole"]))
     # print(min(MTdf_pre_tot["Semax"]))
     # print(min(MTdf_pre_tot["BlackHole"]))
-    
 
-    
-######## UPDATE 07.11.24
-    
 
- 
-    if not os.path.exists(path+ "/Plots/" + mod +  str(c.strftime("%m.%d")+ "/" + current_time + "/") ): 
-        os.makedirs(path + "/Plots/"  + mod +  str(c.strftime("%m.%d")+ "/" + current_time + "/") ) 
-    directoryp = path + "/Plots/"  + mod +  str(c.strftime("%m.%d") + "/" + current_time + "/")  
-    # Produces heatmaps. Only black holes, companions are commented since not needed.
-    values, xbins, ybins = np.histogram2d(*mylog(SPdf_tot["Semax"], SPdf_tot["BlackHole"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
-    # Check the shape of values to ensure it matches the expected dimensions
-    print("Shape of values:", values.shape)
-    print("Length of xbins:", len(xbins))
-    print("Length of ybins:", len(ybins))
-    # df = pd.DataFrame({
-    # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
-    # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
-    # 'frequency': values.T.flatten()})
 
-    df = pd.DataFrame(values, columns=xbins[1:], index=ybins[1:])
-    print('df:', df)
-    vals = df
+    ######## UPDATE 07.11.24
+
+
+
+    # if not os.path.exists(path+ "/Plots/" + mod +  str(c.strftime("%m.%d")+ "/" + current_time + "/") ): 
+    #     os.makedirs(path + "/Plots/"  + mod +  str(c.strftime("%m.%d")+ "/" + current_time + "/") ) 
+    # pathToPlots = path + "/Plots/"  + mod +  str(c.strftime("%m.%d") + "/" + current_time + "/")  
+    # # Produces heatmaps. Only black holes, companions are commented since not needed.
+    # values, xbins, ybins = np.histogram2d(*calc.mylog(SPdf_tot["Semax"], SPdf_tot["BlackHole"]), bins=5)
+    # values = calc.ppm(systemSize, values)
+    # xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    # ybins = ['{:.1g}'.format(10**y) for y in ybins]
+    # # Check the shape of values to ensure it matches the expected dimensions
+    # print("Shape of values:", values.shape)
+    # print("Length of xbins:", len(xbins))
+    # print("Length of ybins:", len(ybins))
+    # # df = pd.DataFrame({
+    # # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
+    # # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
+    # # 'frequency': values.T.flatten()})
+
+    # df = pd.DataFrame(values, columns=xbins[1:], index=ybins[1:])
+    # print('df:', df)
+    # vals = df
+    # # print('values:', values)
+    # print('vals:', vals)
     # print('values:', values)
-    print('vals:', vals)
-    print('values:', values)
-    print('vals:', vals)
+    # print('vals:', vals)
 
-    # Check the shape of the pivot table to ensure it matches the expected dimensions
-    print("Shape of pivot table:", vals.shape)
+    # # Check the shape of the pivot table to ensure it matches the expected dimensions
+    # print("Shape of pivot table:", vals.shape)
 
-    f, ax = plt.subplots(figsize=(18, 16))
+    # f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True, fmt=".1e", linewidths=.1, ax=ax)
-    cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
-    ax.invert_yaxis()
-    ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
-    ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    print(ax.get_xticks())
-    print(ax.get_yticks()) 
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)", fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)", fontsize=45, labelpad=25)
-    #ax.set_title(f"Black Hole(BH mass)-Star($M_s$) Binary Syst at ZAMS (SP) N:{len(SP['MASSZAMSSP1'])}", fontsize=30, pad=30)
-    f.savefig(directoryp + "SP_atZAMS_inMT" + current_time + ".png", bbox_inches='tight')
-    plt.close()
+    # hmapplot = sns.heatmap(vals, annot=True, fmt=".3g", linewidths=.1, ax=ax)
+    # cbar = hmapplot.collections[0].colorbar
+    # cbar.ax.tick_params(labelsize=11)
+    # ax.invert_yaxis()
+    # ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
+    # ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
+    # print(ax.get_xticks())
+    # print(ax.get_yticks()) 
+    # ax.tick_params(axis='both', which='major', rotation=45)
+    # ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    # ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
+    # #ax.set_title(f"Black Hole(BH mass)-Star($M_s$) Binary Syst at ZAMS (SP) N:{len(SP['MASSZAMSSP1'])}", fontsize=30, pad=30)
+    # f.savefig(pathToPlots + '/' + "SP_atZAMS_inMT" + current_time + ".png", bbox_inches='tight')
+    # plt.close()
 
-    values, xbins, ybins = np.histogram2d(*mylog(SPdf_tot["Semax_MT"],SPdf_tot["BlackHole_MT"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
-    # df = pd.DataFrame({
-    # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
-    # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
-    # 'frequency': values.T.flatten()})
+    # values, xbins, ybins = np.histogram2d(*calc.mylog(SPdf_tot["Semax_MT"],SPdf_tot["BlackHole_MT"]), bins=5)
+    # values = calc.ppm(systemSize, values)
+    # xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    # ybins = ['{:.1g}'.format(10**y) for y in ybins]
+    # # df = pd.DataFrame({
+    # # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
+    # # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
+    # # 'frequency': values.T.flatten()})
 
-    df = pd.DataFrame(values, columns=xbins[1:], index=ybins[1:])
-    print('df:', df)
-    vals = df
+    # df = pd.DataFrame(values, columns=xbins[1:], index=ybins[1:])
+    # print('df:', df)
+    # vals = df
+    # # print('values:', values)
+    # print('vals:', vals)
     # print('values:', values)
-    print('vals:', vals)
-    print('values:', values)
-    print('values:', values)
-    print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    # print('values:', values)
+    # print('vals:', vals)
+    # f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
-    cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)    
+    # hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    # cbar = hmapplot.collections[0].colorbar
+    # cbar.ax.tick_params(labelsize=11)    
 
-    ax.invert_yaxis()
-    ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
-    ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
-    #ax.set_title(f"Black Hole(BH mass)-Star($M_s$) Binaries at ZAMS undergoing MT (MTs in SP) N:{np.sum(SP_mask['MASKMTinSP'])})",  fontsize=30, pad=30)
-    f.savefig(directoryp + "SP_atZAMS_inMT_" + current_time + ".png",   bbox_inches='tight')
-    plt.close()
+    # ax.invert_yaxis()
+    # ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
+    # ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
+    # ax.tick_params(axis='both', which='major', rotation=45)
+    # ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    # ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
+    # #ax.set_title(f"Black Hole(BH mass)-Star($M_s$) Binaries at ZAMS undergoing MT (MTs in SP) N:{np.sum(SP_mask['MASKMTinSP'])})",  fontsize=30, pad=30)
+    # f.savefig(pathToPlots + '/' + "SP_atZAMS_inMT_" + current_time + ".png",   bbox_inches='tight')
+    # plt.close()
 
-    # values, xbins, ybins = np.histogram2d(*mylog(SPdf_tot["Semax"],SPdf_tot["Companion"]), bins=5)
+    # values, xbins, ybins = np.histogram2d(*calc.mylog(SPdf_tot["Semax"],SPdf_tot["Companion"]), bins=5)
     # df = pd.DataFrame({
     # "Companion": np.repeat(xbins[:-1], len(ybins)-1),
     # "Semax": np.tile(ybins[:-1], len(xbins)-1),
     # 'frequency': values.T.flatten()})
     # vals = df.pivot(index="Companion", columns="Semax", values="frequency")
-    # f, ax = plt.subplots(figsize=(18, 16))
-    # xlabl = ["{:.2f}".format(10**x) for x in vals.columns]
-    # ylabl = ["{:.1f}".format(10**y) for y in vals.index]
+    # f, ax = plt.subplots(figsize=(4, 3.5))
+    # xlabl = ["{:.1g}".format(10**x) for x in vals.columns]
+    # ylabl = ["{:.1g}".format(10**y) for y in vals.index]
     # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", linewidths=.1, ax=ax)
     # cbar = hmapplot.collections[0].colorbar
-    # cbar.ax.tick_params(labelsize=40)
+    # cbar.ax.tick_params(labelsize=11)
     # ax.invert_yaxis()
-    # ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    # ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    # ax.set_ylabel("$M_s$ (solar mass)",  fontsize=45, labelpad=25)
+    # ax.tick_params(axis='both', which='major', rotation=45)
+    # ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    # ax.set_ylabel(r"$M_s$ [M$_{\odot}$]", labelpad=5)
     # #ax.set_title("Black Hole (BH mass)  - Star ($M_s$) Binary Systems (SP)",  fontsize=30, pad=30)
-    # f.savefig(directoryp + "SP_Ms_" + current_time + ".png",   bbox_inches='tight')
+    # f.savefig(pathToPlots + '/' + "SP_Ms_" + current_time + ".png",   bbox_inches='tight')
     # plt.close()
 
-    # values, xbins, ybins = np.histogram2d(*mylog(SPdf_tot["Semax_MT"],SPdf_tot["Companion_MT"]), bins=5)
+    # values, xbins, ybins = np.histogram2d(*calc.mylog(SPdf_tot["Semax_MT"],SPdf_tot["Companion_MT"]), bins=5)
     # df = pd.DataFrame({
     # "Companion_MT": np.repeat(xbins[:-1], len(ybins)-1),
     # "Semax_MT": np.tile(ybins[:-1], len(xbins)-1),
     # 'frequency': values.T.flatten()})
     # vals = df.pivot(index="Companion_MT", columns="Semax_MT", values="frequency")
-    # f, ax = plt.subplots(figsize=(18, 16))
-    # xlabl = ["{:.2f}".format(10**x) for x in vals.columns]
-    # ylabl = ["{:.1f}".format(10**y) for y in vals.index]
+    # f, ax = plt.subplots(figsize=(4, 3.5))
+    # xlabl = ["{:.1g}".format(10**x) for x in vals.columns]
+    # ylabl = ["{:.1g}".format(10**y) for y in vals.index]
     # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", linewidths=.1, ax=ax)
     # cbar = hmapplot.collections[0].colorbar
-    # cbar.ax.tick_params(labelsize=40)
+    # cbar.ax.tick_params(labelsize=11)
     # ax.invert_yaxis()
-    # ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    # ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    # ax.set_ylabel("$M_s$ (solar mass)",  fontsize=45, labelpad=25)
+    # ax.tick_params(axis='both', which='major', rotation=45)
+    # ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    # ax.set_ylabel(r"$M_s$ [M$_{\odot}$]", labelpad=5)
     # #ax.set_title("Black Hole (BH mass)  - Star ($M_s$) Binary Systems (MTs in SP)",  fontsize=30, pad=30)
-    # f.savefig(directoryp + "SP_Ms_MT_" + current_time + ".png",   bbox_inches='tight')
+    # f.savefig(pathToPlots + '/' + "SP_Ms_MT_" + current_time + ".png",   bbox_inches='tight')
     # plt.close()
 
-    # values, xbins, ybins = np.histogram2d(*mylog(MTdf_pre_tot["Semax"],MTdf_pre_tot["BlackHole"]), bins=5)
-    # values = percentage(systemSize, values)
+    # values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pre_tot["Semax"],MTdf_pre_tot["BlackHole"]), bins=5)
+    # values = calc.ppm(systemSize, values)
     # df = pd.DataFrame({
     # "BlackHole": np.repeat(xbins[:-1], len(ybins)-1),
     # "Semax": np.tile(ybins[:-1], len(xbins)-1),
     # 'frequency': values.T.flatten()})
     # vals = df.pivot(column="Semax", index="BlackHole", values="frequency")
-    # f, ax = plt.subplots(figsize=(18, 16))
-    # xlabl = ["{:.2f}".format(10**x) for x in vals.columns]
-    # ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    # hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    # f, ax = plt.subplots(figsize=(4, 3.5))
+    # xlabl = ["{:.1g}".format(10**x) for x in vals.columns]
+    # ylabl = ["{:.1g}".format(10**y) for y in vals.index]
+    # hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     # cbar = hmapplot.collections[0].colorbar
-    # cbar.ax.tick_params(labelsize=40)
+    # cbar.ax.tick_params(labelsize=11)
     # ax.invert_yaxis()
-    # ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    # ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    # ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    # ax.tick_params(axis='both', which='major', rotation=45)
+    # ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    # ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     # #ax.set_title(f"Black Hole (BH mass)  - Star ($M_s$) Binary Systems(MTO) N:{len(df['BlackHole'])}",  fontsize=30, pad=30)
-    # f.savefig(directoryp + "MT_All_" + current_time + ".png",   bbox_inches='tight')
+    # f.savefig(pathToPlots + '/' + "MT_All_" + current_time + ".png",   bbox_inches='tight')
     # plt.close()
 
     # #%%
-    
-    values, xbins, ybins = np.histogram2d(*mylog(MTdf_pre_tot["Semax_firstmsk"],MTdf_pre_tot["BlackHole_firstmsk"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
+
+    values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pre_tot["Semax_firstmsk"],MTdf_pre_tot["BlackHole_firstmsk"]), bins=5)
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    ybins = ['{:.1g}'.format(10**y) for y in ybins]
     # df = pd.DataFrame({
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
@@ -456,25 +536,27 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Star($M_s$) Binaries before first MT N:{np.sum(first)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_preFirstMT_" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_preFirstMT_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
-    values, xbins, ybins = np.histogram2d(*mylog(MTdf_pst_tot["Semax_lastmsk"],MTdf_pst_tot["BlackHole_lastmsk"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
+    values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pst_tot["Semax_lastmsk"],MTdf_pst_tot["BlackHole_lastmsk"]), bins=5)
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    ybins = ['{:.1g}'.format(10**y) for y in ybins]
     # df = pd.DataFrame({
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
@@ -485,26 +567,28 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Star($M_s$) Binaries after last MT N:{np.sum(last)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_postLastMT_" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_postLastMT_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
 
-    values, xbins, ybins = np.histogram2d(*mylog(MTdf_pre_tot["Semax_mainpremsk"],MTdf_pre_tot["BlackHole_mainpremsk"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
+    values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pre_tot["Semax_mainpremsk"],MTdf_pre_tot["BlackHole_mainpremsk"]), bins=5)
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    ybins = ['{:.1g}'.format(10**y) for y in ybins]
     # df = pd.DataFrame({
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
@@ -515,25 +599,27 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries before first MT N:{np.sum(mainsequence_pre)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_preFirstMT_" + current_time + ".png",   bbox_inches='tight')    
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_preFirstMT_" + current_time + ".png",   bbox_inches='tight')    
     plt.close()
 
-    values, xbins, ybins = np.histogram2d(*mylog(MTdf_pst_tot["Semax_mainpstmsk"],MTdf_pst_tot["BlackHole_mainpstmsk"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
+    values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pst_tot["Semax_mainpstmsk"],MTdf_pst_tot["BlackHole_mainpstmsk"]), bins=5)
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    ybins = ['{:.1g}'.format(10**y) for y in ybins]
     # df = pd.DataFrame({
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
@@ -544,25 +630,27 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_postLastMT_" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_postLastMT_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
-    values, xbins, ybins = np.histogram2d(*mylog(MTdf_pst_tot["OP_mainpstmsk"],MTdf_pst_tot["BlackHole_mainpstmsk"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
+    values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pst_tot["OP_mainpstmsk"],MTdf_pst_tot["BlackHole_mainpstmsk"]), bins=5)
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    ybins = ['{:.1g}'.format(10**y) for y in ybins]
     # df = pd.DataFrame({
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
@@ -573,25 +661,27 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Orbital period [days]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_postLastMT_OP_" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_postLastMT_OP_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
-    values, xbins, ybins = np.histogram2d(*mylog(MTdf_pre_tot["Semax_mainpreTlimmsk"],MTdf_pre_tot["BlackHole_mainpreTlimmsk"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
+    values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pre_tot["Semax_mainpreTlimmsk"],MTdf_pre_tot["BlackHole_mainpreTlimmsk"]), bins=5)
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    ybins = ['{:.1g}'.format(10**y) for y in ybins]
     # df = pd.DataFrame({
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
@@ -602,25 +692,27 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries before first MT N:{np.sum(mainsequence_pre_Tlim)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_preFirstMT_Tlim_" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_preFirstMT_Tlim_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
-    values, xbins, ybins = np.histogram2d(*mylog(MTdf_pst_tot["Semax_mainpstTlimmsk"],MTdf_pst_tot["BlackHole_mainpstTlimmsk"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
+    values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pst_tot["Semax_mainpstTlimmsk"],MTdf_pst_tot["BlackHole_mainpstTlimmsk"]), bins=5)
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    ybins = ['{:.1g}'.format(10**y) for y in ybins]
     # df = pd.DataFrame({
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
@@ -631,25 +723,27 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_Tlim)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_" + current_time + ".png",bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_postLastMT_Tlim_" + current_time + ".png",bbox_inches='tight')
     plt.close()
 
-    values, xbins, ybins = np.histogram2d(*mylog(MTdf_pst_tot["OP_mainpstTlimmsk"],MTdf_pst_tot["BlackHole_mainpstTlimmsk"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
+    values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pst_tot["OP_mainpstTlimmsk"],MTdf_pst_tot["BlackHole_mainpstTlimmsk"]), bins=5)
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    ybins = ['{:.1g}'.format(10**y) for y in ybins]
     # df = pd.DataFrame({
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
@@ -660,25 +754,27 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Orbital period [days]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_Tlim)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_OP_" + current_time + ".png",bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_postLastMT_Tlim_OP_" + current_time + ".png",bbox_inches='tight')
     plt.close()
 
-    values, xbins, ybins = np.histogram2d(*mylog(MTdf_pst_tot["Semax_mainpstalimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstalimmasudamsk"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
+    values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pst_tot["Semax_mainpstalimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstalimmasudamsk"]), bins=5)
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    ybins = ['{:.1g}'.format(10**y) for y in ybins]
     print('xbins:', xbins)
     print('ybins:', ybins)
     # df = pd.DataFrame({
@@ -691,25 +787,27 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_postLastMT_alim_masuda_" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_postLastMT_alim_masuda_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
-    values, xbins, ybins = np.histogram2d(*mylog(MTdf_pst_tot["Semax_mainpstTlimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstTlimmasudamsk"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
+    values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pst_tot["Semax_mainpstTlimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstTlimmasudamsk"]), bins=5)
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    ybins = ['{:.1g}'.format(10**y) for y in ybins]
     print('xbins:', xbins)
     print('ybins:', ybins)
     # df = pd.DataFrame({
@@ -722,27 +820,29 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_Tlim_masuda)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_masuda_" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_postLastMT_Tlim_masuda_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
 
 
-    values, xbins, ybins = np.histogram2d(*mylog(MTdf_pst_tot["OP_mainpstalimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstalimmasudamsk"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
+    values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pst_tot["OP_mainpstalimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstalimmasudamsk"]), bins=5)
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    ybins = ['{:.1g}'.format(10**y) for y in ybins]
     # df = pd.DataFrame({
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
@@ -753,25 +853,27 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Orbital period [days]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_postLastMT_alim_masuda_OP" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_postLastMT_alim_masuda_OP" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
-    values, xbins, ybins = np.histogram2d(*mylog(MTdf_pst_tot["OP_mainpstTlimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstTlimmasudamsk"]), bins=5)
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(10**x) for x in xbins]    
-    ybins = ['{:.1f}'.format(10**y) for y in ybins]
+    values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pst_tot["OP_mainpstTlimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstTlimmasudamsk"]), bins=5)
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(10**x) for x in xbins]    
+    ybins = ['{:.1g}'.format(10**y) for y in ybins]
     # df = pd.DataFrame({
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
@@ -782,23 +884,25 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Orbital period [days]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_masuda_OP" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_postLastMT_Tlim_masuda_OP" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
 
-# Define the bin edges for the histogram
+    # Define the bin edges for the histogram
     bh_mass_bins = [5, 9.1, 16.6, 30.2, 54.9, 100]
     orbital_period_bins = [0.3, 0.8, 1.9, 4.8, 11.9, 30.0]
 
@@ -832,9 +936,9 @@ for mod in mode:
     vals_masuda = vals0
 
     values, xbins, ybins = np.histogram2d(MTdf_pst_tot["OP_mainpstTlimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstTlimmasudamsk"], bins=[(orbital_period_bins),(bh_mass_bins)]) 
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(x) for x in xbins]    
-    ybins = ['{:.1f}'.format(y) for y in ybins]
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(x) for x in xbins]    
+    ybins = ['{:.1g}'.format(y) for y in ybins]
 
     print('values:', values)
     print('x bins:', xbins)
@@ -851,25 +955,27 @@ for mod in mode:
     # print('values:', values)
     print('vals:', vals)
 
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Orbital period [days]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_masuda_diff_" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_postLastMT_Tlim_masuda_diff_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
     values, xbins, ybins = np.histogram2d(MTdf_pst_tot["OP_mainpstTlimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstTlimmasudamsk"], bins=[(orbital_period_bins),(bh_mass_bins)])     
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(x) for x in xbins]    
-    ybins = ['{:.1f}'.format(y) for y in ybins]
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(x) for x in xbins]    
+    ybins = ['{:.1g}'.format(y) for y in ybins]
     # df = pd.DataFrame({
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
@@ -880,24 +986,26 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Orbital period [days]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_masuda_OP_searchability" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_postLastMT_Tlim_masuda_OP_searchability" + current_time + ".png",   bbox_inches='tight')
     plt.close()
     values, xbins, ybins = np.histogram2d(MTdf_pst_tot["OP_mainpstTlimmasudamsk"],MTdf_pst_tot["BlackHole_mainpstTlimmasudamsk"], bins=[(orbital_period_bins),(bh_mass_bins)])     
-    values = percentage(systemSize, values)
-    xbins = ['{:.2f}'.format(x) for x in xbins]    
-    ybins = ['{:.1f}'.format(y) for y in ybins]
+    values = calc.ppm(systemSize, values)
+    xbins = ['{:.1g}'.format(x) for x in xbins]    
+    ybins = ['{:.1g}'.format(y) for y in ybins]
     # df = pd.DataFrame({
     # "BlackHole": np.tile(ybins[:-1], len(xbins)-1),
     # "Orbper": np.repeat(xbins[:-1], len(ybins)-1),
@@ -908,77 +1016,81 @@ for mod in mode:
     vals = df
     # print('values:', values)
     print('vals:', vals)
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.tick_params(axis='both', which='major', rotation=45)
+    ax.set_xlabel(r"Orbital period [days]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_masuda_OP_noSearchability" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "MT_MainSequence_postLastMT_Tlim_masuda_OP_noSearchability" + current_time + ".png",   bbox_inches='tight')
     plt.close()
     print('values:', values)
     print('vals:', vals)
     print('vals_masuda:', vals_masuda)
 
 
-    # values, xbins, ybins = np.histogram2d(*mylog(MTdf_pre_tot["Semax_MT"],MTdf_pre_tot["Companion"]), bins=5)
-    # values = percentage(systemSize, values)
+    # values, xbins, ybins = np.histogram2d(*calc.mylog(MTdf_pre_tot["Semax_MT"],MTdf_pre_tot["Companion"]), bins=5)
+    # values = calc.ppm(systemSize, values)
     # df = pd.DataFrame({
     # "Companion": np.repeat(xbins[:-1], len(ybins)-1),
     # "Semax": np.tile(ybins[:-1], len(xbins)-1),
     # 'frequency': values.T.flatten()})
     # vals = df.pivot(index="Companion", columns="Semax", values="frequency")
-    # f, ax = plt.subplots(figsize=(18, 16))
-    # xlabl = ["{:.2f}".format(10**x) for x in vals.columns]
-    # ylabl = ["{:.1f}".format(10**y) for y in vals.index]
+    # f, ax = plt.subplots(figsize=(4, 3.5))
+    # xlabl = ["{:.1g}".format(10**x) for x in vals.columns]
+    # ylabl = ["{:.1g}".format(10**y) for y in vals.index]
     # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", linewidths=.1, ax=ax)
     # cbar = hmapplot.collections[0].colorbar
-    # cbar.ax.tick_params(labelsize=40)
+    # cbar.ax.tick_params(labelsize=11)
     # ax.invert_yaxis()
-    # ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    # ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    # ax.set_ylabel("$M_s$ (solar mass)",  fontsize=45, labelpad=25)
+    # ax.tick_params(axis='both', which='major', rotation=45)
+    # ax.set_xlabel(r"Semimajor Axis [AU]", labelpad=5)
+    # ax.set_ylabel(r"$M_s$ [M$_{\odot}$]", labelpad=5)
     # #ax.set_title("Black Hole (BH mass)  - Star ($M_s$) Binary Systems (MT)",  fontsize=30, pad=30)
-    # f.savefig(directoryp + "_MT_Ms_" + current_time + ".png",   bbox_inches='tight')
+    # f.savefig(pathToPlots + '/' + "_MT_Ms_" + current_time + ".png",   bbox_inches='tight')
     # plt.close()
 
 
     #####
 
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals_masuda, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals_masuda, annot=True,fmt=".3g", linewidths=.1, ax=ax)
     cbar = hmapplot.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=40)
+
+    cbar.ax.set_title('[ppm]')
+
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
-    ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
+    ax.tick_params(axis='both', which='major', rotation=45)
     # ax.set_xticks(np.log10(xbins), xlabl)
     # ax.set_yticks(np.log10(ybins), ylabl)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel(r"Orbital period [days]", labelpad=5)
+    ax.set_ylabel(r"BH mass [M$_{\odot}$]", labelpad=5)
 
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
-    f.savefig(directoryp + "masuda" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "masuda" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
     plt.hist(MTdf_pst_tot["OP_mainpstTlimmasudamsk"], bins=100, histtype='stepfilled', color='yellow', label='T<30 days', log=True)
     plt.hist(MTdf_pst_tot["OP_mainpstTlimmsk"], bins=100, histtype='step', color='r', label='T<70 days', log=True)
     plt.legend(fontsize=30)
-    f.savefig(directoryp + "hist_1" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "hist_1" + current_time + ".png",   bbox_inches='tight')
     plt.close()
 
-    f, ax = plt.subplots(figsize=(18, 16))
+    f, ax = plt.subplots(figsize=(4, 3.5))
     plt.hist(MTdf_pst_tot["OP_mainpstTlimmsk"], bins=100, histtype='stepfilled', color='cyan', label='T<70 days', log=True)
     plt.hist(MTdf_pst_tot["OP_mainpstmsk"], bins=100, histtype='step', color='k', label='no limit', log=True)
     plt.legend(fontsize=30)
-    f.savefig(directoryp + "hist_2" + current_time + ".png",   bbox_inches='tight')
+    f.savefig(pathToPlots + '/' + "hist_2" + current_time + ".png",   bbox_inches='tight')
     plt.close()

@@ -1,7 +1,7 @@
 # test_imports.py
 # Run this script from the parent directory (where luxetenebrae/ is located)
 
-from luxetenebrae.utils import utils, calculations
+from luxetenebrae.Utils import utils, calculations
 
 print("utils module loaded:", utils)
 print("calculations module loaded:", calculations)

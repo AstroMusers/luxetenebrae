@@ -10,7 +10,7 @@ import datetime as dt
 import h5py as h5                # for reading the COMPAS data
 import matplotlib.pyplot as plt  # for plotting
 import matplotlib
-from luxetenebrae.utils import utils as utils      # functions from utils.py
+from luxetenebrae.Utils import utils as utils      # functions from utils.py
 import astropy.units as u
 from astropy import constants as const
 # Import COMPAS specific scripts

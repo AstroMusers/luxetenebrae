@@ -10,8 +10,12 @@ import datetime as dt
 import h5py as h5                # for reading the COMPAS data
 import matplotlib.pyplot as plt  # for plotting
 import matplotlib
-from luxetenebrae import calculations as calc      # functions from calculations.py
-from luxetenebrae.utils import is_ms_bh_pair
+import calculations as calc      # functions from calculations.py
+from astropy.io import fits
+from astropy.table import Table
+from astropy import constants as const
+from astropy import units as u
+from Luxetenebrae.utils import is_ms_bh_pair
 
 matplotlib.use("Agg")
 
@@ -160,6 +164,7 @@ for mod in mode:
 survivors.close()
 print(f"Total number of systems with BHs: {k}")
 print(f"Total number of systems without BHs: {i}")
-print(f"Total number of systems without BH-MS pairs: {j}")
+print(f"Total number of systems without BH-MS pairs: {j}")           
 
-
+  
+ 
