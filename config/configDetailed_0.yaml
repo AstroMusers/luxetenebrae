@@ -5,23 +5,23 @@
 ##~!!~## all COMPAS option entries commented so that the COMPAS default value for the
 ##~!!~## option is used by default. To use a value other than the COMPAS default value,
 ##~!!~## users must uncomment the entry and change the option value to the desired value.
-
+## RUNS AFTER THE MEETING, 12/9/35. TIDAL:NONE, EMIT GW:TRUE
 booleanChoices:
 
     ### LOGISTICS
 #    --debug-to-file: False                                                # Default: False
-#    --detailed-output: False                                              # Default: False                                                                                                                                                                            # WARNING! this creates a data heavy file
-#    --emit-gravitational-radiation: False                                 # Default: False
+    --detailed-output: True                                              # Default: False                                                                                                                                                                            # WARNING! this creates a data heavy file
+    --emit-gravitational-radiation: True                                 # Default: False
 #    --enable-warnings: False                                              # Default: False                                                                                                                                                                            # option to enable/disable warning messages
 #    --errors-to-file: False                                               # Default: False
 #    --evolve-main-sequence-mergers: False                                 # Default: False
 #    --evolve-unbound-systems: True                                        # Default: True
-#    --population-data-printing: False                                     # Default: False
+    --population-data-printing: True                                     # Default: False
 #    --print-bool-as-string: False                                         # Default: False
 #    --quiet: False                                                        # Default: False
 #    --rlof-printing: True                                                 # Default: True
 #    --store-input-files: True                                             # Default: True
-#    --switch-log: False                                                   # Default: False
+    --switch-log: True                                                   # Default: False
 
     ### STELLAR PROPERTIES
 #    --check-photon-tiring-limit: False                                    # Default: False
@@ -33,7 +33,7 @@ booleanChoices:
 
     ### BINARY PROPERTIES
 #    --allow-touching-at-birth: False                                      # Default: False                                                                                                                                                                            # record binaries that have stars touching at birth in output files
-#    --include-WD-binaries-as-DCO: False                                   # Default: False                                                                                                                                                                            # record WD binaries in the BSE DCO file
+#    --include-WD-binaries-as-DCO: True                                   # Default: False                                                                                                                                                                            # record WD binaries in the BSE DCO file
 
     ### MASS TRANSFER
 #    --angular-momentum-conservation-during-circularisation: False         # Default: False
@@ -63,7 +63,7 @@ booleanChoices:
 #    --evolve-pulsars: False                                               # Default: False
 
    ### WHITE DWARF PARAMETERS
-#    --evolve-double-white-dwarfs: False                                   # Default: False
+   ###--evolve-double-white-dwarfs: True                                   # Default: False
 
 
 numericalChoices:
@@ -86,7 +86,7 @@ numericalChoices:
 #    --mass-change-fraction: 0.001000                                      # Default: 0.001000                                                                                                                                                                         # approximate desired fractional changes in stellar mass per timestep
 #    --maximum-evolution-time: 14021.28                                    # Default: 14021.28                                                                                                                                                                         # maximum physical time a system can be evolved [Myr]
 #    --maximum-number-timestep-iterations: 99999                           # Default: 99999
-#    --number-of-systems: 10                                               # Default: 10                                                                                                                                                                               # number of systems per batch
+    --number-of-systems: 1000                                               # Default: 10                                                                                                                                                                               # number of systems per batch
 #    --radial-change-fraction: 0.100000                                    # Default: 0.100000                                                                                                                                                                         # approximate desired fractional changes in stellar radius per timestep
 #    --system-snapshot-age-thresholds: '{ }'                               # Default: ''                                                                                                                                                                               # age thresholds for the system snapshot log
 #    --system-snapshot-time-thresholds: '{ }'                              # Default: ''                                                                                                                                                                               # time thresholds for the system snapshot log
@@ -236,7 +236,7 @@ stringChoices:
 #    --mode: 'BSE'                                                         # Default: 'BSE'                         # Options: ['BSE','SSE']                                                                                                                           # evolving single (SSE) or binary stars (BSE)
 #    --notes: { }                                                          # Default: { }
 #    --notes-hdrs: { }                                                     # Default: { }
-#    --output-container: 'COMPAS_Output'                                   # Default: 'COMPAS_Output'
+    --output-container: 'COMPAS_Output_Detailed'                                   # Default: 'COMPAS_Output'
 #    --timesteps-filename: ''                                              # Default: ''
 
     ### STELLAR PROPERTIES
@@ -277,7 +277,7 @@ stringChoices:
 #    --common-envelope-second-stage-gamma-prescription: 'ISOTROPIC'        # Default: 'ISOTROPIC'                   # Options: ['ARBITRARY','KLENCKI_LINEAR','MACLEOD_LINEAR','CIRCUMBINARY','ISOTROPIC','JEANS']
 
     ### TIDES
-#    --tides-prescription: 'NONE'                                          # Default: 'NONE'                        # Options: ['KAPIL2025','PERFECT','NONE']
+    --tides-prescription: 'NONE'                                          # Default: 'NONE'                        # Options: ['KAPIL2025','PERFECT','NONE']
 
     ### SUPERNOVAE, KICKS AND REMNANTS
 #    --black-hole-kicks-mode: 'FALLBACK'                                   # Default: 'FALLBACK'                    # Options: ['FALLBACK','ZERO','REDUCED','FULL']

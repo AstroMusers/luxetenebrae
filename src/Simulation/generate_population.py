@@ -6,13 +6,10 @@ import warnings
 import argparse
 from subprocess import call
 import secrets
-
-# Prefer installed package; fall back to the in-repo copy
-try:
-    from compas_python_utils.preprocessing.runSubmit import runSubmit as _runSubmit
-except ImportError:
-    from luxetenebrae.compas_python_utils.preprocessing.runSubmit import runSubmit as _runSubmit
-
+from compas_python_utils.preprocessing.runSubmit import runSubmit
+import os
+os.environ["COMPAS_EXECUTABLE_PATH"] = "/data/a.saricaoglu/repo/luxetenebrae/COMPAS/src/bin/COMPAS"
+os.environ["COMPAS_ROOT_DIR"] = "/data/a.saricaoglu/repo/luxetenebrae/COMPAS"
 class GenerateBinaryPopulation:
     """
     Runs COMPAS to generate a population of binary systems based on input data.
@@ -73,15 +70,16 @@ class GenerateBinaryPopulation:
         """
         try:
             # Most implementations accept cli_args=[...]
-            return _runSubmit(cli_args=[config_path])
+            return runSubmit(cli_args=[config_path])
         except TypeError:
             # Fallback: simulate CLI
             argv_bak = sys.argv[:]
             try:
                 sys.argv = ["runSubmit.py", config_path]
-                return _runSubmit()
+                return runSubmit()
             finally:
                 sys.argv = argv_bak
+        print(f'arguments restored: {sys.argv}')
 
     def run_COMPAS_simulation(self):
         default_cfg, repo_root = self._default_config_for_mode()

@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt  #for plotting
 import matplotlib
 import seaborn as sns
 from astropy.io import fits
-from luxetenebrae.Utils import calculations as calc
-from luxetenebrae.Utils import utils as utils      # functions from utils.py
+from src.Utils import calculations as calc
+from src.Utils import utils as utils      # functions from utils.py
 import logging
 import datetime as dt
 from matplotlib.font_manager import FontProperties

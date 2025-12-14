@@ -15,8 +15,8 @@ from astropy.io import fits
 from astropy.table import Table
 from astropy import constants as const
 from astropy import units as u
-from luxetenebrae.Utils import calculations as calc   # functions from calculations.py
-from luxetenebrae.Utils import utils as utils      # functions from utils.py
+from src.Utils import calculations as calc   # functions from calculations.py
+from src.Utils import utils as utils      # functions from utils.py
 
 now = dt.datetime.now()
 # Choose the modee to process

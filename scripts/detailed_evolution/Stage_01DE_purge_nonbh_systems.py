@@ -12,7 +12,7 @@ from astropy.io import fits
 from astropy.table import Table
 from astropy import constants as const
 from astropy import units as u
-from luxetenebrae.Utils import utils as utils      # functions from utils.py
+from src.Utils import utils as utils      # functions from utils.py
 
 
 def purge_nonbh_systems(mode):

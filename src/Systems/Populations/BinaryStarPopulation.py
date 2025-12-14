@@ -11,8 +11,8 @@ from astropy.io import fits
 from astropy.table import Table
 from astropy import constants as const
 from astropy import units as u
-from luxetenebrae.Utils import utils as utils      # functions from utils.py
-from luxetenebrae.Systems.BinarySystem import BinarySystem
+from src.Utils import utils as utils      # functions from utils.py
+from src.Systems.BinarySystem import BinarySystem
 
 compasRootDir = os.environ['COMPAS_ROOT_DIR']
 sys.path.append(compasRootDir + '/postProcessing/PythonScripts')
