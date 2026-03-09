@@ -1,8 +1,8 @@
-from src.Properties.SystemParameters import SystemParameters
-from src.Properties.CommonEnvelopes import CommonEnvelopes
-from src.Properties.Supernovae import Supernovae
-from src.Properties.MassTransfers import MassTransfers
-from src.Properties.DoubleCompactObjects import DoubleCompactObjects
+# from src.Properties.SystemParameters import SystemParameters
+# from src.Properties.CommonEnvelopes import CommonEnvelopes
+# from src.Properties.Supernovae import Supernovae
+# from src.Properties.MassTransfers import MassTransfers
+# from src.Properties.DoubleCompactObjects import DoubleCompactObjects
 
 class BinarySystem:
     """
