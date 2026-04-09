@@ -23,9 +23,9 @@ def orbital_period(m1, m2, semimajax):
     A = A.to(u.m)
     orbitalPeriod = (np.sqrt((4 * np.pi**2 * A**3)) / np.sqrt(G * (m1 + m2))) # units of s
     orbitalPeriod = orbitalPeriod.to(u.hour).value
-    print('max orbital period in hours:', np.max(orbitalPeriod))
+    # print('max orbital period in hours:', np.max(orbitalPeriod))
     orbitalPeriod = orbitalPeriod / 24 # units of days
-    print('max orbital period in days:', np.max(orbitalPeriod))
+    # print('max orbital period in days:', np.max(orbitalPeriod))
 
     return orbitalPeriod
 

@@ -15,16 +15,38 @@ class GenerateBinaryPopulation:
     Runs COMPAS to generate a population of binary systems based on input data.
     """
 
-    def __init__(self, mode, number_of_systems, config_files=None, output_dir=None):
+    def __init__(self, mode, number_of_systems, starting_seed, config_files=None, output_dir=None):
         self.mode = mode
         # One COMPAS run ~ 1000 systems
         self.number_of_runs = int(math.ceil(number_of_systems / 1000.0))
+        self.starting_seed = starting_seed
         # Allow a single path or a list of paths
         if isinstance(config_files, str):
             config_files = [config_files]
         self.config_files = config_files
         self.output_dir = output_dir  # optional override
 
+    def _prepare_config(self, config_path, seed, run_idx, out_dir):
+        """
+        Copy config file and override --random-seed with the given seed.
+        Returns the path to the modified config file.
+        """
+        with open(config_path, 'r') as f:
+            cfg = yaml.safe_load(f)
+
+        # Set the random seed in numericalChoices
+        if 'numericalChoices' not in cfg:
+            cfg['numericalChoices'] = {}
+        cfg['numericalChoices']['--random-seed'] = seed
+
+        # Save modified config to output dir
+        modified_cfg_path = os.path.join(out_dir, f"config_run{run_idx}_seed{seed}.yaml")
+        with open(modified_cfg_path, 'w') as f:
+            yaml.dump(cfg, f)
+
+        print(f"[COMPAS] Prepared config: {modified_cfg_path} with seed={seed}")
+        return modified_cfg_path
+    
     def _default_config_for_mode(self):
         here = os.path.dirname(__file__)
         repo_root = os.path.abspath(os.path.join(here, "../../"))
@@ -91,13 +113,17 @@ class GenerateBinaryPopulation:
 
         # Determine which configs to use
         cfgs = self.config_files or [default_cfg]
+        seed = self.starting_seed
         for run_idx in range(self.number_of_runs):
-            # Cycle through provided configs if multiple; otherwise reuse the only one
             cfg = cfgs[run_idx % len(cfgs)]
-            print(f"[COMPAS] Run {run_idx+1}/{self.number_of_runs} using config: {cfg}")
+            print(f"[COMPAS] Run {run_idx+1}/{self.number_of_runs} using config: {cfg}, seed: {seed}")
             if not os.path.isfile(cfg):
                 raise FileNotFoundError(f"Config file not found: {cfg}")
-            self._call_runSubmit(cfg)
+
+            # Prepare a modified config with the seed baked in
+            modified_cfg = self._prepare_config(cfg, seed, run_idx, out_dir)
+            self._call_runSubmit(modified_cfg)
+            seed += 1000
 
         # Save for introspection
         self._last_repo_root = repo_root

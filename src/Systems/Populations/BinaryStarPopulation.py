@@ -13,10 +13,10 @@ from astropy import constants as const
 from astropy import units as u
 from src.Utils import utils as utils      # functions from utils.py
 from src.Systems.BinarySystem import BinarySystem
-from src.Processing import Processes as Processes
 
 compasRootDir = os.environ['COMPAS_ROOT_DIR']
 sys.path.append(compasRootDir + '/postProcessing/PythonScripts')
+repoRootDir = os.path.abspath(os.path.join(compasRootDir, "../"))
 
 class BinarySystemEvolution:
     """Class for detailed evolution of binary systems."""
@@ -25,32 +25,35 @@ class BinarySystemEvolution:
 
         self.mode = mode
         self.name = name if name else f'BinarySystemEvolution_{mode}'
+        self.pathToData, self.pathToLogs, self.pathToFiles = self._set_directory_paths(mode)
 
-        Proc = Processes(mode=mode, name=self.name)
-        self.pathToData, self.pathToLogs, self.pathToFiles = Proc.pathToData, Proc.pathToLogs, Proc.pathToFiles
-        self.binary_population = {}
-
-    def read_data(self, raw_data=True, process_level='Purged', filetype='.h5'):
+    def get_data(self, path=None, filetype='.h5'):
         """Read the binary population from the data files."""
-        if raw_data:
-            data_outputs, detailed_data_outputs = self._read_data()
-        else:
-            processedPath = os.path.join(self.pathToData, f"Processed/{process_level}")
-            data_outputs, detailed_data_outputs = self._read_processed_data(processedPath, filetype)
 
+        data_outputs, detailed_data_outputs = self._read_data(path=path, filetype=filetype)
         self.detailed_data_outputs = detailed_data_outputs
         self.data_outputs = data_outputs
 
         return data_outputs, detailed_data_outputs
     
+    def get_processed_data(self, level='Purged', path=None, filetype='.h5'):
+        """Read the processed binary population from the data files."""
+        if path is None:
+            pth = os.path.join(self.pathToData, f"Processed/{level}")
+
+        processed_detailed_data_outputs = self._read_processed_data(path=pth, filetype=filetype)
+        self.processed_detailed_data_outputs = processed_detailed_data_outputs
+
+        return processed_detailed_data_outputs
+
     def _read_data(self, path=None, filetype='.h5'):
         """Read raw data from detailed output files."""
         if path is None:
-            path = self.pathToData
-        runs= [x[0] for x in os.walk(path) if 'Detailed_Output' in x[1]]  # Adjust the slice as needed
+            pth = self.pathToData
+        runs= [x[0] for x in os.walk(pth) if 'Detailed_Output' in x[1]]  # Adjust the slice as needed
         if len(runs) == 0:
-            raise ValueError(f"No raw data found in {path}")
-        print('runs:', runs)
+            raise ValueError(f"No raw data found in {pth}")
+        # print('runs:', runs)
         detailed_data_outputs = []
         data_outputs= []
         for run in runs:  # Adjust the slice as needed
@@ -60,14 +63,34 @@ class BinarySystemEvolution:
                 try:
                     data_d = h5.File(run + '/Detailed_Output' + "/" + f)
                     detailed_data_outputs.append(data_d)
-
-                    data = h5.File( run + "/" + f, 'r')
-                    data_outputs.append(data)
                 except:
                     continue
+        for run in runs:        
+            try:
+                data = h5.File(run + "/COMPAS_Output.h5")
+                data_outputs.append(data)
+            except:
+                continue
         
         return data_outputs, detailed_data_outputs
     
+    def _read_processed_data(self, path, filetype='.h5'):
+        """Read processed data from the specified directory."""
+        if not os.path.exists(path):
+            raise ValueError(f"Processed data directory {path} does not exist.")
+        out = [f for f in os.listdir(path) if f.endswith(filetype)]
+        processed_detailed_data_outputs = []
+        for f in out:
+            # print("Reading file: ", path + "/" + f)
+            try:
+                data_d = h5.File(path + "/" + f)
+                processed_detailed_data_outputs.append(data_d)
+            except:
+                continue
+        
+        return processed_detailed_data_outputs
+
+
     def get_info(self):
         """Get information about the binary population."""
         info_dict = {
@@ -222,4 +245,9 @@ class BinarySystemEvolution:
             seed = Data['SEED'][()]
             self.binary_population[seed] = BinarySystem(Data, requested_properties)
 
-    
+    def _set_directory_paths(self, mode):
+        """Set directory paths based on the mode."""
+        pathToData = os.path.join(repoRootDir, "luxetenebrae/runs", mode)
+        pathToLogs = os.path.join(repoRootDir, "luxetenebrae/logs", mode)
+        pathToFiles = os.path.join(repoRootDir, "luxetenebrae/files", mode)
+        return pathToData, pathToLogs, pathToFiles

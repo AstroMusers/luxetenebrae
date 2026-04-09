@@ -17,26 +17,15 @@ from astropy import constants as const
 import astropy.io.fits as fits
 from astropy.table import Table
 from src.Systems.Populations.BinaryStarPopulation import BinarySystemEvolution
+import src.Utils.calculations as calc
 
-class Process(BinarySystemEvolution):
-    """
-    A class to represent the processing of binary star systems in the luxetenebrae package.
-    Inherits from BinarySystemEvolution.
-    Public attributes: None (inherits from BinarySystemEvolution)
-    Internal (prefixed with _): None (inherits from BinarySystemEvolution)
-    """
-    def __init__(self, mode, name=None):
-        super().__init__(mode=mode, name=name)
-        self._set_directory_paths(mode)
-        self.pathToData, self.pathToLogs, self.pathToFiles = self._set_directory_paths(mode)
+class Process:
+    """Class to process the COMPAS output data, including purging non-BH systems and extracting system data."""
+    
+    def __init__(self, binary_system_evolution: BinarySystemEvolution):
 
-    def _set_directory_paths(mode):
-        """Set directory paths based on the mode."""
-        compasRootDir = os.environ['COMPAS_ROOT_DIR']
-        pathToData = os.path.join(compasRootDir, "../luxetenebrae/runs", mode)
-        pathToLogs = os.path.join(compasRootDir, "../luxetenebrae/logs", mode)
-        pathToFiles = os.path.join(compasRootDir, "../luxetenebrae/files", mode)
-        return pathToData, pathToLogs, pathToFiles
+        self.bse = binary_system_evolution
+        self.name = f"Process_{self.bse.mode}"
 
     def purge_nonbh_systems(self, delete_after_purge=True, with_logging=True):
         """Purge non-black hole systems from the detailed output files."""
@@ -45,15 +34,15 @@ class Process(BinarySystemEvolution):
         now = dt.datetime.now()
 
         # Create output directory if it doesn't exist
-        os.makedirs(self.pathToFiles, exist_ok=True)
+        os.makedirs(self.bse.pathToFiles, exist_ok=True)
 
         logger = logging.getLogger(self.name)
         logger.setLevel(logging.INFO)
 
         fh = None
         if with_logging:
-            os.makedirs(self.pathToLogs, exist_ok=True)
-            log_filename = os.path.join(self.pathToLogs, f"purge_{now.strftime('%Y%m%d_%H%M%S')}.log")
+            os.makedirs(self.bse.pathToLogs, exist_ok=True)
+            log_filename = os.path.join(self.bse.pathToLogs, f"purge_{now.strftime('%Y%m%d_%H%M%S')}.log")
             fh = logging.FileHandler(log_filename, mode='w')
             fh.setLevel(logging.INFO)
             formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -78,18 +67,18 @@ class Process(BinarySystemEvolution):
         s = dt.datetime.now()
         start_time = s.strftime("%d%m%y") + "_" + s.strftime('%H%M')
         print("Start time :", start_time)
-        n_systems = len(self.data_outputs)
+        n_systems = len(self.bse.data_outputs)
         print(f"Total number of systems to process: {n_systems}")
-        purgePath = os.path.join(self.pathToData, f"Processed/Purged")
+        purgePath = os.path.join(self.bse.pathToData, f"Processed/Purged")
         os.makedirs(purgePath, exist_ok=True)
 
 
         i = j = k = l = b = s = er = 0
         # Loop through the data outputs and check for black holes and MS + BH pairs. If not found, delete the detailed output file. 
-        print(f"Total number of systems to process: {len(self.data_outputs)}")
+        print(f"Total number of systems to process: {len(self.bse.detailed_data_outputs)}")
         print("Starting the purge...")
 
-        for Data in self.data_outputs:
+        for Data in self.bse.detailed_data_outputs:
 
             try:
 
@@ -97,7 +86,7 @@ class Process(BinarySystemEvolution):
                 Data = h5.File(Data.filename, 'r')
                 seed = Data['SEED'][()]
 
-                print(f"System of {k} (of {len(self.data_outputs)} sys.)")
+                print(f"System of {k} (of {len(self.bse.detailed_data_outputs)} sys.)")
 
 
 
@@ -106,7 +95,7 @@ class Process(BinarySystemEvolution):
                 BH1 = [x for x in stellar_type_1 if x == 14]
                 BH2 = [x for x in stellar_type_2 if x == 14]
 
-                print(f"System of {k} (of {len(self.data_outputs)} sys.) - Number of primary BH: {len(BH1)}, Number of secondary BH: {len(BH2)}")
+                print(f"System of {k} (of {len(self.bse.detailed_data_outputs)} sys.) - Number of primary BH: {len(BH1)}, Number of secondary BH: {len(BH2)}")
 
                 # Check if there are any BHs in the system
                 if (len(BH1) + len(BH2)) == 0:
@@ -140,7 +129,8 @@ class Process(BinarySystemEvolution):
                 # Save the seed of the system
                 print(f"System {seed[0]} survived the purge.")
                 # Move the file to the purged directory
-                dest_file = os.path.join(purgePath, os.path.basename(Data.filename))
+                unique_filename = f"{seed[0]}_{os.path.basename(Data.filename)}"
+                dest_file = os.path.join(purgePath, unique_filename)
                 print(f"Moving file to {dest_file}")
                 os.rename(Data.filename, dest_file)
                 l = l + 1
@@ -165,25 +155,25 @@ class Process(BinarySystemEvolution):
             sys.stderr = sys.__stderr__
             logging.shutdown()
 
-        results = [f"Total number of systems: {k} Total number of systems without BHs: {i} Total number of systems without BH-MS pairs: {j} Total number of systems that survived the purge: {l} Total number of BH + BH pairs in the systems: {b} survivors file created at: {self.pathToFiles}/purged_{start_time}.txt"
+        results = [f"Total number of systems: {k} Total number of systems without BHs: {i} Total number of systems without BH-MS pairs: {j} Total number of systems that survived the purge: {l} Total number of BH + BH pairs in the systems: {b} survivors file created at: {self.bse.pathToFiles}/purged_{start_time}.txt"
                 ]
 
         return results
 
-    def extract_system_data(self, proccess_from='Purged', with_logging=True):
+    def extract_detailed_system_data(self, process_from='Purged', with_logging=True):
         
-        now = dt.datetime.now()
+        start_time = dt.datetime.now()
 
         # Create output directory if it doesn't exist
-        os.makedirs(self.pathToFiles, exist_ok=True)
+        os.makedirs(self.bse.pathToFiles, exist_ok=True)
 
         logger = logging.getLogger(self.name)
         logger.setLevel(logging.INFO)
 
         fh = None
         if with_logging:
-            os.makedirs(self.pathToLogs, exist_ok=True)
-            log_filename = os.path.join(self.pathToLogs, f"extract_system_data_{now.strftime('%Y%m%d_%H%M%S')}.log")
+            os.makedirs(self.bse.pathToLogs, exist_ok=True)
+            log_filename = os.path.join(self.bse.pathToLogs, f"extract_detailed_system_data_{start_time.strftime('%Y%m%d_%H%M%S')}.log")
             fh = logging.FileHandler(log_filename, mode='w')
             fh.setLevel(logging.INFO)
             formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -198,79 +188,20 @@ class Process(BinarySystemEvolution):
             sys.stderr = utils.StreamToLogger(logger, logging.ERROR)
             logger.info('data extraction started')
 
-        # Import COMPAS specific scripts
+        # Check required output data exists
+        # if 'Purged' in process_from:
+        detailed_data = self.bse.get_processed_data(level=process_from)
+        print(f"Extracting system data from {len(detailed_data)} purged systems.")
+        # else:
+        #     detailed_data = self.bse.detailed_data_outputs
+        #     print(f"Extracting system data from raw {len(detailed_data)} systems.")
 
-        # print("COMPAS_ROOT_DIR:", compasRootDir)
-        # print(sys.path)
-
-
-
-        s = dt.datetime.now()
-        start_time = s.strftime("%d%m%y") + "_" + s.strftime('%H%M')
-        print("Start time :", start_time)
-        n_systems = len(self.data_outputs)
+        base_data = self.bse.data_outputs
+        
+        start_time_str = start_time.strftime("%d%m%y") + "_" + start_time.strftime('%H%M')
+        print("Start time :", start_time_str)
+        n_systems = len(detailed_data)
         print(f"Total number of systems to process: {n_systems}")
-
-        if proccess_from == 'Purged':
-            
-        purgePath = os.path.join(self.pathToData, f"Processed/Purged")
-        os.makedirs(purgePath, exist_ok=True)
-
-
-        i = j = k = l = b = s = er = 0
-        # Loop through the data outputs and check for black holes and MS + BH pairs. If not found, delete the detailed output file. 
-        print(f"Total number of systems to process: {len(self.data_outputs)}")
-        print("Starting the purge...")
-
-
-        # Get the script name
-        script_name = os.path.basename(__file__)
-        # Configure logging
-        log_filename = f"{pathToLogs}/{script_name}_{now.strftime('%m.%d')}_{now.strftime('%H%M')}.log"
-        os.makedirs(os.path.dirname(log_filename), exist_ok=True)
-        logging.basicConfig(filename=log_filename, level=logging.INFO, 
-                            format='%(asctime)s - %(levelname)s - %(message)s')
-
-        # Redirect stdout and stderr to the log file
-        sys.stdout = utils.StreamToLogger(logging.getLogger('STDOUT'), logging.INFO)
-        sys.stderr = utils.StreamToLogger(logging.getLogger('STDERR'), logging.ERROR)
-        # Log the start of the script with the script name
-        logging.info(f'Script {script_name} started')
-
-        # Displays Time
-        s = dt.datetime.now()
-        starttime = t.ctime(t.time())
-        start = t.process_time()
-        start_time = s.strftime("%d%m%y") + "_" + s.strftime('%H%M')
-        print("Start time :", start_time)
-
-
-        # Choose an output hdf5 file to work with
-
-        ps = open(f'{compasRootDir}/luxetenebrae/files/survivors.txt', 'r')
-        survivors = ps.read().splitlines()
-        runs= [x[0] for x in os.walk(pathToData) if "Detailed_Output" in x[1]]
-        print('runs:', runs)
-        data_outputs_1 = []
-        data_outputs_2 = []
-        for run in runs:  # Adjust the slice as needed
-            out1 = [f for f in os.listdir(run + '/Detailed_Output') if ".h5" in f]
-            out2 = [f for f in os.listdir(run) if ".h5" in f]
-            for f in out1:
-                print("Reading file: ", run + '/Detailed_Output' + "/" + f)
-                try:
-                    data = h5.File(run + '/Detailed_Output' + "/" + f)
-                    data_outputs_1.append(data)
-                except:
-                    continue
-            for f in out2:
-                print("Reading file: ", run  + "/" + f)
-                data = h5.File( run + "/" + f, 'r')
-                data_outputs_2.append(data)
-        # Keeps corresponding numerical values. 
-        # SPs
-        c = dt.datetime.now()
-        current_time = c.strftime("%d%m%y") + "_" + c.strftime('%H%M')
 
         i = 0
         j = 0
@@ -280,32 +211,34 @@ class Process(BinarySystemEvolution):
         MT_dict = {}
         CE_dict = {}
 
-        for Data in data_outputs_2:
+        survivor_seeds = []
+        survivors = []
+        for Data in detailed_data:
+            Data = h5.File(Data.filename, 'r')
+            seeds = Data['SEED'][()]
+            seed = seeds[0]  # Assuming we want to process the first seed in the file
+            survivor_seeds.append(seed)
+            survivors.append(Data)
+
+        print(f"Total number of systems that survived the purge: {len(survivor_seeds)}")
+
+        for Data in base_data:
 
             Data = h5.File(Data.filename, 'r')
-
-            SP_d, MT_d, CE_d = utils.extract_masked_systems_by_seed(Data, survivors) 
+            SP_d, MT_d, CE_d = utils.extract_masked_systems_by_seed(Data, survivor_seeds) 
             SP_dict.update(SP_d)
             MT_dict.update(MT_d)
             CE_dict.update(CE_d)
 
-        for Data in data_outputs_1:
+        for Data, seed in zip(survivors, survivor_seeds):
 
-            Data = h5.File(Data.filename, 'r')
-            seeds = Data['SEED'][()]
-            seed = seeds[0]  # Assuming we want to process the first seed in the file
 
-            # Check if the seed exists in the survivors list
-            if str(seed) not in survivors:
-                print(f"Seed {seed} not in survivors, skipping...")
-                i = i + 1
-                continue
-
-            fit_filename = pathToFiles + f"/stage_02DE_outputs_{seed}.fits" 
+            fit_filename = os.path.join(self.bse.pathToFiles, f"{process_from}_processed__detailed_outputs_{seed}.fits") 
             hdu_pr = fits.PrimaryHDU()
             hdu_pr.writeto(fit_filename, overwrite=True)
             hdu = fits.open(fit_filename, mode='update')
 
+            seeds = Data['SEED'][()]
             stellar_type_1 = Data['Stellar_Type(1)'][()]
             stellar_type_2 = Data['Stellar_Type(2)'][()]
             radius_1 = Data['Radius(1)'][()]
@@ -433,7 +366,7 @@ class Process(BinarySystemEvolution):
                 hdu.append(table_four)
                 hdu.flush()
 
-            print(f"System of {l} (of {len(data_outputs_1)} sys.)")
+            print(f"System of {l} (of {len(survivor_seeds)} sys.)")
             # Close the FITS file
             hdu.close()
 
@@ -441,15 +374,16 @@ class Process(BinarySystemEvolution):
             print(f"Data successfully written to {fit_filename}")
 
             l = l + 1
+
         print(f"Total number of systems with BHs: {l}")
         print(f"Total number of systems without MT data: {j}")
         print(f"Total number of systems without CE data: {k}")
         print(f"Total number of systems without CE data: {k}")
-        e = dt.datetime.now()
+        end_time = dt.datetime.now()
         # Displays Time
-        current_time = e.strftime("%d%m%y") + "_" + e.strftime('%H%M')
-        duration = e - s
-        print(" \n Finish time :", current_time)
+        end_time_str = end_time.strftime("%d%m%y") + "_" + end_time.strftime('%H%M')
+        duration = end_time.timestamp() - start_time.timestamp()
+        print(" \n Finish time :", end_time_str, f"Duration: {duration}")
 
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
@@ -458,5 +392,686 @@ class Process(BinarySystemEvolution):
         results = [f"Total number of systems with BHs: {l}",
                 f"Total number of systems without MT data: {j}",
                 f"Total number of systems without CE data: {k}",
-                f"Output files created in: {pathToFiles}"]
+                f"Output files created in: {self.bse.pathToFiles}"]
+        
         return results
+    
+    def extract_base_system_data(self, with_logging=True):
+        """Extracts system data from COMPAS detailed output files and saves it to a FITS file."""
+        start_time = dt.datetime.now()
+
+        # Create output directory if it doesn't exist
+        os.makedirs(self.bse.pathToFiles, exist_ok=True)
+
+        logger = logging.getLogger(self.name)
+        logger.setLevel(logging.INFO)
+
+        fh = None
+        if with_logging:
+            os.makedirs(self.bse.pathToLogs, exist_ok=True)
+            log_filename = os.path.join(self.bse.pathToLogs, f"extract_base_system_data_{start_time.strftime('%Y%m%d_%H%M%S')}.log")
+            fh = logging.FileHandler(log_filename, mode='w')
+            fh.setLevel(logging.INFO)
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+            fh.setFormatter(formatter)
+            # Prevent duplicate handlers if method called multiple times
+            if not any(isinstance(h, logging.FileHandler) and h.baseFilename == fh.baseFilename for h in logger.handlers):
+                logger.addHandler(fh)
+            logger.propagate = False  # keep logs out of root logger
+
+            # Optional: redirect prints to logger (comment out in Jupyter if undesired)
+            sys.stdout = utils.StreamToLogger(logger, logging.INFO)
+            sys.stderr = utils.StreamToLogger(logger, logging.ERROR)
+            logger.info('data extraction started')
+
+        base_data = self.bse.data_outputs
+
+
+        fit_filename = os.path.join(self.bse.pathToFiles, f"processed_base_outputs.fits")
+        hdu_pr = fits.PrimaryHDU()
+        hdu_pr.writeto(fit_filename, overwrite=True)
+        hdu = fits.open(fit_filename, mode='update')
+
+        SPs = []
+
+        EVENTSMT = []
+        EVOLUTIONSTATSP = []
+
+        STELLARTYPEZAMSSP1   =  []
+        STELLARTYPEZAMSSP2   =  []
+        STELLARTYPESP1   =  []
+        STELLARTYPESP2   =  []   
+        MASSZAMSSP1 = []
+        MASSZAMSSP2 = []
+        EVOLUTIONSTATSP = []
+        SEMIMAJORAXISZAMSSP = []
+        ECCENTRICITYZAMSSP = []
+        CIRCULARIZATIONTIME = []
+        RADIUSSP1 = []
+        RADIUSSP2 = []
+
+        MTs = []
+        EVENTSMT = []
+        STELLARTYPEPREMT1   =  []
+        STELLARTYPEPREMT2   =  [] 
+        STELLARTYPEPSTMT1   =  []
+        STELLARTYPEPSTMT2   =  [] 
+        MASSPREMT1 = []
+        MASSPREMT2 = []
+        MASSPSTMT1 = []
+        MASSPSTMT2 = []
+
+        SEMIMAJORAXISZAMSSP = []
+        SEMIMAJORAXISPREMT = []
+        SEMIMAJORAXISPSTMT = []
+        ECCENTRICITYPREMT = []
+        ECCENTRICITYPSTMT = []
+        RADIUSPREMT1 = []
+        RADIUSPREMT2 = []
+        RADIUSPSTMT1 = []
+        RADIUSPSTMT2 = []
+        TIMEPREMT = []
+        TIMEPSTMT = []
+        CEAFTERMT = []
+        MASSTRANSFERHISTORY = []
+
+        CEs = []
+        EVENTSCE = []
+        STELLARTYPEPRECE1   =  []
+        STELLARTYPEPRECE2   =  [] 
+        STELLARTYPEPSTCE1   =  []
+        STELLARTYPEPSTCE2   =  [] 
+        MASSPRECE1 = []
+        MASSPRECE2 = []
+        MASSPSTCE1 = []
+        MASSPSTCE2 = []
+        SEMIMAJORAXISPRECE = []
+        SEMIMAJORAXISPSTCE = []
+        RADIUSPRECE1 = []
+        RADIUSPRECE2 = []
+        RADIUSPSTCE1 = []
+        RADIUSPSTCE2 = []
+        COSIPRECE = []
+        COSIPSTCE = []
+        TIMECE = []
+
+        print(f'Data outputs :, {base_data}')
+
+        i = 0
+
+        for Data in base_data:
+
+            c = dt.datetime.now()
+            current_time = c.strftime("%d%m%y") + "_" + c.strftime('%H%M')
+
+            SP = Data['BSE_System_Parameters']
+            # print(SP.keys())
+
+
+
+            seedsSP = SP['SEED'][()]
+            statusSP = SP['Evolution_Status'][()]
+
+            print(f"Batch (of {len(seedsSP)} sys.)" + str(i) +  " start time :", current_time)
+
+            stellarTypeZamsSP1   =  SP['Stellar_Type@ZAMS(1)'][()]
+            stellarTypeZamsSP2   =  SP['Stellar_Type@ZAMS(2)'][()]
+            stellarTypeSP1   =  SP['Stellar_Type(1)'][()]
+            stellarTypeSP2   =  SP['Stellar_Type(2)'][()]  
+
+            massZamsSP1 = SP['Mass@ZAMS(1)'][()] 
+            massZamsSP2 = SP['Mass@ZAMS(2)'][()]
+
+            semimajorAxisZamsSP = SP['SemiMajorAxis@ZAMS'][()] # in AU
+            eccentricityZamsSP = SP['Eccentricity@ZAMS'][()]
+
+            radiusSP1 = massZamsSP1**(0.8) # in R_sun
+            radiusSP2 = massZamsSP2**(0.8) # in R_sun
+            print(radiusSP1)
+
+
+            
+
+            SPs.extend(seedsSP)
+            EVOLUTIONSTATSP.extend(statusSP)
+
+            STELLARTYPEZAMSSP1.extend(stellarTypeZamsSP1)
+            STELLARTYPEZAMSSP2.extend(stellarTypeZamsSP2)
+            STELLARTYPESP1.extend(stellarTypeSP1)
+            STELLARTYPESP2.extend(stellarTypeSP2)   
+
+            MASSZAMSSP1.extend(massZamsSP1)
+            MASSZAMSSP2.extend(massZamsSP2)
+
+            SEMIMAJORAXISZAMSSP.extend(semimajorAxisZamsSP)
+            ECCENTRICITYZAMSSP.extend(eccentricityZamsSP)
+
+            RADIUSSP1.extend(radiusSP1)
+            RADIUSSP2.extend(radiusSP2)
+
+
+
+            MT = Data['BSE_RLOF']
+
+            seedsMT = MT['SEED'][()]
+            eventsMT = MT['MT_Event_Counter'][()]
+
+            stellarTypepreMT1   =  MT['Stellar_Type(1)<MT'][()]
+            stellarTypepreMT2   =  MT['Stellar_Type(2)<MT'][()]  
+            stellarTypepstMT1   =  MT['Stellar_Type(1)>MT'][()]
+            stellarTypepstMT2   =  MT['Stellar_Type(2)>MT'][()] 
+
+            masspreMT1 = MT['Mass(1)<MT'][()] 
+            masspreMT2 = MT['Mass(2)<MT'][()] 
+            masspstMT1 = MT['Mass(1)>MT'][()] 
+            masspstMT2 = MT['Mass(2)>MT'][()]
+
+            semimajorAxispreMT = MT['SemiMajorAxis<MT'][()] # in R_sun
+            semimajorAxispstMT = MT['SemiMajorAxis>MT'][()]
+
+            eccentricitypreMT = MT['Eccentricity<MT'][()]
+            eccentricitypstMT = MT['Eccentricity>MT'][()]
+
+            semimajorAxispreMT = (semimajorAxispreMT*const.R_sun).to(u.au).value
+            semimajorAxispstMT = (semimajorAxispstMT*const.R_sun).to(u.au).value
+
+
+            timepreMT = MT['Time<MT'][()]
+            timepstMT = MT['Time>MT'][()]
+            
+            massTransferhistory = MT['CEE>MT'][()]
+
+            radiuspreMT1 = MT['Radius(1)<MT'][()]
+            radiuspstMT1 = MT['Radius(1)>MT'][()] 
+            radiuspreMT2 = MT['Radius(2)<MT'][()]
+            radiuspstMT2 = MT['Radius(2)>MT'][()]
+
+            
+
+            CEafterMT = MT['CEE>MT'][()]
+
+            MTs.extend(seedsMT)
+            EVENTSMT.extend(eventsMT)
+            
+            STELLARTYPEPREMT1.extend(stellarTypepreMT1)
+            STELLARTYPEPREMT2.extend(stellarTypepreMT2) 
+            STELLARTYPEPSTMT1.extend(stellarTypepstMT1)
+            STELLARTYPEPSTMT2.extend(stellarTypepstMT2) 
+
+            MASSPREMT1.extend(masspreMT1)
+            MASSPREMT2.extend(masspreMT2)
+            MASSPSTMT1.extend(masspstMT1)
+            MASSPSTMT2.extend(masspstMT2)
+
+            SEMIMAJORAXISPREMT.extend(semimajorAxispreMT)
+            SEMIMAJORAXISPSTMT.extend(semimajorAxispstMT)
+
+            ECCENTRICITYPREMT.extend(eccentricitypreMT)
+            ECCENTRICITYPSTMT.extend(eccentricitypstMT)
+
+            TIMEPREMT.extend(timepreMT)
+            TIMEPSTMT.extend(timepstMT)
+
+            MASSTRANSFERHISTORY.extend(massTransferhistory)
+            
+
+
+            CEAFTERMT.extend(CEafterMT)
+
+            RADIUSPREMT1.extend(radiuspreMT1)
+            RADIUSPREMT2.extend(radiuspreMT2)
+            RADIUSPSTMT1.extend(radiuspstMT1)
+            RADIUSPSTMT2.extend(radiuspstMT2)
+
+
+
+            CE = Data['BSE_Common_Envelopes']
+
+            seedsCE = CE['SEED'][()]
+            eventsCE = CE['CE_Event_Counter'][()]
+            
+            stellarTypepreCE1   =  CE['Stellar_Type(1)<CE'][()]
+            stellarTypepreCE2   =  CE['Stellar_Type(2)<CE'][()]  
+            stellarTypepstCE1   =  CE['Stellar_Type(1)'][()]
+            stellarTypepstCE2   =  CE['Stellar_Type(2)'][()] 
+            # PreCE refers to the mass just before the first CE event, while pstCE refers to the mass just after the last CE event.
+            masspreCE1 = CE['Mass(1)<CE'][()] 
+            masspreCE2 = CE['Mass(2)<CE'][()] 
+            masspstCE1 = CE['Mass(1)>CE'][()] 
+            masspstCE2 = CE['Mass(2)>CE'][()]
+
+            semimajorAxispreCE = CE['SemiMajorAxis<CE'][()] # in R_sun
+            semimajorAxispstCE = CE['SemiMajorAxis>CE'][()]
+
+            semimajorAxispreCE = (semimajorAxispreCE*const.R_sun).to(u.au).value
+            semimajorAxispstCE = (semimajorAxispstCE*const.R_sun).to(u.au).value
+
+            timeCE = CE['Time'][()]
+            circulartizationTime = CE['Tau_Circ'][()]
+            
+            radiuspreCE1 = CE['Radius(1)<CE'][()] # in R_sun
+            radiuspstCE1 = CE['Radius(1)>CE'][()] 
+            radiuspreCE2 = CE['Radius(2)<CE'][()]
+            radiuspstCE2 = CE['Radius(2)>CE'][()] 
+
+            CEs.extend(seedsCE)
+            EVENTSCE.extend(eventsCE)
+
+            STELLARTYPEPRECE1.extend(stellarTypepreCE1)
+            STELLARTYPEPRECE2.extend(stellarTypepreCE2) 
+            STELLARTYPEPSTCE1.extend(stellarTypepstCE1)
+            STELLARTYPEPSTCE2.extend(stellarTypepstCE2) 
+
+            MASSPRECE1.extend(masspreCE1)
+            MASSPRECE2.extend(masspreCE2)
+            MASSPSTCE1.extend(masspstCE1)
+            MASSPSTCE2.extend(masspstCE2)
+
+            SEMIMAJORAXISPRECE.extend(semimajorAxispreCE)
+            SEMIMAJORAXISPSTCE.extend(semimajorAxispstCE)
+
+            CIRCULARIZATIONTIME.extend(circulartizationTime)
+
+
+            # PreMT refers to the mass just before the first MT event, while pstMT refers to the mass just after the last MT event.
+
+
+            c = dt.datetime.now()
+            current_time = c.strftime("%d%m%y") + "_" + c.strftime('%H%M')
+            print("Batch " + str(i) +  " end time :", current_time)
+            i = i+1
+        Data.close()
+
+        arrays_to_save = [ ]
+        filenames = []
+        checklist = [MTs,STELLARTYPEPREMT1,STELLARTYPEPREMT2,STELLARTYPEPSTMT1,STELLARTYPEPSTMT2,
+                                            MASSPREMT1,MASSPREMT2,MASSPSTMT1,MASSPSTMT2,SEMIMAJORAXISPREMT, SEMIMAJORAXISPSTMT,
+                                            EVENTSMT,MASSTRANSFERHISTORY,RADIUSPREMT1, RADIUSPREMT2, RADIUSPSTMT1, RADIUSPSTMT2,
+                                            TIMEPREMT, TIMEPSTMT, CEAFTERMT]
+        for e in checklist:
+            print(len(e))
+
+        SP_hdu = fits.BinTableHDU(Table(data=[SPs, STELLARTYPEZAMSSP1,STELLARTYPEZAMSSP2,STELLARTYPESP1,STELLARTYPESP2,
+                                            MASSZAMSSP1,MASSZAMSSP2,SEMIMAJORAXISZAMSSP, EVOLUTIONSTATSP, ECCENTRICITYZAMSSP, RADIUSSP1, RADIUSSP2], 
+                                        names=["SPs","STELLARTYPEZAMSSP1", "STELLARTYPEZAMSSP2", "STELLARTYPESP1", "STELLARTYPESP2",
+                                            "MASSZAMSSP1", "MASSZAMSSP2",  "SEMIMAJORAXISZAMSSP", "EVOLUTIONSTATSP", "ECCENTRICITYZAMSSP", "RADIUSSP1", "RADIUSSP2"]))
+
+        MT_hdu = fits.BinTableHDU(Table(data=[MTs,STELLARTYPEPREMT1,STELLARTYPEPREMT2,STELLARTYPEPSTMT1,STELLARTYPEPSTMT2,
+                                            MASSPREMT1,MASSPREMT2,MASSPSTMT1,MASSPSTMT2,SEMIMAJORAXISPREMT, SEMIMAJORAXISPSTMT,
+                                            EVENTSMT,MASSTRANSFERHISTORY,RADIUSPREMT1, RADIUSPREMT2, RADIUSPSTMT1, RADIUSPSTMT2,
+                                            TIMEPREMT, TIMEPSTMT, CEAFTERMT, ECCENTRICITYPREMT, ECCENTRICITYPSTMT], 
+                                        names=["MTs","STELLARTYPEPREMT1", "STELLARTYPEPREMT2", "STELLARTYPEPSTMT1", "STELLARTYPEPSTMT2",
+                                            "MASSPREMT1", "MASSPREMT2", "MASSPSTMT1", "MASSPSTMT2", "SEMIMAJORAXISPREMT", "SEMIMAJORAXISPSTMT",
+                                            "EVENTSMT","MASSTRANSFERHISTORY", "RADIUSPREMT1", "RADIUSPREMT2", "RADIUSPSTMT1", "RADIUSPSTMT2",
+                                            "TIMEPREMT", "TIMEPSTMT","CEAFTERMT", "ECCENTRICITYPREMT", "ECCENTRICITYPSTMT"]))
+        CE_hdu = fits.BinTableHDU(Table(data=[CEs, EVENTSCE, STELLARTYPEPRECE1, STELLARTYPEPRECE2, STELLARTYPEPSTCE1, STELLARTYPEPSTCE2, 
+                                            MASSPRECE1, MASSPRECE2, MASSPSTCE1, MASSPSTCE2, SEMIMAJORAXISPRECE, SEMIMAJORAXISPSTCE, CIRCULARIZATIONTIME],
+                                        names= ["CEs", "EVENTSCE","STELLARTYPEPRECE1", "STELLARTYPEPRECE2", "STELLARTYPEPSTCE1", "STELLARTYPEPSTCE2", 
+                                            "MASSPRECE1", "MASSPRECE2", "MASSPSTCE1", "MASSPSTCE2", "SEMIMAJORAXISPRECE", "SEMIMAJORAXISPSTCE", "CIRCULARIZATIONTIME"])) 
+        hdu.append(SP_hdu)
+        hdu.append(MT_hdu)
+        hdu.append(CE_hdu)
+        hdu.close()
+
+        end_time = dt.datetime.now()
+        # Displays Time
+        end_time_str = end_time.strftime("%d%m%y") + "_" + end_time.strftime('%H%M')
+        duration = end_time.timestamp() - start_time.timestamp()
+        print(" \n Finish time :", end_time_str, f"Duration: {duration}")
+
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        logging.shutdown()
+
+    def create_base_data_masks(self, with_logging=True):
+        """Create data masks for heatmaps."""
+
+        start_time = dt.datetime.now()
+
+        # Create output directory if it doesn't exist
+        os.makedirs(self.bse.pathToFiles, exist_ok=True)
+
+        logger = logging.getLogger(self.name)
+        logger.setLevel(logging.INFO)
+
+        fh = None
+        if with_logging:
+            os.makedirs(self.bse.pathToLogs, exist_ok=True)
+            log_filename = os.path.join(self.bse.pathToLogs, f"mask_base_data_{start_time.strftime('%Y%m%d_%H%M%S')}.log")
+            fh = logging.FileHandler(log_filename, mode='w')
+            fh.setLevel(logging.INFO)
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+            fh.setFormatter(formatter)
+            # Prevent duplicate handlers if method called multiple times
+            if not any(isinstance(h, logging.FileHandler) and h.baseFilename == fh.baseFilename for h in logger.handlers):
+                logger.addHandler(fh)
+            logger.propagate = False  # keep logs out of root logger
+
+            # Optional: redirect prints to logger (comment out in Jupyter if undesired)
+            sys.stdout = utils.StreamToLogger(logger, logging.INFO)
+            sys.stderr = utils.StreamToLogger(logger, logging.ERROR)
+            logger.info('data extraction started')
+
+
+        start_time_str = start_time.strftime("%d%m%y") + "_" + start_time.strftime('%H%M')
+        print("Start time :", start_time_str)
+        # Choose an output hdf5 file to work with
+
+        fit_filename = os.path.join(self.bse.pathToFiles, f"masks_base_outputs.fits")
+        hdu_pr = fits.PrimaryHDU()
+        hdu_pr.writeto(fit_filename, overwrite=True)
+        hdu = fits.open(fit_filename, mode='update')
+
+        # Boolen arrays for MASKing.
+        MASKSPBH1 = np.array([], dtype='bool')
+        MASKSPBH2 = np.array([], dtype='bool')
+
+        MASKPREMT = np.array([], dtype='bool')
+        MASKPSTMT = np.array([], dtype='bool')
+
+        MASKSPunb = np.array([], dtype='bool')
+        MASKSPdco = np.array([], dtype='bool')
+        MASKSPmrgr = np.array([], dtype='bool')
+
+        MASKPREMTBH1 = np.array([], dtype='bool')
+        MASKPSTMTBH1 = np.array([], dtype='bool')
+
+        MASKPREMTBH2 = np.array([], dtype='bool')
+        MASKPSTMTBH2 = np.array([], dtype='bool')
+
+        MASKPREMTinSP = np.array([], dtype='bool')
+        MASKPSTMTinSP = np.array([], dtype='bool')
+
+        MASKPREMTBHNS1 = np.array([], dtype='bool')
+        MASKPSTMTBHNS1 = np.array([], dtype='bool')
+
+        MASKPREMTBHNS2 = np.array([], dtype='bool')
+        MASKPSTMTBHNS2 = np.array([], dtype='bool')
+
+        MASKPREMTnonBH = np.array([], dtype='bool')
+        MASKPSTMTnonBH = np.array([], dtype='bool')
+
+        MASKPREMTSEMAJ = np.array([], dtype='bool')
+        MASKPSTMTSEMAJ = np.array([], dtype='bool')
+
+        MASKPREMTORBPER = np.array([], dtype='bool')
+        MASKPSTMTORBPER = np.array([], dtype='bool')
+
+        MASKPREMTnegCE = np.array([], dtype='bool')
+        MASKPSTMTnegCE = np.array([], dtype='bool')
+
+        MASKPREMTposCE = np.array([], dtype='bool')
+        MASKPSTMTposCE = np.array([], dtype='bool')
+
+        MASKFIRSTMT = np.array([], dtype='bool')
+        MASKLASTMT = np.array([], dtype='bool')
+
+        MASKPREMTSEARCHABILITY = np.array([], dtype='bool')
+        MASKPSTMTSEARCHABILITY = np.array([], dtype='bool')
+
+        fits_data = os.path.join(self.bse.pathToFiles, f"processed_base_outputs.fits")
+
+        with fits.open(fits_data) as hdul:
+            hdul.info()
+            SP = hdul[1].data
+            MT = hdul[2].data
+            CE = hdul[3].data
+
+
+        # for file in files:
+        #     print("file :", file)
+        #     for var in filenames:
+        #         print("var :", var)
+        #         print("if check :" , arrays_to_save[np.where(np.asarray(filenames) == var)[0][0]])
+        #         if var in file and len(arrays_to_save[np.where(np.asarray(filenames) == var)[0][0]]) == 0 :
+        #             index = np.where(np.asarray(filenames) == var)[0][0]
+        #             arrays_to_save[np.where(np.asarray(filenames) == var)[0][0]] = 1
+
+        #     print(pathToData  + file)
+        #     data = np.loadtxt(pathToData  + file)
+        #     print("index: ", index)
+        #     print("File name: ", file, " Variable name: ", filenames[index])
+        #     if len(data) != 0:
+        #         print("data reached.")
+        #     print("len: ", len(data))
+        #     print("df col name:", filenames[index])   
+
+        #     if index == 0:
+        #         lenSP = len(data)
+        #     if index == 1:
+        #         lenMT = len(data)
+        #     if index == 2:
+        #         lenCE = len(data_CE)
+
+        #     if len(data) == lenSP:
+
+        #         SPdf[filenames[index]] = data
+        #         print(SPdf[filenames[index]] .isnull().sum(), SPdf[filenames[index]] .max())
+        #         print("SUCCESS (SP)")
+        #         i = i+1
+
+        #     if len(data) == lenMT:
+
+        #         MTdf[filenames[index]] = data
+        #         print(MTdf[filenames[index]].isnull().sum(), MTdf[filenames[index]].max())
+        #         print("SUCCESS (MT)")
+        #         i = i+1
+
+        #     if len(data) == lenCE:
+
+        #         CEdf[filenames[index]] = data
+        #         print(CEdf[filenames[index]].isnull().sum(), CEdf[filenames[index]].max())
+        #         print("SUCCESS (CE)")
+        #         i = i+1
+
+
+        # Chooses first MT events.
+        MASKFIRSTMT = (MT['EVENTSMT'] == 1)
+
+        # Chooses last MT events.
+        MASKLASTMT = utils.find_last_mt(MT['MTs'])
+
+        # Chooses MT events where stellar type changes.
+        MASKTYPECHANGE1, MASKTYPECHANGE2 = utils.type_change_MT(MT['STELLARTYPEPREMT1'],MT['STELLARTYPEPSTMT1'],MT['STELLARTYPEPREMT2'], MT['STELLARTYPEPSTMT2'], start_time)
+
+
+        ORBITALPERIODSP = calc.orbital_period(SP['MASSZAMSSP1'], SP['MASSZAMSSP2'], SP['SEMIMAJORAXISZAMSSP'])
+        ORBITALPERIODPREMT = calc.orbital_period(MT['MASSPREMT1'], MT['MASSPREMT2'], MT['SEMIMAJORAXISPREMT'])
+        ORBITALPERIODPSTMT = calc.orbital_period(MT['MASSPSTMT1'], MT['MASSPSTMT2'], MT['SEMIMAJORAXISPSTMT'])
+        print(np.shape(ORBITALPERIODPREMT))
+
+        COSIPREMT = calc.orbital_inclination(MT['RADIUSPREMT1'], MT['RADIUSPREMT2'], MT['SEMIMAJORAXISPREMT'])
+        COSIPSTMT = calc.orbital_inclination(MT['RADIUSPSTMT1'], MT['RADIUSPSTMT2'], MT['SEMIMAJORAXISPSTMT'])
+        print(np.shape(COSIPREMT))
+        MASKPREMTSEARCHABILITY = calc.searchability(COSIPREMT)
+        MASKPSTMTSEARCHABILITY = calc.searchability(COSIPSTMT)
+
+        print(MASKPREMTSEARCHABILITY)
+        print(np.shape(MASKPREMTSEARCHABILITY))
+        # i = np.random.uniform(0,180,len(MTs))
+
+
+
+        ## may add eccentricity later on
+        CEAFTERMT = MT['CEAFTERMT']
+
+        MASKSPBH1 = ((SP['STELLARTYPESP1']  == 14) & (SP['STELLARTYPESP2']  != 14)) 
+        MASKSPBH2 = ((SP['STELLARTYPESP1']  != 14) & (SP['STELLARTYPESP2']  == 14))
+        MASKPREMTBH1 = ((MT['STELLARTYPEPREMT1']  == 14) & (MT['STELLARTYPEPREMT2']  != 14)) 
+        MASKPREMTBH2 = ((MT['STELLARTYPEPREMT1']  != 14) & (MT['STELLARTYPEPREMT2']  == 14))       
+        MASKPSTMTBH1 = ((MT['STELLARTYPEPSTMT1']  == 14) & (MT['STELLARTYPEPSTMT2']  != 14)) 
+        MASKPSTMTBH2 = ((MT['STELLARTYPEPSTMT1']  != 14) & (MT['STELLARTYPEPSTMT2']  == 14))
+
+        MASKSPunb = (SP['EVOLUTIONSTATSP'] == 14)
+        MASKSPdco = (SP['EVOLUTIONSTATSP'] == 11)
+        MASKSPmrgr = (SP['EVOLUTIONSTATSP'] == 9) 
+
+        MASKMTinSP =  np.isin(SP['SPs'], MT['MTs'])
+
+        MASKPREMTnonBH = ((MT['STELLARTYPEPREMT1'] != 14) & (MT['STELLARTYPEPREMT2'] != 14)) #none is bh
+        MASKPREMTBHNS1 = ((MT['STELLARTYPEPREMT1'] == 14) & (MT['STELLARTYPEPREMT2'] == 13)) #primary is bh secondary is ns
+        MASKPREMTBHNS2 = ((MT['STELLARTYPEPREMT1'] == 13) & (MT['STELLARTYPEPREMT2'] == 14)) #primary is ns secondary is bh
+        MASKPREMTBHMS1 = ((MT['STELLARTYPEPREMT1'] == 14) & ((MT['STELLARTYPEPREMT2'] == 0)|(MT['STELLARTYPEPREMT2'] == 1))) #primary is bh secondary is MS
+        MASKPREMTBHMS2 = (((MT['STELLARTYPEPREMT1'] == 0)|(MT['STELLARTYPEPREMT1'] == 1)) & (MT['STELLARTYPEPREMT2'] == 14)) #primary is MS secondary is bh
+
+        MASKPSTMTnonBH = ((MT['STELLARTYPEPSTMT1'] != 14) & (MT['STELLARTYPEPSTMT2'] != 14)) #none is bh
+        MASKPSTMTBHNS1 = ((MT['STELLARTYPEPSTMT1'] == 14) & (MT['STELLARTYPEPSTMT2'] == 13)) #primary is bh secondary is ns
+        MASKPSTMTBHNS2 = ((MT['STELLARTYPEPSTMT1'] == 13) & (MT['STELLARTYPEPSTMT2'] == 14)) #primary is ns secondary is bh
+        MASKPSTMTBHMS1 = ((MT['STELLARTYPEPSTMT1'] == 14) & ((MT['STELLARTYPEPSTMT2'] == 0) | (MT['STELLARTYPEPSTMT2'] == 1))) #primary is bh secondary is MS
+        MASKPSTMTBHMS2 = (((MT['STELLARTYPEPSTMT1'] == 0) | (MT['STELLARTYPEPSTMT1'] == 1)) & (MT['STELLARTYPEPSTMT2'] == 14)) #primary is MS secondary is bh
+
+
+        MASKPREMTSEMAJ = (MT['SEMIMAJORAXISPREMT'] <= 3.0)
+        MASKPSTMTSEMAJ = (MT['SEMIMAJORAXISPSTMT'] <= 3.0)
+
+        MASKPREMTORBPER = (ORBITALPERIODPREMT <= 70)
+        MASKPSTMTORBPER = (ORBITALPERIODPSTMT <= 70)
+
+        MASKPREMTSEMAJ_masuda = (MT['SEMIMAJORAXISPREMT'] <= 0.4)
+        MASKPSTMTSEMAJ_masuda = (MT['SEMIMAJORAXISPSTMT'] <= 0.4)
+
+        MASKPREMTORBPER_masuda = (ORBITALPERIODPREMT <= 30)
+        MASKPSTMTORBPER_masuda = (ORBITALPERIODPSTMT <= 30)
+
+        MASKPREMTnegCE =  np.isin(MT['MTs']*MASKFIRSTMT, CE['CEs'], invert=True)
+        MASKPREMTposCE =  np.isin(MT['MTs']*MASKFIRSTMT, CE['CEs'])
+        MASKPSTMTnegCE =  np.isin(MT['MTs']*MASKLASTMT, CE['CEs'], invert=True)
+        MASKPSTMTposCE =  np.isin(MT['MTs']*MASKLASTMT, CE['CEs'])
+        # print('maskpremtnegce, posce, pstnegce, pstposce ', len(MASKPREMTnegCE),len(MASKPREMTposCE),len(MASKPSTMTnegCE),len(MASKPSTMTposCE))
+
+        # arrays_to_save = [MASKPREMTBH1,MASKPREMTBH2,MASKPREMTBHNS1,MASKPREMTBHNS2,
+        #                 MASKPREMTnonBH, MASKPREMTSEMAJ, MASKPREMTnegCE, MASKPREMTposCE,MASKFIRSTMT,
+        #                 MASKPSTMTBH1,MASKPSTMTBH2,MASKPSTMTBHNS1,MASKPSTMTBHNS2, MASKPSTMTnonBH, MASKPSTMTSEMAJ,
+        #                 MASKPSTMTnegCE, MASKPSTMTposCE, MASKLASTMT, MASKTYPECHANGE1, MASKTYPECHANGE2,
+        #                 ORBITALPERIODPREMT,ORBITALPERIODPSTMT, MASKPREMTORBPER, COSIPREMT,MASKPSTMTORBPER, COSIPSTMT,
+        #                 MASKPREMTSEARCHABILITY, MASKPSTMTSEARCHABILITY, CEAFTERMT]
+
+        # filenames = [   "MASKPREMTBH1", "MASKPREMTBH2", "MASKPREMTBHNS1", "MASKPREMTBHNS2",
+        #                 "MASKPREMTnonBH", "MASKPREMTSEMAJ", "MASKPREMTnegCE", "MASKPREMTposCE", "MASKFIRSTMT",
+        #                 "MASKPSTMTBH1", "MASKPSTMTBH2", "MASKPSTMTBHNS1", "MASKPSTMTBHNS2", "MASKPSTMTnonBH", "MASKPSTMTSEMAJ", 
+        #                 "MASKPSTMTnegCE", "MASKPSTMTposCE", "MASKLASTMT", "MASKTYPECHANGE1", "MASKTYPECHANGE2",
+        #                 "ORBITALPERIODPREMT", "ORBITALPERIODPSTMT","MASKPREMTORBPER", "COSIPREMT", "MASKPSTMTORBPER", "COSIPSTMT",
+        #                 "MASKPREMTSEARCHABILITY", "MASKPSTMTSEARCHABILITY","CEAFTERMT"]
+
+        # for e in arrays_to_save:
+        #     print(len(e))
+
+
+        print(f'Run : {start_time}')
+
+        print(f"Number of systems: {len(SP['MASSZAMSSP1'])}") 
+        print(f"Number of systems forming MT (via SP STATUS): {np.sum(MASKMTinSP)}") 
+        print(f"Number of systems forming MT (via MT mass): {np.sum(MASKFIRSTMT)}")  
+        print(f"Number of primary mass BHs (SP):  {np.sum(MASKSPBH1)}") 
+        print(f"Number of primary mass BHs (MT): {np.sum(MASKPREMTBH1)}")   
+        print(f"Number of secondary mass BHs (SP): {np.sum(MASKSPBH2)}") 
+        print(f"Number of secondary mass BHs (MT): {np.sum(MASKPREMTBH2)}")      
+        print(f"Number of unbound binaries (SP): {np.sum(MASKSPunb)}")  
+        print(f"Number of double compact objects (SP): {np.sum(MASKSPdco)}")   
+        print(f"Number of mergers (SP): {np.sum(MASKSPmrgr)}")
+        print(f"Number of BH-NS binaries (pre MT): {np.sum(MASKPREMTBHNS1)}") 
+        print(f"Number of NS-BH binaries (pre MT): {np.sum(MASKPREMTBHNS2)}") 
+
+        print(f"Number of systems without any BHs (pre MT):  {np.sum(MASKPREMTnonBH)}") 
+        print(f"Number of systems with semimajor axis < 3.0 AU (pre MT):  {np.sum(MASKPREMTSEMAJ)}") 
+        print(f"Number of systems undergoing CE (pre MT):  {np.sum(MASKPREMTposCE)}") 
+        print(f"Number of systems not undergoing CE (pre MT):  {np.sum(MASKPREMTnegCE)}") 
+        print(f"Number of systems with semimajor axis < 3.0 AU AND undergoing CE (pre MT):  {np.sum(MASKPREMTSEMAJ*MASKPREMTposCE)}") 
+        print(f"Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (pre MT):  {np.sum(MASKPREMTSEMAJ*MASKPREMTnegCE)}") 
+        print(f"Number of systems with orbital period < 70 days AND undergoing CE (pre MT):  {np.sum(MASKPREMTORBPER*MASKPREMTposCE)}") 
+        print(f"Number of systems with orbital period < 70 days AND NOT undergoing CE (pre MT):  {np.sum(MASKPREMTORBPER*MASKPREMTnegCE)}")     
+        print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.9)) AND undergoing CE (pre MT):  {np.sum(MASKPREMTSEARCHABILITY*MASKPREMTposCE)}") 
+        print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.9)) AND NOT undergoing CE (pre MT):  {np.sum(MASKPREMTSEARCHABILITY*MASKPREMTnegCE)}") 
+        print(f"Number of BH-NS binaries (pst MT):  {np.sum(MASKPSTMTBHNS1)}") 
+        print(f"Number of NS-BH binaries (pst MT):  {np.sum(MASKPSTMTBHNS2)}") 
+
+        print(f"Number of systems without any BHs (pst MT):  {np.sum(MASKPSTMTnonBH)}") 
+        print(f"Number of systems with semimajor axis < 3.0 AU (pst MT):  {np.sum(MASKPSTMTSEMAJ)}") 
+        print(f"Number of systems undergoing CE (pst MT):  {np.sum(MASKPSTMTposCE)}") 
+        print(f"Number of systems not undergoing CE (pst MT):  {np.sum(MASKPSTMTnegCE)}") 
+        print(f"Number of systems with semimajor axis < 3.0 AU AND undergoing CE (pst MT):  {np.sum(MASKPSTMTSEMAJ*MASKPSTMTposCE)}") 
+        print(f"Number of systems with semimajor axis < 3.0 AU AND NOT undergoing CE (pst MT):  {np.sum(MASKPSTMTSEMAJ*MASKPSTMTnegCE)}") 
+        print(f"Number of systems with orbital period < 70 days AND undergoing CE (pst MT):  {np.sum(MASKPSTMTORBPER*MASKPSTMTposCE)}") 
+        print(f"Number of systems with orbital period < 70 days AND NOT undergoing CE (pst MT):  {np.sum(MASKPSTMTORBPER*MASKPSTMTnegCE)}") 
+        print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.9)) AND undergoing CE (pst MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTposCE)}") 
+        print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.9)) AND NOT undergoing CE (pst MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTnegCE)}") 
+        print(f"Total MT events:  {np.sum(MT['EVENTSMT'])}") 
+        print(f"Number of primary HeWD (pre MT) :  {np.sum([MT['STELLARTYPEPREMT1'] == 10 ])}") 
+        print(f"Number of primary COWD (pre MT) :  {np.sum([MT['STELLARTYPEPREMT1'] == 11 ])}") 
+        print(f"Number of primary ONeWD (pre MT) :  {np.sum([MT['STELLARTYPEPREMT1'] == 12 ])}") 
+        print(f"Number of primary HeWD (pst MT) :  {np.sum([MT['STELLARTYPEPSTMT1'] == 10 ])}") 
+        print(f"Number of primary COWD (pst MT) :  {np.sum([MT['STELLARTYPEPSTMT1'] == 11 ])}") 
+        print(f"Number of primary ONeWD (pst MT) :  {np.sum([MT['STELLARTYPEPSTMT1'] == 12 ])}") 
+        print(f"Number of secondary HeWD (pre MT) :  {np.sum([MT['STELLARTYPEPREMT2'] == 10 ])}") 
+        print(f"Number of secondary COWD (pre MT) :  {np.sum([MT['STELLARTYPEPREMT2'] == 11 ])}") 
+        print(f"Number of secondary ONeWD (pre MT) :  {np.sum([MT['STELLARTYPEPREMT2'] == 12 ])}") 
+        print(f"Number of secondary HeWD (pst MT) :  {np.sum([MT['STELLARTYPEPSTMT2'] == 10 ])}") 
+        print(f"Number of secondary COWD (pst MT) :  {np.sum([MT['STELLARTYPEPSTMT2'] == 11 ])}") 
+        print(f"Number of secondary ONeWD (pst MT) :  {np.sum([MT['STELLARTYPEPSTMT2'] == 12 ])}")
+
+        print(f"Number of BH-MS binaries (pre MT): {np.sum(MASKPREMTBHMS1)}") 
+        print(f"Number of MS-BH binaries (pre MT): {np.sum(MASKPREMTBHMS2)}")
+        print(f"Number of BH-MS binaries (pst MT):  {np.sum(MASKPSTMTBHMS1)}") 
+        print(f"Number of MS-BH binaries (pst MT):  {np.sum(MASKPSTMTBHMS2)}") 
+        print(f"Number of BH-MS binaries (pst last MT):  {np.sum(MASKPSTMTBHMS1*MASKLASTMT)}") 
+        print(f"Number of MS-BH binaries (pst last MT):  {np.sum(MASKPSTMTBHMS2*MASKLASTMT)}") 
+        print(f"Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pre MT):  {np.sum(MASKPREMTSEMAJ*MASKPREMTBHMS1)}") 
+        print(f"Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pre MT):  {np.sum(MASKPREMTSEMAJ*MASKPREMTBHMS2)}") 
+        print(f"Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pst MT):  {np.sum(MASKPSTMTSEMAJ*MASKPSTMTBHMS1)}") 
+        print(f"Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pst MT):  {np.sum(MASKPSTMTSEMAJ*MASKPSTMTBHMS2)}") 
+        print(f"Number of systems with semimajor axis < 3.0 AU BH-MS binaries (pst last MT):  {np.sum(MASKPSTMTSEMAJ*MASKPSTMTBHMS1*MASKLASTMT)}") 
+        print(f"Number of systems with semimajor axis < 3.0 AU MS-BH binaries (pst last MT):  {np.sum(MASKPSTMTSEMAJ*MASKPSTMTBHMS2*MASKLASTMT)}")
+        print(f"Number of systems with orbital period < 70 days BH-MS binaries (pre MT):  {np.sum(MASKPREMTORBPER*MASKPREMTBHMS1)}")
+        print(f"Number of systems with orbital period < 70 days MS-BH binaries (pre MT):  {np.sum(MASKPREMTORBPER*MASKPREMTBHMS2)}")
+        print(f"Number of systems with orbital period < 70 days BH-MS binaries (pst MT):  {np.sum(MASKPSTMTORBPER*MASKPSTMTBHMS1)}")
+        print(f"Number of systems with orbital period < 70 days MS-BH binaries (pst MT):  {np.sum(MASKPSTMTORBPER*MASKPSTMTBHMS2)}")
+        print(f"Number of systems with orbital period < 70 days BH-MS binaries (pst last MT):  {np.sum(MASKPSTMTORBPER*MASKPSTMTBHMS1*MASKLASTMT)}")
+        print(f"Number of systems with orbital period < 70 days MS-BH binaries (pst last MT):  {np.sum(MASKPSTMTORBPER*MASKPSTMTBHMS2*MASKLASTMT)}")
+        print(f"Number of systems with orbital period < 30 days BH-MS binaries (pst MT):  {np.sum(MASKPSTMTORBPER_masuda*MASKPSTMTBHMS1)}")
+        print(f"Number of systems with orbital period < 30 days MS-BH binaries (pst MT):  {np.sum(MASKPSTMTORBPER_masuda*MASKPSTMTBHMS2)}")
+        print(f"Number of systems with orbital period < 30 days BH-MS binaries (pst last MT):  {np.sum(MASKPSTMTORBPER_masuda*MASKPSTMTBHMS1*MASKLASTMT)}")
+        print(f"Number of systems with orbital period < 30 days MS-BH binaries (pst last MT):  {np.sum(MASKPSTMTORBPER_masuda*MASKPSTMTBHMS2*MASKLASTMT)}")
+        print(f"Number of systems with semimajor axis < 0.4 AU BH-MS binaries (pst MT):  {np.sum(MASKPSTMTSEMAJ_masuda*MASKPSTMTBHMS1)}")
+        print(f"Number of systems with semimajor axis < 0.4 AU MS-BH binaries (pst MT):  {np.sum(MASKPSTMTSEMAJ_masuda*MASKPSTMTBHMS2)}")
+        print(f"Number of systems with semimajor axis < 0.4 AU BH-MS binaries (pst last MT):  {np.sum(MASKPSTMTSEMAJ_masuda*MASKPSTMTBHMS1*MASKLASTMT)}")
+        print(f"Number of systems with semimajor axis < 0.4 AU MS-BH binaries (pst last MT):  {np.sum(MASKPSTMTSEMAJ_masuda*MASKPSTMTBHMS2*MASKLASTMT)}")
+
+        print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.99)) BH-MS binaries (pre MT):  {np.sum(MASKPREMTSEARCHABILITY*MASKPREMTBHMS1)}")
+        print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.99)) MS-BH binaries (pre MT):  {np.sum(MASKPREMTSEARCHABILITY*MASKPREMTBHMS2)}")
+        print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.99)) BH-MS binaries (pst MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTBHMS1)}")
+        print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.99)) MS-BH binaries (pst MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTBHMS2)}")
+        print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.99)) BH-MS binaries (pst last MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTBHMS1*MASKLASTMT)}")
+        print(f"Number of systems with orbital inclination (COSI) <  np.cos(np.deg2rad(89.99)) MS-BH binaries (pst last MT):  {np.sum(MASKPSTMTSEARCHABILITY*MASKPSTMTBHMS2*MASKLASTMT)}")
+
+        SP_mask_hdu = fits.BinTableHDU(Table(data=[MASKSPBH1,MASKSPBH2, MASKSPunb,MASKSPdco,MASKSPmrgr,MASKMTinSP, ORBITALPERIODSP], 
+                                            names=["MASKSPBH1","MASKSPBH2", "MASKSPunb","MASKSPdco","MASKSPmrgr","MASKMTinSP", "ORBITALPERIODSP"]))
+        MT_mask_hdu = fits.BinTableHDU(Table(data=[MASKPREMTBH1,MASKPREMTBH2,MASKPREMTBHNS1,MASKPREMTBHNS2,MASKPREMTBHMS1,MASKPREMTBHMS2,
+                                                    MASKPREMTnonBH, MASKPREMTSEMAJ, MASKPREMTnegCE, MASKPREMTposCE,MASKFIRSTMT,
+                                                    MASKPSTMTBH1,MASKPSTMTBH2,MASKPSTMTBHNS1,MASKPSTMTBHNS2,MASKPSTMTBHMS1,MASKPSTMTBHMS2,
+                                                    MASKPSTMTnonBH, MASKPSTMTSEMAJ,
+                                                    MASKPSTMTnegCE, MASKPSTMTposCE, MASKLASTMT, MASKTYPECHANGE1, MASKTYPECHANGE2,
+                                                    ORBITALPERIODPREMT,ORBITALPERIODPSTMT, MASKPREMTORBPER, COSIPREMT,MASKPSTMTORBPER, COSIPSTMT,
+                                                    MASKPREMTSEARCHABILITY, MASKPSTMTSEARCHABILITY, CEAFTERMT, MASKPREMTSEMAJ_masuda, MASKPSTMTSEMAJ_masuda,
+                                                    MASKPREMTORBPER_masuda, MASKPSTMTORBPER_masuda], 
+                                            names=["MASKPREMTBH1","MASKPREMTBH2","MASKPREMTBHNS1","MASKPREMTBHNS2","MASKPREMTBHMS1","MASKPREMTBHMS2",
+                                                    "MASKPREMTnonBH", "MASKPREMTSEMAJ", "MASKPREMTnegCE", "MASKPREMTposCE","MASKFIRSTMT",
+                                                    "MASKPSTMTBH1","MASKPSTMTBH2","MASKPSTMTBHNS1","MASKPSTMTBHNS2", "MASKPSTMTBHMS1","MASKPSTMTBHMS2", 
+                                                    "MASKPSTMTnonBH", "MASKPSTMTSEMAJ",
+                                                    "MASKPSTMTnegCE", "MASKPSTMTposCE", "MASKLASTMT", "MASKTYPECHANGE1", "MASKTYPECHANGE2",
+                                                    "ORBITALPERIODPREMT", "ORBITALPERIODPSTMT","MASKPREMTORBPER", "COSIPREMT", "MASKPSTMTORBPER", "COSIPSTMT",
+                                                    "MASKPREMTSEARCHABILITY", "MASKPSTMTSEARCHABILITY","CEAFTERMT", "MASKPREMTSEMAJ_masuda", "MASKPSTMTSEMAJ_masuda",
+                                                    "MASKPREMTORBPER_masuda", "MASKPSTMTORBPER_masuda"]))
+        hdu.append(SP_mask_hdu)
+        hdu.append(MT_mask_hdu)
+        hdu.close()
+
+
+        end_time = dt.datetime.now()
+        # Displays Time
+        end_time_str = end_time.strftime("%d%m%y") + "_" + end_time.strftime('%H%M')
+        duration = end_time.timestamp() - start_time.timestamp()
+        print(" \n Finish time :", end_time_str, f"Duration: {duration}")
+
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        logging.shutdown()
