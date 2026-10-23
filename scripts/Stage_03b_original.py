@@ -12,21 +12,9 @@ import matplotlib.pyplot as plt  #for plotting
 import matplotlib
 import seaborn as sns
 from astropy.io import fits
-from luxetenebrae import calculations as calc
+from src.Utils import calculations as calc
+from src.Utils.calculations import mylog, percentage
 
-def mylog(x, y):
-    # Compute the logarithm of x and y
-    log_x = np.log10(x[y > 0])
-    log_y = np.log10(y[x > 0])
-    
-    # Filter out NaN values
-    mask = ~np.isnan(log_x) & ~np.isnan(log_y)
-    log_x_filtered = log_x[mask]
-    log_y_filtered = log_y[mask]
-    
-    return log_x_filtered, log_y_filtered
-def percentage(size, vals):
-    return vals * (100/size)
 sns.set_theme(style="ticks")
 
 c = datetime.now()

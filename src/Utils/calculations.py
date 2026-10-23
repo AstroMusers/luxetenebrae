@@ -118,16 +118,20 @@ def kroupa_imf_normalized(m_min, m_max):
     return imf / normalization
 
 def mylog(x, y):
-    # Compute the logarithm of x and y
-    log_x = np.log10(x[y > 0])
-    log_y = np.log10(y[x > 0])
-    
-    # Filter out NaN values
-    mask = ~np.isnan(log_x) & ~np.isnan(log_y)
-    log_x_filtered = log_x[mask]
-    log_y_filtered = log_y[mask]
-    
-    return log_x_filtered, log_y_filtered
+    """Return base-ten logarithms of finite positive pairs, preserving alignment."""
+    first = np.ma.asarray(x)
+    second = np.ma.asarray(y)
+    if first.shape != second.shape:
+        raise ValueError("Paired logarithm inputs must have the same shape")
+    valid = (
+        ~np.ma.getmaskarray(first)
+        & ~np.ma.getmaskarray(second)
+        & np.isfinite(first.data)
+        & np.isfinite(second.data)
+        & (first.data > 0)
+        & (second.data > 0)
+    )
+    return np.log10(first.data[valid]), np.log10(second.data[valid])
 
 def percentage(size, vals):
     return vals * (100/size)
