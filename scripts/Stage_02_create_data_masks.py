@@ -209,7 +209,7 @@ def create_data_masks(mode):
     MASKSPdco = (SP['EVOLUTIONSTATSP'] == 11)
     MASKSPmrgr = (SP['EVOLUTIONSTATSP'] == 9) 
 
-    MASKMTinSP =  np.in1d(SP['SPs'], MT['MTs'])
+    MASKMTinSP =  np.isin(SP['SPs'], MT['MTs'])
 
     MASKPREMTnonBH = ((MT['STELLARTYPEPREMT1'] != 14) & (MT['STELLARTYPEPREMT2'] != 14)) #none is bh
     MASKPREMTBHNS1 = ((MT['STELLARTYPEPREMT1'] == 14) & (MT['STELLARTYPEPREMT2'] == 13)) #primary is bh secondary is ns
@@ -236,10 +236,10 @@ def create_data_masks(mode):
     MASKPREMTORBPER_masuda = (ORBITALPERIODPREMT <= 30)
     MASKPSTMTORBPER_masuda = (ORBITALPERIODPSTMT <= 30)
 
-    MASKPREMTnegCE =  np.in1d(MT['MTs']*MASKFIRSTMT, CE['CEs'], invert=True)
-    MASKPREMTposCE =  np.in1d(MT['MTs']*MASKFIRSTMT, CE['CEs'])
-    MASKPSTMTnegCE =  np.in1d(MT['MTs']*MASKLASTMT, CE['CEs'], invert=True)
-    MASKPSTMTposCE =  np.in1d(MT['MTs']*MASKLASTMT, CE['CEs'])
+    MASKPREMTnegCE =  np.isin(MT['MTs']*MASKFIRSTMT, CE['CEs'], invert=True)
+    MASKPREMTposCE =  np.isin(MT['MTs']*MASKFIRSTMT, CE['CEs'])
+    MASKPSTMTnegCE =  np.isin(MT['MTs']*MASKLASTMT, CE['CEs'], invert=True)
+    MASKPSTMTposCE =  np.isin(MT['MTs']*MASKLASTMT, CE['CEs'])
     # print('maskpremtnegce, posce, pstnegce, pstposce ', len(MASKPREMTnegCE),len(MASKPREMTposCE),len(MASKPSTMTnegCE),len(MASKPSTMTposCE))
 
     # arrays_to_save = [MASKPREMTBH1,MASKPREMTBH2,MASKPREMTBHNS1,MASKPREMTBHNS2,

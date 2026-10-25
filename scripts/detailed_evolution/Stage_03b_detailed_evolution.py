@@ -315,7 +315,7 @@ axes[0,1].plot(sorted_sa, cumulative, 'b-', linewidth=2)
 axes[0,1].set_xlabel('Semimajor Axis (AU)')
 axes[0,1].set_ylabel('Cumulative Percentage')
 axes[0,1].set_xscale('log')
-axes[0,1].grid(True, alpha=0.3)
+axes[0,1].grid(False)
 axes[0,1].set_title('Cumulative Distribution of Semimajor Axis')
 
 # 3. Box plot showing quartiles
@@ -358,7 +358,7 @@ axes[0,0].set_ylabel('Lifetime (Myr)')
 axes[0,0].set_xscale('log')
 axes[0,0].set_yscale('log')
 axes[0,0].set_title('Lifetime vs Semimajor Axis')
-axes[0,0].grid(True, alpha=0.3)
+axes[0,0].grid(False)
 
 # 2. Eccentricity vs Semimajor Axis scatter plot with percentile regions
 axes[0,1].scatter(semimajoraxis_array, eccentricity_array, alpha=0.6, s=20, c='green')
@@ -368,7 +368,7 @@ axes[0,1].set_xlabel('Semimajor Axis (AU)')
 axes[0,1].set_ylabel('Eccentricity')
 axes[0,1].set_xscale('log')
 axes[0,1].set_title('Eccentricity vs Semimajor Axis')
-axes[0,1].grid(True, alpha=0.3)
+axes[0,1].grid(False)
 
 # 3. 3D scatter plot (Semimajor Axis vs Lifetime vs Eccentricity)
 ax_3d = fig.add_subplot(2, 3, 3, projection='3d')
