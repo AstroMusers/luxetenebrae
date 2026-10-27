@@ -2,6 +2,7 @@ import astropy.units as u
 from astropy import constants as const
 import numpy as np
 import logging
+import re
 import sys, os
 
 def is_ms_bh_pair(st1, st2):
@@ -333,21 +334,23 @@ class StreamToLogger:
         pass
 
 def rename_runs(starting_num, path_to_data):
+    """Rename numbered duplicate run directories, refusing existing targets."""
+    from tdpy.verbosity import print
 
-    start_num = starting_num  # The next available number
-
-    # Find all folders matching COMPAS_Output_X(1)
     pattern = re.compile(r"COMPAS_Output_(\d+) \(1\)$")
-    print(f"Searching in directory: {path_to_data}")
-    print(f"Using pattern: {pattern.pattern}")
-    folders = [f for f in os.listdir(path_to_data) if pattern.match(f)]
-    print(f"Found folders: {folders}")
+    print(f"Reading from {path_to_data}...")
+    folders = [name for name in os.listdir(path_to_data)
+               if pattern.match(name) and os.path.isdir(os.path.join(path_to_data, name))]
     folders.sort(key=lambda x: int(pattern.match(x).group(1)))
-    print(f"Found folders: {folders}")
+    renames = []
     for i, folder in enumerate(folders):
-        new_num = start_num + i
+        new_num = starting_num + i
         new_name = f"COMPAS_Output_{new_num}"
         src = os.path.join(path_to_data, folder)
         dst = os.path.join(path_to_data, new_name)
-        print(f"Renaming {src} -> {dst}")
+        if os.path.lexists(dst):
+            raise FileExistsError(f"Destination already exists at {dst}")
+        renames.append((src, dst))
+    for src, dst in renames:
+        print(f"Writing to {dst}...")
         os.rename(src, dst)

@@ -411,7 +411,7 @@ def generate_plots_L_bins(mode):
 
     # f, ax = plt.subplots(figsize=(4, 3.5))
 
-    # hmapplot = sns.heatmap(vals, annot=True, fmt=".3g", linewidths=.1, ax=ax)
+    # hmapplot = sns.heatmap(vals, annot=True, fmt=".3g", ax=ax)
     # cbar = hmapplot.collections[0].colorbar
     # cbar.ax.tick_params(labelsize=11)
     # ax.invert_yaxis()
@@ -445,7 +445,7 @@ def generate_plots_L_bins(mode):
     # print('vals:', vals)
     # f, ax = plt.subplots(figsize=(4, 3.5))
 
-    # hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    # hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     # cbar = hmapplot.collections[0].colorbar
     # cbar.ax.tick_params(labelsize=11)    
 
@@ -468,7 +468,7 @@ def generate_plots_L_bins(mode):
     # f, ax = plt.subplots(figsize=(4, 3.5))
     # xlabl = ["{:.1g}".format(10**x) for x in vals.columns]
     # ylabl = ["{:.1g}".format(10**y) for y in vals.index]
-    # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", linewidths=.1, ax=ax)
+    # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", ax=ax)
     # cbar = hmapplot.collections[0].colorbar
     # cbar.ax.tick_params(labelsize=11)
     # ax.invert_yaxis()
@@ -488,7 +488,7 @@ def generate_plots_L_bins(mode):
     # f, ax = plt.subplots(figsize=(4, 3.5))
     # xlabl = ["{:.1g}".format(10**x) for x in vals.columns]
     # ylabl = ["{:.1g}".format(10**y) for y in vals.index]
-    # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", linewidths=.1, ax=ax)
+    # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", ax=ax)
     # cbar = hmapplot.collections[0].colorbar
     # cbar.ax.tick_params(labelsize=11)
     # ax.invert_yaxis()
@@ -509,7 +509,7 @@ def generate_plots_L_bins(mode):
     # f, ax = plt.subplots(figsize=(4, 3.5))
     # xlabl = ["{:.1g}".format(10**x) for x in vals.columns]
     # ylabl = ["{:.1g}".format(10**y) for y in vals.index]
-    # hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    # hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     # cbar = hmapplot.collections[0].colorbar
     # cbar.ax.tick_params(labelsize=11)
     # ax.invert_yaxis()
@@ -538,7 +538,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -569,7 +569,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -601,7 +601,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -632,7 +632,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -663,7 +663,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -694,7 +694,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -725,7 +725,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -756,7 +756,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -789,7 +789,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -822,7 +822,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -855,7 +855,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -886,7 +886,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -957,7 +957,7 @@ def generate_plots_L_bins(mode):
 
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -988,7 +988,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -1018,7 +1018,7 @@ def generate_plots_L_bins(mode):
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')
@@ -1047,7 +1047,7 @@ def generate_plots_L_bins(mode):
     # f, ax = plt.subplots(figsize=(4, 3.5))
     # xlabl = ["{:.1g}".format(10**x) for x in vals.columns]
     # ylabl = ["{:.1g}".format(10**y) for y in vals.index]
-    # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", linewidths=.1, ax=ax)
+    # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", ax=ax)
     # cbar = hmapplot.collections[0].colorbar
     # cbar.ax.tick_params(labelsize=11)
     # ax.invert_yaxis()
@@ -1063,7 +1063,7 @@ def generate_plots_L_bins(mode):
 
     f, ax = plt.subplots(figsize=(4, 3.5))
 
-    hmapplot = sns.heatmap(vals_masuda, annot=True,fmt=".3g", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals_masuda, annot=True,fmt=".3g", ax=ax)
     cbar = hmapplot.collections[0].colorbar
 
     cbar.ax.set_title('[ppm]')

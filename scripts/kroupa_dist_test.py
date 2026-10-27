@@ -1,14 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 from scipy.integrate import quad
 from scipy.interpolate import interp1d
 import matplotlib as mpl  
 import matplotlib.lines as mlines
 from matplotlib.font_manager import FontProperties
 
-mpl.rc('font',family='DeJavu Serif')
 font = FontProperties(family='DeJavu Serif')
-plt.rcParams['savefig.dpi'] = 600  # Set the resolution for saved figures
 # Set the number of lines to plot and the colormap
 n_lines = 10
 cmap = mpl.colormaps['plasma']
@@ -93,98 +92,109 @@ normalization, _ = quad(kroupa_imf_continuous, m_min, m_max)
 def kroupa_pdf(m):
     return kroupa_imf_continuous(m) / normalization
 
-# Calculate number of stars between 25 and 150 M_sun
-m1a, m2a = 25,60
-fractiona, _ = quad(kroupa_pdf, m1a, m2a)
+def main(output_directory='Plots'):
+    output_directory = Path(output_directory)
+    output_directory.mkdir(parents=True, exist_ok=True)
+    mpl.rc('font',family='DeJavu Serif')
+    plt.rcParams['savefig.dpi'] = 600
+    masses = np.logspace(np.log10(m_min), np.log10(m_max), 1000)
 
-N_total = 200000
-N_in_range_1 = fractiona * N_total
-print(f"Expected number of stars between {m1a}-{m2a} M☉ = {N_in_range_1  :.2f}, percentage = {fractiona*100:.2f}%")
+    # Calculate number of stars between 25 and 150 M_sun
+    m1a, m2a = 25,60
+    fractiona, _ = quad(kroupa_pdf, m1a, m2a)
 
-m1b, m2b = 12,150
-fractionb, _ = quad(kroupa_pdf, m1b, m2b)
-N_in_range_2 = fractionb * N_total
-print(f"Expected number of stars between {m1b}-{m2b} M☉ = {N_in_range_2  :.2f}, percentage = {fractionb*100:.2f}%")
+    N_total = 200000
+    N_in_range_1 = fractiona * N_total
+    print(f"Expected number of stars between {m1a}-{m2a} M☉ = {N_in_range_1  :.2f}, percentage = {fractiona*100:.2f}%")
 
-fractionc, _ = quad(kroupa_pdf, m_min, m_max)
-print(f"Expected number of stars between {m_min}-{m_max} M☉ = {N_total:.2f}, percentage = {fractionc*100:.2f}%")
+    m1b, m2b = 12,150
+    fractionb, _ = quad(kroupa_pdf, m1b, m2b)
+    N_in_range_2 = fractionb * N_total
+    print(f"Expected number of stars between {m1b}-{m2b} M☉ = {N_in_range_2  :.2f}, percentage = {fractionb*100:.2f}%")
 
-pdf_values = np.array([kroupa_pdf(m) for m in masses])
+    fractionc, _ = quad(kroupa_pdf, m_min, m_max)
+    print(f"Expected number of stars between {m_min}-{m_max} M☉ = {N_total:.2f}, percentage = {fractionc*100:.2f}%")
 
-plt.figure(figsize=(3.5,3.5))
-plt.bar(masses, pdf_values, label='Normalized Kroupa IMF', color=colors[7], width=np.diff(masses, prepend=masses[0]), alpha=1)
-plt.fill_between([m for m in masses if m1a <= m <= m2a], 0,np.max(pdf_values),alpha=1, label=r'(25-60)M$_{\odot}$)', color=colors[4])
-plt.fill_between([m for m in masses if m1b <= m <= m2b], 0,np.max(pdf_values),alpha=0.3, color=colors[2], label=r'(20-150)M$_{\odot}$)')
-plt.text(16, 0.03, fr'$\Delta$(25-60)M$_\odot$ = $\sim${fractiona*100:.0f}%')
-plt.text(16, 0.018, fr'$\Delta$(20-150)M$_\odot$ = $\sim${fractionb*100:.0f}%')
-plt.xscale('log')
-plt.yscale('log')
-plt.xlabel(r'Mass [$M_\odot$]')
-plt.ylabel(r'Probability Density [1/$M_\odot$]')
-plt.legend(handlelength=0.5,
-            handletextpad=0.1,
-            frameon=False,
-            labelspacing=0.08,
-            loc='upper right',
-            bbox_to_anchor=(1.04, 1.03),
-            fontsize=11)
-# plt.title('Kroupa IMF')
-plt.xlim(m_min, m_max)
-plt.ylim(np.min(pdf_values), np.max(pdf_values))
-plt.tight_layout()
-plt.savefig('Plots/kroupa_imf_test.pdf', bbox_inches='tight')
-plt.close()
+    pdf_values = np.array([kroupa_pdf(m) for m in masses])
 
-# Generate grid for masses and compute PDF
-masses = np.logspace(np.log10(m_min), np.log10(m_max), 10000)
-pdf_values = np.array([kroupa_pdf(m) for m in masses])
+    plt.figure(figsize=(3.5,3.5))
+    plt.bar(masses, pdf_values, label='Normalized Kroupa IMF', color=colors[7], width=np.diff(masses, prepend=masses[0]), alpha=1)
+    plt.fill_between([m for m in masses if m1a <= m <= m2a], 0,np.max(pdf_values),alpha=1, label=r'(25-60)M$_{\odot}$)', color=colors[4])
+    plt.fill_between([m for m in masses if m1b <= m <= m2b], 0,np.max(pdf_values),alpha=0.3, color=colors[2], label=r'(20-150)M$_{\odot}$)')
+    plt.text(16, 0.03, fr'$\Delta$(25-60)M$_\odot$ = $\sim${fractiona*100:.0f}%')
+    plt.text(16, 0.018, fr'$\Delta$(20-150)M$_\odot$ = $\sim${fractionb*100:.0f}%')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlabel(r'Mass [$M_\odot$]')
+    plt.ylabel(r'Probability Density [1/$M_\odot$]')
+    plt.legend(handlelength=0.5,
+                handletextpad=0.1,
+                frameon=False,
+                labelspacing=0.08,
+                loc='upper right',
+                bbox_to_anchor=(1.04, 1.03),
+                fontsize=11)
+    # plt.title('Kroupa IMF')
+    plt.xlim(m_min, m_max)
+    plt.ylim(np.min(pdf_values), np.max(pdf_values))
+    plt.tight_layout()
+    plt.savefig(output_directory / 'kroupa_imf_test.pdf', bbox_inches='tight')
+    plt.close()
 
-cdf = np.cumsum(pdf_values * np.gradient(masses))
-cdf = cdf - cdf[0]   # force start at 0 exactly
-cdf /= cdf[-1] 
-# Create inverse CDF interpolator
-inverse_cdf = interp1d(cdf, masses, kind='linear') 
+    # Generate grid for masses and compute PDF
+    masses = np.logspace(np.log10(m_min), np.log10(m_max), 10000)
+    pdf_values = np.array([kroupa_pdf(m) for m in masses])
 
-N_samples = 100000
-u = np.random.rand(N_samples)
-sampled_masses = inverse_cdf(u)
+    cdf = np.cumsum(pdf_values * np.gradient(masses))
+    cdf = cdf - cdf[0]   # force start at 0 exactly
+    cdf /= cdf[-1]
+    # Create inverse CDF interpolator
+    inverse_cdf = interp1d(cdf, masses, kind='linear')
 
-# Plot histogram of sampled masses
-plt.figure(figsize=(3.5,3.5))
-plt.bar(masses, pdf_values, label='Normalized Kroupa IMF', color=colors[7],  width=np.diff(masses, prepend=masses[0]), alpha=1)
-plt.hist(sampled_masses, bins=np.logspace(np.log10(m_min), np.log10(m_max), 50),
-         density=True, fill=False, linewidth=0.5,  label='Sampled Distribution', edgecolor='purple', alpha=1)
-# plt.fill_between([m for m in masses if m1a <= m <= m2a], 0,np.max(pdf_values),alpha=0.3, label='25-60 M☉', hatch='xx', color=colors[4])
-# plt.fill_between([m for m in masses if m1b <= m <= m2b], 0,np.max(pdf_values),alpha=0.3, color=colors[7], label='20-150 M☉')
-plt.text(14, 0.05, fr'N($\Delta$({m1a}-{m2a})M$_\odot$): {np.sum((sampled_masses >= m1a) & (sampled_masses <= m2a))}')
-plt.text(14, 0.03, fr'N($\Delta$({m1b}-{m2b})M$_\odot$): {np.sum((sampled_masses >= m1b) & (sampled_masses <= m2b))}')
-plt.xscale('log')
-plt.yscale('log')
-plt.xlabel(r'Mass [M$_\odot$]')
-plt.ylabel(r'Probability Density [1/M$_\odot$]')
-plt.legend(handlelength=0.5,
-            handletextpad=0.1,
-            frameon=False,
-            labelspacing=0.08,
-            loc='upper right',
-            bbox_to_anchor=(1.04, 1.03),
-            fontsize=11,
-            draggable=True)
-plt.xlim(m_min, m_max)
-plt.ylim(np.min(pdf_values), np.max(pdf_values))
-# plt.title(f'Sampled from Kroupa IMF (N:{N_samples})')
-plt.tight_layout()
-plt.savefig('Plots/kroupa_imf_sampled.pdf', bbox_inches='tight')
-plt.close()
-# Print the first 10 sampled masses
-print("First 10 sampled masses:", sampled_masses[:10])
-# Print the number of stars in the sampled range
-print(f"Number of stars in the range {m1a}-{m2a} M☉: {np.sum((sampled_masses >= m1a) & (sampled_masses <= m2a))}")
-# Print the number of stars in the sampled range
-print(f"Number of stars in the range {m1b}-{m2b} M☉: {np.sum((sampled_masses >= m1b) & (sampled_masses <= m2b))}")
-# Print the total number of sampled stars
-print(f"Total number of sampled stars: {len(sampled_masses)}")
-# Print the total number of stars in the sampled range
-print(r'For interval $[25,60]$ M☉: f$_{BH}$ ', fractiona/fractionc)
-print(r'For interval $[20,150]$ M☉: f$_{BH}$ ', fractionb/fractionc)
+    N_samples = 100000
+    u = np.random.rand(N_samples)
+    sampled_masses = inverse_cdf(u)
+
+    # Plot histogram of sampled masses
+    plt.figure(figsize=(3.5,3.5))
+    plt.bar(masses, pdf_values, label='Normalized Kroupa IMF', color=colors[7],  width=np.diff(masses, prepend=masses[0]), alpha=1)
+    plt.hist(sampled_masses, bins=np.logspace(np.log10(m_min), np.log10(m_max), 50),
+             density=True, fill=False, linewidth=0.5,  label='Sampled Distribution', edgecolor='purple', alpha=1)
+    # plt.fill_between([m for m in masses if m1a <= m <= m2a], 0,np.max(pdf_values),alpha=0.3, label='25-60 M☉', hatch='xx', color=colors[4])
+    # plt.fill_between([m for m in masses if m1b <= m <= m2b], 0,np.max(pdf_values),alpha=0.3, color=colors[7], label='20-150 M☉')
+    plt.text(14, 0.05, fr'N($\Delta$({m1a}-{m2a})M$_\odot$): {np.sum((sampled_masses >= m1a) & (sampled_masses <= m2a))}')
+    plt.text(14, 0.03, fr'N($\Delta$({m1b}-{m2b})M$_\odot$): {np.sum((sampled_masses >= m1b) & (sampled_masses <= m2b))}')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlabel(r'Mass [M$_\odot$]')
+    plt.ylabel(r'Probability Density [1/M$_\odot$]')
+    plt.legend(handlelength=0.5,
+                handletextpad=0.1,
+                frameon=False,
+                labelspacing=0.08,
+                loc='upper right',
+                bbox_to_anchor=(1.04, 1.03),
+                fontsize=11,
+                draggable=True)
+    plt.xlim(m_min, m_max)
+    plt.ylim(np.min(pdf_values), np.max(pdf_values))
+    # plt.title(f'Sampled from Kroupa IMF (N:{N_samples})')
+    plt.tight_layout()
+    plt.savefig(output_directory / 'kroupa_imf_sampled.pdf', bbox_inches='tight')
+    plt.close()
+    # Print the first 10 sampled masses
+    print("First 10 sampled masses:", sampled_masses[:10])
+    # Print the number of stars in the sampled range
+    print(f"Number of stars in the range {m1a}-{m2a} M☉: {np.sum((sampled_masses >= m1a) & (sampled_masses <= m2a))}")
+    # Print the number of stars in the sampled range
+    print(f"Number of stars in the range {m1b}-{m2b} M☉: {np.sum((sampled_masses >= m1b) & (sampled_masses <= m2b))}")
+    # Print the total number of sampled stars
+    print(f"Total number of sampled stars: {len(sampled_masses)}")
+    # Print the total number of stars in the sampled range
+    print(r'For interval $[25,60]$ M☉: f$_{BH}$ ', fractiona/fractionc)
+    print(r'For interval $[20,150]$ M☉: f$_{BH}$ ', fractionb/fractionc)
+
+
+if __name__ == '__main__':
+    main()
 

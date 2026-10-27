@@ -62,7 +62,7 @@ def mylog(x,y):
 if occrate:
     def percentage(size, vals):
         return vals * (1/size)
-    rate = " Occurence Rate"
+    rate = " Occurrence Rate"
 else:
     def percentage(size, vals):
         return vals * (100/size)
@@ -337,13 +337,13 @@ for IMF in IMFs:
     f, ax = plt.subplots(figsize=fgsize)
     xlabl = ["{:.1f}".format(10**x) for x in vals.columns]
     ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=lsize)
     ax.invert_yaxis()
     ax.tick_params(axis='both', which='major', labelsize=lsize, left=True, labelleft=True)
-    ax.set_xlabel("Semimajor Axis inital [AU]",   fontsize=fsize, labelpad=25)
-    ax.set_ylabel("$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
+    ax.set_xlabel("Semimajor Axis initial [AU]",   fontsize=fsize, labelpad=25)
+    ax.set_ylabel(r"$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
     ax.set_title("Black Hole ($M_p$)  - Star ($M_s$) Binary Systems (SP)"+ rate,   fontsize=fsize, pad=30)
     f.savefig("/data/a.saricaoglu/Plots/" + str(c.strftime("%m.%d")) + "/" + mode  + "_semax_" +  IMF + "_SP_Mp_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -358,7 +358,7 @@ for IMF in IMFs:
     f, ax = plt.subplots(figsize=fgsize)
     xlabl = ["{:.1f}".format(10**x) for x in vals.columns]
     ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=lsize)
     ax.invert_yaxis()
@@ -367,8 +367,8 @@ for IMF in IMFs:
     ax.set_yticks(hmapplot.get_yticks())
     ax.set_yticklabels(hmapplot.get_yticklabels())
     ax.tick_params(axis='both', which='major', labelsize=lsize, left=True, labelleft=True)
-    ax.set_xlabel("Semimajor Axis inital [AU]",   fontsize=fsize, labelpad=25)
-    ax.set_ylabel("$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
+    ax.set_xlabel("Semimajor Axis initial [AU]",   fontsize=fsize, labelpad=25)
+    ax.set_ylabel(r"$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
     ax.set_title("Black Hole ($M_p$) - Star ($M_s$) Binary Systems (DCs in SP)"+ rate,   fontsize=fsize, pad=30)
     f.savefig("/data/a.saricaoglu/Plots/" + str(c.strftime("%m.%d")) + "/" + mode  + "_semax_" +  IMF + "_SP_Mp_DC_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -423,13 +423,13 @@ for IMF in IMFs:
     f, ax = plt.subplots(figsize=fgsize)
     xlabl = ["{:.1f}".format(10**x) for x in vals.columns]
     ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=lsize)
     ax.invert_yaxis()
     ax.tick_params(axis='both', which='major', labelsize=lsize, left=True, labelleft=True)
     ax.set_xlabel("Semimajor Axis [AU]",   fontsize=fsize, labelpad=25)
-    ax.set_ylabel("$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
+    ax.set_ylabel(r"$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
     ax.set_title("Black Hole ($M_p$)  - Star ($M_s$) Binary Systems (DCs without CE)"+ rate,   fontsize=fsize, pad=30)
     f.savefig("/data/a.saricaoglu/Plots/" + str(c.strftime("%m.%d")) + "/" + mode  + "_semax_" +  IMF + "_DC_Mp_nonCE" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -444,13 +444,13 @@ for IMF in IMFs:
     f, ax = plt.subplots(figsize=fgsize)
     xlabl = ["{:.1f}".format(10**x) for x in vals.columns]
     ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=lsize)
     ax.invert_yaxis()
     ax.tick_params(axis='both', which='major', labelsize=lsize, left=True, labelleft=True)
     ax.set_xlabel("Semimajor Axis [AU]",   fontsize=fsize, labelpad=25)
-    ax.set_ylabel("$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
+    ax.set_ylabel(r"$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
     ax.set_title("Black Hole ($M_p$)  - Star ($M_s$) Binary Systems (DCs with CE)"+ rate,   fontsize=fsize, pad=30)
     f.savefig("/data/a.saricaoglu/Plots/" + str(c.strftime("%m.%d")) + "/" + mode  + "_semax_" +  IMF + "_DC_Mp_CE_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -467,13 +467,13 @@ for IMF in IMFs:
     f, ax = plt.subplots(figsize=fgsize)
     xlabl = ["{:.1f}".format(10**x) for x in vals.columns]
     ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=lsize)
     ax.invert_yaxis()
     ax.tick_params(axis='both', which='major', labelsize=lsize, left=True, labelleft=True)
-    ax.set_xlabel("Orbital Period inital [days]",   fontsize=fsize, labelpad=25)
-    ax.set_ylabel("$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
+    ax.set_xlabel("Orbital Period initial [days]",   fontsize=fsize, labelpad=25)
+    ax.set_ylabel(r"$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
     ax.set_title("Black Hole ($M_p$)  - Star ($M_s$) Binary Systems (SP)"+ rate,   fontsize=fsize, pad=30)
     f.savefig("/data/a.saricaoglu/Plots/" + str(c.strftime("%m.%d")) + "/" + mode  + "_orbperiod_" +  IMF + "_SP_Mp_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -488,13 +488,13 @@ for IMF in IMFs:
     f, ax = plt.subplots(figsize=fgsize)
     xlabl = ["{:.1f}".format(10**x) for x in vals.columns]
     ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=lsize)
     ax.invert_yaxis()
     ax.tick_params(axis='both', which='major', labelsize=lsize, left=True, labelleft=True)
-    ax.set_xlabel("Orbital Period inital [days]",   fontsize=fsize, labelpad=25)
-    ax.set_ylabel("$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
+    ax.set_xlabel("Orbital Period initial [days]",   fontsize=fsize, labelpad=25)
+    ax.set_ylabel(r"$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
     ax.set_title("Black Hole ($M_p$) - Star ($M_s$) Binary Systems (DCs in SP)"+ rate,   fontsize=fsize, pad=30)
     f.savefig("/data/a.saricaoglu/Plots/" + str(c.strftime("%m.%d")) + "/" + mode  + "_orbperiod_" +  IMF + "_SP_Mp_DC_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -549,13 +549,13 @@ for IMF in IMFs:
     f, ax = plt.subplots(figsize=fgsize)
     xlabl = ["{:.1f}".format(10**x) for x in vals.columns]
     ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=lsize)
     ax.invert_yaxis()
     ax.tick_params(axis='both', which='major', labelsize=lsize, left=True, labelleft=True)
     ax.set_xlabel("Orbital Period [days]",   fontsize=fsize, labelpad=25)
-    ax.set_ylabel("$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
+    ax.set_ylabel(r"$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
     ax.set_title("Black Hole ($M_p$)  - Star ($M_s$) Binary Systems (DCs with CE)" + rate,   fontsize=fsize, pad=30)
     f.savefig("/data/a.saricaoglu/Plots/" + str(c.strftime("%m.%d")) + "/" + mode  + "_orbperiod_" +  IMF + "_DC_Mp_CE" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -570,13 +570,13 @@ for IMF in IMFs:
     f, ax = plt.subplots(figsize=fgsize)
     xlabl = ["{:.1f}".format(10**x) for x in vals.columns]
     ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax, xticklabels=xlabl, yticklabels=ylabl, annot_kws={"size":sz})
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=lsize)
     ax.invert_yaxis()
     ax.tick_params(axis='both', which='major', labelsize=lsize, left=True, labelleft=True)
     ax.set_xlabel("Orbital Period [days]",   fontsize=fsize, labelpad=25)
-    ax.set_ylabel("$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
+    ax.set_ylabel(r"$M_p$  [$M_{\odot}$]",   fontsize=fsize, labelpad=25)
     ax.set_title("Black Hole ($M_p$)  - Star ($M_s$) Binary Systems (DCs without CE)"+ rate,   fontsize=fsize, pad=30)
     f.savefig("/data/a.saricaoglu/Plots/" + str(c.strftime("%m.%d")) + "/" + mode  + "_orbperiod_" +  IMF + "_DC_Mp_nonCE_" + current_time + ".png",   bbox_inches='tight')
     plt.close()

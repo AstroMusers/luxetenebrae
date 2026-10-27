@@ -10,4 +10,5 @@ dependencies:
   - pytest
   - pip
   - pip:
+      - tdpy @ git+https://github.com/tansudaylan/tdpy.git@35df1703c6b63d6a62f7d44b12cf5928b5d355ed
       - git+https://github.com/TeamCOMPAS/COMPAS.git

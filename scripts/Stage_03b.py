@@ -319,7 +319,7 @@ for mod in mode:
 
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True, fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True, fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
@@ -328,8 +328,8 @@ for mod in mode:
     print(ax.get_xticks())
     print(ax.get_yticks()) 
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)", fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)", fontsize=45, labelpad=25)
+    ax.set_xlabel("Semimajor Axis [AU]", fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]", fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Star($M_s$) Binary Syst at ZAMS (SP) N:{len(SP['MASSZAMSSP1'])}", fontsize=30, pad=30)
     f.savefig(directoryp + "SP_atZAMS_inMT" + current_time + ".png", bbox_inches='tight')
     plt.close()
@@ -353,7 +353,7 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)    
 
@@ -361,8 +361,8 @@ for mod in mode:
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Semimajor Axis [AU]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Star($M_s$) Binaries at ZAMS undergoing MT (MTs in SP) N:{np.sum(SP_mask['MASKMTinSP'])})",  fontsize=30, pad=30)
     f.savefig(directoryp + "SP_atZAMS_inMT_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -376,7 +376,7 @@ for mod in mode:
     # f, ax = plt.subplots(figsize=(18, 16))
     # xlabl = ["{:.2f}".format(10**x) for x in vals.columns]
     # ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", linewidths=.1, ax=ax)
+    # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", ax=ax)
     # cbar = hmapplot.collections[0].colorbar
     # cbar.ax.tick_params(labelsize=40)
     # ax.invert_yaxis()
@@ -396,7 +396,7 @@ for mod in mode:
     # f, ax = plt.subplots(figsize=(18, 16))
     # xlabl = ["{:.2f}".format(10**x) for x in vals.columns]
     # ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", linewidths=.1, ax=ax)
+    # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", ax=ax)
     # cbar = hmapplot.collections[0].colorbar
     # cbar.ax.tick_params(labelsize=40)
     # ax.invert_yaxis()
@@ -417,7 +417,7 @@ for mod in mode:
     # f, ax = plt.subplots(figsize=(18, 16))
     # xlabl = ["{:.2f}".format(10**x) for x in vals.columns]
     # ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    # hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    # hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     # cbar = hmapplot.collections[0].colorbar
     # cbar.ax.tick_params(labelsize=40)
     # ax.invert_yaxis()
@@ -446,15 +446,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Semimajor Axis [AU]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Star($M_s$) Binaries before first MT N:{np.sum(first)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_preFirstMT_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -475,15 +475,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Semimajor Axis [AU]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Star($M_s$) Binaries after last MT N:{np.sum(last)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_postLastMT_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -505,15 +505,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Semimajor Axis [AU]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries before first MT N:{np.sum(mainsequence_pre)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_preFirstMT_" + current_time + ".png",   bbox_inches='tight')    
     plt.close()
@@ -534,15 +534,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Semimajor Axis [AU]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_postLastMT_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -563,15 +563,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Orbital period [day]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_postLastMT_OP_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -592,15 +592,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Semimajor Axis [AU]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries before first MT N:{np.sum(mainsequence_pre_Tlim)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_preFirstMT_Tlim_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -621,15 +621,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Semimajor Axis [AU]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_Tlim)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_" + current_time + ".png",bbox_inches='tight')
     plt.close()
@@ -650,15 +650,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Orbital period [day]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_Tlim)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_OP_" + current_time + ".png",bbox_inches='tight')
     plt.close()
@@ -681,15 +681,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Semimajor Axis [AU]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_postLastMT_alim_masuda_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -712,15 +712,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Semimajor Axis (au)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Semimajor Axis [AU]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_Tlim_masuda)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_masuda_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -743,15 +743,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Orbital period [day]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_postLastMT_alim_masuda_OP" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -772,15 +772,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Orbital period [day]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_masuda_OP" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -841,15 +841,15 @@ for mod in mode:
 
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Orbital period [day]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_masuda_diff_" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -870,15 +870,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Orbital period [day]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_masuda_OP_searchability" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -898,15 +898,15 @@ for mod in mode:
     print('vals:', vals)
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
     ax.set_xticks([x+0.5 for x in ax.get_xticks()],labels=[i for i in ax.get_xticklabels()])
     ax.set_yticks([y+0.5 for y in ax.get_yticks()],labels=[i for i in ax.get_yticklabels()])
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Orbital period [day]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "MT_MainSequence_postLastMT_Tlim_masuda_OP_noSearchability" + current_time + ".png",   bbox_inches='tight')
     plt.close()
@@ -925,7 +925,7 @@ for mod in mode:
     # f, ax = plt.subplots(figsize=(18, 16))
     # xlabl = ["{:.2f}".format(10**x) for x in vals.columns]
     # ylabl = ["{:.1f}".format(10**y) for y in vals.index]
-    # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", linewidths=.1, ax=ax)
+    # hmapplot = sns.heatmap(vals, annot=True,fmt=".0f", ax=ax)
     # cbar = hmapplot.collections[0].colorbar
     # cbar.ax.tick_params(labelsize=40)
     # ax.invert_yaxis()
@@ -941,7 +941,7 @@ for mod in mode:
 
     f, ax = plt.subplots(figsize=(18, 16))
 
-    hmapplot = sns.heatmap(vals_masuda, annot=True,fmt=".1e", linewidths=.1, ax=ax)
+    hmapplot = sns.heatmap(vals_masuda, annot=True,fmt=".1e", ax=ax)
     cbar = hmapplot.collections[0].colorbar
     cbar.ax.tick_params(labelsize=40)
     ax.invert_yaxis()
@@ -950,8 +950,8 @@ for mod in mode:
     ax.tick_params(axis='both', which='major',labelsize=30, rotation=45)
     # ax.set_xticks(np.log10(xbins), xlabl)
     # ax.set_yticks(np.log10(ybins), ylabl)
-    ax.set_xlabel("Orbital period (days)",  fontsize=45, labelpad=25)
-    ax.set_ylabel("BH mass (solar mass)",  fontsize=45, labelpad=25)
+    ax.set_xlabel("Orbital period [day]",  fontsize=45, labelpad=25)
+    ax.set_ylabel("BH mass [solar mass]",  fontsize=45, labelpad=25)
 
     #ax.set_title(f"Black Hole(BH mass)-Main Sequence Star($M_s$) Binaries after last MT N:{np.sum(mainsequence_pst_alim_masuda)}",  fontsize=30, pad=30)
     f.savefig(directoryp + "masuda" + current_time + ".png",   bbox_inches='tight')

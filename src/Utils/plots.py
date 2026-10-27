@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.ticker import FuncFormatter
+from matplotlib.ticker import FormatStrFormatter, FuncFormatter
 
 def set_plot_style():
     """
@@ -31,6 +31,7 @@ def plot_time_evolution(array_x, array_y, y_labels,legend_labels, path_to_save, 
     rows = len(array_y)
     cols = len(array_x)
     fig, ax = plt.subplots(rows, cols, sharex=True, figsize=(3.5, cols*3.5))
+    ax = np.atleast_1d(ax).ravel()
     for i in range(rows*cols):
         for j in range(len(array_y[i])):
             x = array_x[j]
@@ -48,7 +49,7 @@ def plot_time_evolution(array_x, array_y, y_labels,legend_labels, path_to_save, 
 
     if x_labels is None:
         # If no x_labels provided, default to 'Time [Myr]'
-        plt.set_xlabel('Time [Myr]')
+        fig.supxlabel('Time [Myr]')
 
     if info:
         for i, text in enumerate(info):
@@ -64,12 +65,17 @@ def plot_time_evolution(array_x, array_y, y_labels,legend_labels, path_to_save, 
 # Example: plot histogram of properties (from Stage_03b_detailed_evolution.py)
 def plot_bhms_properties_histogram(rows, cols, array_x, array_y, y_labels,legend_labels, path_to_save, x_labels=None, x_scale=None, y_scale=None, idx=None, info=None):
     fig, ax = plt.subplots(rows, cols, figsize=(3.5*rows, 3.5*cols))
+    ax = np.atleast_1d(ax).ravel()
     for i in range(rows*cols):
         x = array_x[i]
         y = array_y[i]
         label = legend_labels[i]
         ax[i].hist(y, bins=20, color='coral')
         ax[i].set_title(label)
+        if x_labels is not None:
+            ax[i].set_xlabel(x_labels[i])
+        if y_labels is not None:
+            ax[i].set_ylabel(y_labels[i])
         ax[i].xaxis.set_major_formatter(FuncFormatter(two_sig_figs))
         ax[i].yaxis.set_major_formatter(FuncFormatter(two_sig_figs))
     plt.tight_layout()
@@ -77,9 +83,4 @@ def plot_bhms_properties_histogram(rows, cols, array_x, array_y, y_labels,legend
     plt.close(fig)
 
 # Add more plotting functions as needed, following this pattern.
-def format_to_1sf(x, pos=None):
-    """Format a number to 1 significant figure for axis labels."""
-    if x == 0:
-        return "0"
-    else:
-        return f"{x:.1g}"
+format_to_1sf = FormatStrFormatter("%.1g")

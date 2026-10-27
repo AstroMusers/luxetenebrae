@@ -6,6 +6,7 @@ import os
 import time as t
 import os.path
 import numpy as np
+from datetime import datetime
 
 # Choose initial mass function (IMF) : ['KROUPA', 'SALPETER', 'UNIFORM, 'POWERLAW']
 IMF = 'KROUPA'
@@ -24,10 +25,11 @@ for i in range(0,N):
 
 endtime = t.ctime(t.time())
 duration = t.process_time() - start
+date_finished = datetime.now()
 
-if not os.path.exists("/data/a.saricaoglu/Runs/logfiles/" + IMF + "/" +  str(c.strftime("%m.%d"))): 
-    os.makedirs("/data/a.saricaoglu/Runs/logfiles/" + IMF + "/" +  str(c.strftime("%m.%d"))) 
+if not os.path.exists("/data/a.saricaoglu/Runs/logfiles/" + IMF + "/" + date_finished.strftime("%m.%d")):
+    os.makedirs("/data/a.saricaoglu/Runs/logfiles/" + IMF + "/" + date_finished.strftime("%m.%d"))
   
 # Save execution logs to file
 f = ["Run :" + str(i) + ";  Started : " + str(starttime), ";  Ended: " + str(endtime) + ";  Duration : " + str(duration)]
-np.savetxt("/data/a.saricaoglu/Runs/logfiles/" + IMF + "_" + str(c.strftime("%m.%d")) + ".txt", f)
+np.savetxt("/data/a.saricaoglu/Runs/logfiles/" + IMF + "_" + date_finished.strftime("%m.%d") + ".txt", f)
